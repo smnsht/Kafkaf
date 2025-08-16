@@ -1,10 +1,15 @@
 using Kafkaf.Components;
+using Kafkaf.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.Configure<List<ClusterConfigOptions>>(
+    builder.Configuration.GetSection("Kafkaf:Clusters")
+);
 
 var app = builder.Build();
 

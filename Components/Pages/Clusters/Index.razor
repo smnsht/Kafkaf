@@ -1,10 +1,59 @@
 ﻿@page "/clusters"
+@using Kafkaf.Config
+@using Microsoft.Extensions.Options
 @rendermode InteractiveServer
+@inject IOptions<List<ClusterConfigOptions>> Clusters; 
 
 <PageTitle>Clusters: List</PageTitle>
 
-<h3>Clusters: List</h3>
+<div class="card">
+    <div class="card-header">
+        <h3>Clusters: List</h3>
+    </div>
+    <div class="card-body">
+        <EditForm Model="@this">
+            <table class="table">
+                <thead>
+                    <th>Address</th>
+                    <th>Alias</th>
+                    <th>User Name</th>
+                    <th>Password</th>                    
+                </thead>
+                <tbody>
+                    <InputRadioGroup @bind-Value="SelectedAddress" Name="clusterAddress">
+                    @foreach(var cluster in Clusters.Value)
+                    {
+                        <tr>
+                            <td>
+                                <label class="form-check-label">
+                                    <InputRadio Value="@(cluster.Address)" class="form-check-input" />
+                                    @cluster.Address
+                                </label>
+                            </td>
+                            <td>@cluster.Alias</td>
+                            <td>@cluster.UserName</td>
+                            <td>@cluster.Password</td>                            
+                        </tr>                    
+                    }
+                    </InputRadioGroup>                    
+                </tbody>
+            </table>
+        </EditForm>
+        
+    </div>
+    <div class="card-footer">        
+        SelectedAddress: @SelectedAddress
+    </div>
+</div>
+
+
+
 
 @code {
+    private string? SelectedAddress { get; set; }
 
+    private ClusterConfigOptions? selectedCluster;
+    private string? address;
+
+    private void SetSelectedCluster(ClusterConfigOptions cluster) => selectedCluster = cluster;
 }
