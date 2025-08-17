@@ -1,10 +1,51 @@
 ﻿@page "/consumer-groups"
+@using Confluent.Kafka
 @rendermode InteractiveServer
 
 <PageTitle>Consumer Groups: List</PageTitle>
 
 <h3>Consumer Groups: List</h3>
 
-@code {
+<table class="table">
+    <thead>
+        <tr>
+            <th>Group Name</th>
+            <th>State</th>
+            <th>Protocol</th>
+            <th>ProtocolType</th>
+            <th>Broker</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var group in groups)
+        {
+            <tr>
+                <td>@group.Group</td>
+                <td>@group.State</td>
+                <td>@group.Protocol</td>
+                <td>@group.ProtocolType</td>
+                <td>@group.Broker</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
+@code {
+    private List<GroupInfo> groups = new List<GroupInfo>();
+
+    protected override Task OnInitializedAsync()
+    {
+        var config = new AdminClientConfig
+        {
+            BootstrapServers = "localhost:9092"
+            // Add security settings if needed
+        };
+
+        using var adminClient = new AdminClientBuilder(config).Build();
+
+        // List all consumer groups
+        groups = adminClient.ListGroups(TimeSpan.FromSeconds(10));
+                
+        return base.OnInitializedAsync();
+    }
 }
