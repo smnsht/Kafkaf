@@ -1,0 +1,188 @@
+﻿@using Confluent.Kafka
+@using Confluent.Kafka.Admin
+
+@page "/topics/create"
+@rendermode InteractiveServer
+
+<PageTitle>Topics: Create New</PageTitle>
+
+
+<h3>Create Topic</h3>
+
+<EditForm Model="@this" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Topic Name</label>
+        <InputText @bind-Value="@Name"></InputText>
+    </div>
+    <div>
+        <label>NumPartitions</label>
+        <InputNumber @bind-Value="NumPartitions"></InputNumber>
+    </div>
+    <div>
+        <label>ReplicationFactor</label>
+        <InputNumber @bind-Value="ReplicationFactor"></InputNumber>
+    </div>
+
+    <h4>Topic Configs</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pair in Configs)
+            {
+                <tr>
+                    <td>@pair.Key</td>
+                    <td>@pair.Value</td>
+                    <td>
+                        <button @onclick="() => HandleDeleteConfig(pair.Key)">Delete</button>
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td><InputText @bind-Value="newKey"></InputText></td>
+                <td><InputText @bind-Value="newValue"></InputText></td>
+                <td><button @onclick="@HandleAppendToConfigs">Append</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Replicas Assignments (TODO)</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>list ids</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pair in ReplicasAssignments)
+            {
+                <tr>
+                    <td>@pair.Key</td>
+                    <td>@pair.Value</td>
+                    <td>action</td>
+                </tr>
+            }
+            <tr>                                
+                <td><InputNumber @bind-Value="newReplicaKey"></InputNumber></td>
+                <td><InputText @bind-Value="newReplicaValue"></InputText></td>
+                <td>append</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>
+        <button type="submit">Save topic</button>
+    </p>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(successNotice))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!</strong> @successNotice
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <p>
+        <NavLink href="/topics">
+            Return to topics
+        </NavLink>
+    </p>
+}
+
+@if(!string.IsNullOrEmpty(errorNotice))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> @errorNotice
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+}
+
+@code {
+    private string Name { get; set; } = String.Empty;
+    private int NumPartitions { get; set; } = -1;
+    private short ReplicationFactor { get; set; } = -1;
+    private Dictionary<string, string> Configs = new Dictionary<string, string>();
+    private Dictionary<int, List<int>> ReplicasAssignments = new Dictionary<int, List<int>>();
+
+    private string newKey = string.Empty;
+    private string newValue = string.Empty;
+
+    private int newReplicaKey = -1;
+    private string newReplicaValue = string.Empty;
+
+    private string? successNotice;
+    private string? errorNotice;
+
+    private void HandleValidSubmit()
+    {
+        // clear notices
+        errorNotice = null;
+        successNotice = null;
+
+        // Process the submitted data
+        var newTopic = new TopicSpecification
+        {
+            Name = Name,
+            NumPartitions = NumPartitions,
+            ReplicationFactor = ReplicationFactor,
+            Configs = Configs,
+            ReplicasAssignments = ReplicasAssignments
+        };
+
+        var config = new AdminClientConfig { BootstrapServers = "localhost:9092" };
+        using var adminClient = new AdminClientBuilder(config).Build();
+
+        try
+        {
+
+            adminClient.CreateTopicsAsync(new List<TopicSpecification>
+                {
+                    newTopic
+                }).Wait();
+
+            successNotice = $"Topic '{newTopic.Name}' created successfully.";
+
+            Name = string.Empty;
+            NumPartitions = -1;
+            ReplicationFactor = -1;
+            Configs.Clear();
+            ReplicasAssignments.Clear();            
+        }
+        catch (CreateTopicsException e)
+        {            
+            errorNotice = $"An error occurred creating topic '{newTopic.Name}': {e.Results[0].Error.Reason}";
+        }
+        catch (Exception ex)
+        {            
+            errorNotice = $"An unexpected error occurred: {ex.Message}";
+        }
+    }    
+
+    private void HandleAppendToConfigs()
+    {
+        Configs.Add(newKey, newValue);
+        newKey = string.Empty;
+        newValue = string.Empty;
+    }
+
+
+    private void HandleDeleteConfig(string key)
+    {
+        if (Configs.Remove(key))
+        {
+            // If needed, trigger UI refresh
+            StateHasChanged();
+        }
+    }    
+}

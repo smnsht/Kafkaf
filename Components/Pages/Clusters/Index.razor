@@ -1,8 +1,10 @@
-﻿@page "/clusters"
-@using Kafkaf.Config
+﻿@using Kafkaf.Config
 @using Microsoft.Extensions.Options
+
+@page "/clusters"
 @rendermode InteractiveServer
-@inject IOptions<List<ClusterConfigOptions>> Clusters; 
+@inject IOptions<List<ClusterConfigOptions>> Clusters
+@inject NavigationManager NavManager
 
 <PageTitle>Clusters: List</PageTitle>
 
@@ -26,7 +28,7 @@
                         <tr>
                             <td>
                                 <label class="form-check-label">
-                                    <InputRadio Value="@(cluster.Address)" class="form-check-input" />
+                                    <InputRadio Value="@(cluster.Alias)" class="form-check-input" />                                    
                                     @cluster.Address
                                 </label>
                             </td>
@@ -41,8 +43,8 @@
         </EditForm>
         
     </div>
-    <div class="card-footer">        
-        SelectedAddress: @SelectedAddress
+    <div class="card-footer">                
+        SelectedAddress: <a @onclick="NavigateToAddress" href="#">@SelectedAddress</a>                                    
     </div>
 </div>
 
@@ -50,10 +52,23 @@
 
 
 @code {
-    private string? SelectedAddress { get; set; }
+    private string? _selectedAddress;
+    private string? SelectedAddress 
+    { 
+        get => _selectedAddress;
+        set
+        {
+            _selectedAddress = value;            
+        }
+    }
 
-    private ClusterConfigOptions? selectedCluster;
-    private string? address;
+    private void NavigateToAddress()
+    {
+        NavManager.NavigateTo($"/clusters/{_selectedAddress}/details");
+    }
 
-    private void SetSelectedCluster(ClusterConfigOptions cluster) => selectedCluster = cluster;
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }    
 }

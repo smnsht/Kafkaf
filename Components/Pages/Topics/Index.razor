@@ -1,4 +1,6 @@
 ﻿@page "/topics"
+@using Confluent.Kafka
+@using Confluent.Kafka.Admin
 @rendermode InteractiveServer
 
 <PageTitle>Topics: List</PageTitle>
@@ -11,14 +13,152 @@
     <h5 class="card-title">Special title treatment</h5>
     <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
 
+    @foreach (var topic in Topics)
+    {
+        <details>
+            <summary>@topic.Topic</summary>
+
+            <h3>Topic Error:</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Reason</th>
+                            <th>IsFatal</th>
+                            <th>Code</th>
+                            <th>IsBrokerError</th>
+                            <th>IsError</th>
+                            <th>IsFatal</th>
+                            <th>IsLocalError</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@topic.Error.Reason</td>
+                        <td>@topic.Error.IsFatal</td>
+                            <td>@topic.Error.Code</td>
+                            <td>@topic.Error.IsBrokerError</td>
+                            <td>@topic.Error.IsError</td>
+                            <td>@topic.Error.IsFatal</td>
+                            <td>@topic.Error.IsLocalError</td>                            
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Topic Partitions</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                            <th>PartitionId</th>
+                            <th>Leader</th>
+                            <th>Error</th>
+                            <th>Replicas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var p in @topic.Partitions)
+                        {
+                            <tr>
+                                <td>@p.PartitionId</td>
+                                <td>@p.Leader</td>
+                                <td>@p.Error</td>
+                                <td>@p.Replicas</td>
+                            </tr>
+                        }
+                    </tbody>
+            </table>
+
+            <p>
+                <button class="btn btn-danger" @onclick="async () => await HandleDeleteTopicAsync(topic.Topic)">                        
+                    Delete Topic
+                </button>
+            </p>
+        </details>
+    }
+    
   </div>
-  <div class="card-footer">
-        <a href="#" class="btn btn-primary">Create Topic</a>
+  <div class="card-footer">      
+        <a href="/topics/create" class="btn btn-primary">Create Topic</a>
   </div>
 </div>
 
 
 
 @code {
+    public List<TopicMetadata> Topics = new List<TopicMetadata>();
 
+    protected override Task OnInitializedAsync()
+    {        
+        Topics = LoadTopicMetadata();
+
+        return base.OnInitializedAsync();
+    }  
+
+    private async Task HandleDeleteTopicAsync(string topicName)
+    {
+        var config = new AdminClientConfig
+        {
+            BootstrapServers = "localhost:9092"
+        };
+
+        using var adminClient = new AdminClientBuilder(config).Build();
+
+        try
+        {
+            // Create a list of topics to delete
+            var topicsToDelete = new List<string> { topicName };
+
+            // Delete the topic(s) asynchronously
+            await adminClient.DeleteTopicsAsync(topicsToDelete);
+
+            Console.WriteLine($"Topic '{topicName}' successfully deleted.");
+
+            //ReloadComponent();
+            Topics = LoadTopicMetadata();
+        }
+        catch (DeleteTopicsException ex)
+        {
+            Console.WriteLine($"Error deleting topic '{topicName}': {ex.Message}");
+            foreach (var error in ex.Results)
+            {
+                Console.WriteLine($"  Topic: {error.Topic}, Error: {error.Error.Reason}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An unexpected error occurred: {ex.Message}");
+        }        
+    }
+
+
+    // private void ReloadComponent()
+    // {
+    //     var uri = Nav.Uri;
+    //     Nav.NavigateTo(uri, forceLoad: false); triggers re-render
+    // }
+
+    private List<TopicMetadata> LoadTopicMetadata()
+    {
+        var config = new AdminClientConfig
+        {
+            BootstrapServers = "localhost:9092"
+        };
+
+        using var adminClient = new AdminClientBuilder(config).Build();
+
+
+        // Get cluster metadata including topics
+        var metadata = adminClient.GetMetadata(TimeSpan.FromSeconds(10));
+        var topicNames = metadata.Topics.Select(t => t.Topic);
+
+
+        // Describe topics for detailed info
+        //var descriptions = await
+        // var topics = TopicCollection.OfTopicNames(topicNames);
+        // adminClient.DescribeTopicsAsync(topics).ContinueWith(a =>
+        // {
+        //     var foo = a;
+        // });
+
+        return metadata.Topics;
+    }
 }
