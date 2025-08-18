@@ -1,10 +1,198 @@
-﻿@page "/tail"
+﻿@using Confluent.Kafka
+
+@page "/tail"
 @rendermode InteractiveServer
 
 <PageTitle>Live Tail</PageTitle>
 
 <h3>Live Tail</h3>
 
-@code {
+<EditForm Model="@this" FormName="FiltersForm">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Topics</th>
+                <th>Consumer Group</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <InputSelect @bind-Value="SelectedTopic">
+                        <option value="">-- Select topic --</option>
+                        @foreach(var topic in topics)
+                        {
+                            <option value="@topic">@topic</option>
+                        }
+                    </InputSelect>
+                </td>
+                <td>
+                    <InputSelect @bind-Value="SelectedConsumerGroup">
+                        <option value="">-- Select consumer group --</option>
+                        @foreach (var cg in consumerGroups)
+                        {
+                            <option value="@cg">@cg</option>
+                        }
+                    </InputSelect>
+                </td>
+                <th>
+                    <button @onclick="OnStartClick">Startt</button>
+                    <button>Stop</button>
+                    <button>Clear</button>
+                </th>
+            </tr>
+        </tbody>
+    </table>
+</EditForm>
 
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Offset</th>
+            <th>Partition</th>
+            <th>Timestamp</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var cr in consumeResults)
+        {
+            <tr>
+                <td>@cr.Offset</td>
+                <td>@cr.Partition</td>
+                <td>@cr.Message.Timestamp</td>
+                <td>@cr.Message.Value.Substring(20)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<string> topics = new List<string>();
+    private List<string> consumerGroups = new List<string>();
+
+    private CancellationTokenSource cts = new CancellationTokenSource();
+
+    private string? _selectedTopic;
+    private string? SelectedTopic
+    {
+        get => _selectedTopic;
+        set
+        {
+            _selectedTopic = value;
+        }
+    }
+
+    private string? _selectedConsumerGroup;
+    private string? SelectedConsumerGroup
+    {
+        get => _selectedConsumerGroup;
+        set
+        {
+            _selectedConsumerGroup = value;
+        }
+    }
+
+    private List<ConsumeResult<Ignore, string>> consumeResults = new List<ConsumeResult<Ignore, string>>();
+
+    protected override Task OnInitializedAsync()
+    {
+        var config = new AdminClientConfig
+        {
+            BootstrapServers = "localhost:9092"
+        };
+
+        using var adminClient = new AdminClientBuilder(config).Build();
+
+
+        // Get cluster metadata including topics
+        var metadata = adminClient.GetMetadata(TimeSpan.FromSeconds(10));
+        // List all consumer groups
+        var groups = adminClient.ListGroups(TimeSpan.FromSeconds(10));
+
+        topics = metadata.Topics.Select(t => t.Topic).ToList();
+        consumerGroups = groups.Select(g => g.Group).ToList();
+
+        return base.OnInitializedAsync();
+    }
+
+    private void OnStartClick()
+    {
+        if (!string.IsNullOrEmpty(_selectedTopic))
+        {
+            consumeResults.Clear();
+            consumeResults = ReadLastNMessages("localhost:9092", _selectedTopic, 10);                    
+        }
+    }
+
+    private void OnStopClick()
+    {
+
+    }    
+
+    private List<ConsumeResult<Ignore, string>> ReadLastNMessages(string bootstrapServers, string topicName, int numberOfMessages)
+    {
+        int partitionId = 0;
+
+        var consumerConfig = new ConsumerConfig
+        {
+            BootstrapServers = bootstrapServers,
+            GroupId = "read-last-n-group",
+            AutoOffsetReset = AutoOffsetReset.Earliest,
+            EnableAutoCommit = false
+        };
+
+        var consumer = new ConsumerBuilder<Ignore, string>(consumerConfig).Build();
+
+        var topicPartition = new TopicPartition(topicName, new Partition(partitionId));
+        consumer.Assign(topicPartition);
+
+        // Get the end offset (high watermark)
+        WatermarkOffsets watermarkOffsets = consumer.QueryWatermarkOffsets(topicPartition, TimeSpan.FromSeconds(5));
+        long endOffset = watermarkOffsets.High;
+
+        // Calculate the starting offset
+        long startOffset = Math.Max(0, endOffset - numberOfMessages);
+
+        Console.WriteLine($"Seeking to offset {startOffset} to read the last {numberOfMessages} messages from partition {partitionId}.");
+
+        // Seek to the starting offset
+        consumer.Seek(new TopicPartitionOffset(topicPartition, new Offset(startOffset)));
+
+        List<ConsumeResult<Ignore, string>> retval = new();
+
+        // Consume messages
+        try
+        {
+            int messagesConsumed = 0;
+            while (messagesConsumed < numberOfMessages)
+            {
+                var consumeResult = consumer.Consume(TimeSpan.FromSeconds(1));
+                if (consumeResult != null)
+                {
+                    //Console.WriteLine($"Consumed message with value: {consumeResult.Message.Value} at offset: {consumeResult.Offset}");                    
+                    messagesConsumed++;
+                    retval.Add(consumeResult);
+                }
+                else
+                {
+                    // No more messages in the topic or a timeout occurred.
+                    break;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+        finally
+        {
+            consumer.Close();
+        }
+
+        return retval;
+    }    
 }
