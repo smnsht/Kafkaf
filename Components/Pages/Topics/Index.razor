@@ -12,6 +12,7 @@
   <div class="card-body">
     <h5 class="card-title">Special title treatment</h5>
     <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+    
 
     @foreach (var topic in Topics)
     {
@@ -84,11 +85,11 @@
 
 
 @code {
-    public List<TopicMetadata> Topics = new List<TopicMetadata>();
+    public List<TopicMetadata> Topics = new List<TopicMetadata>();    
 
     protected override Task OnInitializedAsync()
     {        
-        Topics = LoadTopicMetadata();
+        Topics = LoadTopicMetadata();        
 
         return base.OnInitializedAsync();
     }  
