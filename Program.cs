@@ -1,3 +1,4 @@
+using Confluent.Kafka;
 using Kafkaf.Components;
 using Kafkaf.Config;
 
@@ -11,6 +12,16 @@ builder.Services.AddRazorComponents()
 builder.Services.Configure<List<ClusterConfigOptions>>(
     builder.Configuration.GetSection("Kafkaf:Clusters")
 );
+
+builder.Services.AddTransient<IAdminClient>(sp =>
+{
+    var config = new AdminClientConfig
+    {
+        BootstrapServers = "localhost:9092"
+    };
+
+    return new AdminClientBuilder(config).Build();
+});
 
 var app = builder.Build();
 

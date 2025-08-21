@@ -1,15 +1,42 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
 
-    <main>        
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+<!-- Top Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Kafkaf</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- Main Layout -->
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-12 col-md-2 bg-light p-3">
+            <h3>
+                <a href="#" class="btn">Dashboard</a>
+            </h3>
+
+            <ClustersAccordion />            
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-12 col-md-10 p-4">
+            <h1>Main Contentt</h1>
+            <p>This area holds your main content, with a responsive top bar above everything and a sidebar on the left for medium+ screens.</p>
+        </main>
+    </div>
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>
