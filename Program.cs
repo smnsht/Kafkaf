@@ -13,16 +13,6 @@ builder.Services.Configure<List<ClusterConfigOptions>>(
     builder.Configuration.GetSection("Kafkaf:Clusters")
 );
 
-builder.Services.AddTransient<IAdminClient>(sp =>
-{
-    var config = new AdminClientConfig
-    {
-        BootstrapServers = "localhost:9092"
-    };
-
-    return new AdminClientBuilder(config).Build();
-});
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

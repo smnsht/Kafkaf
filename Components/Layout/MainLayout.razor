@@ -24,17 +24,18 @@
     <div class="row">
         <!-- Sidebar -->
         <nav class="col-12 col-md-2 bg-light p-3">
-            <h3>
-                <a href="#" class="btn">Dashboard</a>
-            </h3>
+            <h4>                
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="" aria-hidden="true"></span> Dashboard
+                </NavLink>
+            </h4>
 
             <ClustersAccordion />            
         </nav>
 
         <!-- Main Content -->
-        <main class="col-12 col-md-10 p-4">
-            <h1>Main Contentt</h1>
-            <p>This area holds your main content, with a responsive top bar above everything and a sidebar on the left for medium+ screens.</p>
+        <main class="col-12 col-md-10 p-4">            
+            @Body
         </main>
     </div>
 </div>

@@ -1,4 +1,3 @@
-using Confluent.Kafka;
 namespace Kafkaf.Config;
 
 public class ClusterConfigOptions

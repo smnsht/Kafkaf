@@ -1,0 +1,11 @@
+﻿@page "/{clusterId:int}/brokers"
+@rendermode InteractiveServer
+
+<PageTitle>Brokers: Cluster #@clusterId</PageTitle>
+
+<h3>Brokers: Cluster d #@clusterId</h3>
+
+@code {
+	[Parameter]
+	public int clusterId { get; set; }
+}

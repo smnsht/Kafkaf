@@ -1,7 +1,134 @@
-﻿@page "/"
+﻿@using Confluent.Kafka
+@using Kafkaf.Config
+@using Microsoft.Extensions.Options
 
-<PageTitle>Home</PageTitle>
+@page "/"
+@rendermode InteractiveServer
 
-<h1>Hello, world!</h1>
+@inject IOptions<List<ClusterConfigOptions>> ClusterOptions;
 
-Welcome to your new app.
+<PageTitle>Kafkaf: Home</PageTitle>
+
+<h1>Kafkaf: Home</h1>
+
+<div class="card">
+    <div class="card-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-1 bg-light text-center p-2 rounded-2 border">
+                    <div class="badge bg-success d-block">Online</div>
+                    <div>@onlineClusters.Count clusters</div>
+                </div>
+                <div class="col-1 bg-light text-center text-center p-2 rounded-2 border ms-1">
+                    <div class="badge bg-body-secondary d-block">Offline</div>
+                    <div>@offlineClusters.Count clusters</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="card-body">        
+        <h5>Only online clusters</h5>
+
+        <!-- TODO: component-->
+        @if (loading)
+        {
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        }
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Cluster name</th>
+                    <th>Version</th>
+                    <th>Brokers count</th>
+                    <th>Partitions</th>
+                    <th>Topics</th>
+                    <th>Production</th>
+                    <th>Consumption</th>
+                </tr>
+            </thead>
+            <tbody>                
+                @foreach (var infoRow in onlineClusters)
+                {                    
+                    <tr>
+                        <td>@infoRow.ClusterName</td>
+                        <td>@infoRow.Version TODO</td>
+                        <td>@infoRow.BrokersCount</td>
+                        <td>@infoRow.PartitionsCount TODO</td>
+                        <td>@infoRow.TopicsCount</td>
+                        <td>@infoRow.Production TODO</td>
+                        <td>@infoRow.Consumption TODO</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer">        
+        <em>Offline/unreachble clusters</em>
+        <ul>
+            @foreach(var oc in offlineClusters)
+            {
+                <li>@oc.alias (@oc.address)</li>
+            }
+        </ul>
+    </div>
+</div>
+
+@code {
+    public record ClusterInfoRow(
+        string ClusterName, 
+        string Version = "", 
+        int BrokersCount = 0, 
+        int PartitionsCount = 0, 
+        int TopicsCount = 0, 
+        int Production = 0, 
+        int Consumption = 0);
+
+    public record OfflineCluster(string alias, string address);
+
+    public bool loading = false;
+    public List<OfflineCluster> offlineClusters = new List<OfflineCluster>();
+    public List<ClusterInfoRow> onlineClusters = new List<ClusterInfoRow>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+
+        var tasks = ClusterOptions.Value.Select(opt =>
+        {
+            var config = new AdminClientConfig
+            {
+                BootstrapServers = opt.Address,
+            };
+
+            return Task.Run(() =>
+            {
+                try
+                {
+                    using var adminClient = new AdminClientBuilder(config).Build();
+
+                    var meta = adminClient.GetMetadata(TimeSpan.FromSeconds(3));
+                    var infoRow = new ClusterInfoRow(
+                        ClusterName: opt.Alias, 
+                        BrokersCount: meta.Brokers.Count, 
+                        TopicsCount: meta.Topics.Count);
+
+                    onlineClusters.Add(infoRow);
+                }
+                catch (KafkaException ex)
+                {
+                    Console.WriteLine(ex.StackTrace);                    
+                    offlineClusters.Add(new OfflineCluster(alias: opt.Alias, address: opt.Address));
+                }
+            });
+        });
+        
+        await Task.WhenAll(tasks);        
+        await base.OnInitializedAsync();
+
+        loading = false;
+    }         
+}
