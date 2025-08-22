@@ -12,58 +12,74 @@
 
 <PageTitle>Topics: List</PageTitle>
 
-<h1>Topics: List</h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h1>Topics: List</h1>
+        </div>
+        <div class="col text-end">            
+            <NavLink class="nav-link" href="@($"/{clusterIdx}/topics/create")">                
+                <button class="btn btn-primary">Add a Topic</button>
+            </NavLink>
+        </div>
+    </div>
+</div>
 
 <div class="card">
   <div class="card-header">
     <ul class="list-group list-group-horizontal">
         <li class="list-group-item col-4">
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="button-addon2">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">
-                            <i class="bi bi-gear"></i>
-                    </button>
-                </div>
-            </div>
+            <InputText @bind-Value="SearchTopicName" 
+                       class="form-control" 
+                       placeholder="Search by Topic Name">
+            </InputText>
         </li>
-        <li class="list-group-item col-2">
-            checkboxx
+        <li class="list-group-item">
+            <button class="btn btn-primary" @onclick="() => { SearchTopicName = null; }">Clear</button>
+        </li>
+        <li class="list-group-item">
+            <label>Show Internal Topics</label>
+            <InputCheckbox @bind-Value="ShowInternalTopics" />
         </li>
     </ul>
+    <br />
   </div>
   <div class="card-body">
-    <table class="table">
-        <thead>
-            <tr>
-                    <th>Topic Name</th>
-                    <th>Partitions</th>
-                    <th>Out of sync replicas</th>
-                    <th>Replication Factor</th>
-                    <th>Number of messages</th>
-                    <th>Size</th>
-            </tr>
-        </thead>            
-        <tbody>
-                @foreach (var topic in Topics)
-                {
+      <EditForm Model="@SelectedTopics">
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>@topic.TopicName</td>
-                        <td>@topic.Partitions</td>
-                        <td>@topic.OutOfSyncReplicas</td>
-                        <td>@topic.ReplicationFactor</td>
-                        <td>@topic.NumberOfMessages TODO</td>
-                        <td>@topic.Size TODO</td>
+                        <th>&nbsp;</th>
+                        <th>Topic Name</th>
+                        <th>Partitions</th>
+                        <th>Out of sync replicas</th>
+                        <th>Replication Factor</th>
+                        <th>Number of messages</th>
+                        <th>Size</th>
                     </tr>
-                }
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                    @foreach (var topic in Topics)
+                    {
+                        var isChecked = SelectedTopics.Contains(topic.TopicName);
 
-    
+                        <tr>
+                            <td> @isChecked </td>
+                            <td>@topic.TopicName</td>
+                            <td>@topic.Partitions</td>
+                            <td>@topic.OutOfSyncReplicas</td>
+                            <td>@topic.ReplicationFactor</td>
+                            <td>@topic.NumberOfMessages TODO</td>
+                            <td>@topic.Size TODO</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </EditForm>
     
   </div>
   <div class="card-footer">      
-        cluster no: #@clusterIdx
+        cluster no: #@clusterIdx        
   </div>
 </div>
 
@@ -76,7 +92,7 @@
         public int OutOfSyncReplicas { get; set; }
         public string ReplicationFactor { get; set; }
         public int NumberOfMessages { get; set; }
-        public int Size { get; set; }
+        public int Size { get; set; }        
 
         public TopicsListRow(TopicMetadata meta)
         {
@@ -100,10 +116,35 @@
         }
     }
 
+    private List<string> SelectedTopics = new();
+    private List<TopicsListRow> _topics = new();
+    private bool _showInternalTopics = true;
+    private string? _searchTopicName = null;
+
     [Parameter]
     public int clusterIdx { get; set; }
 
     public List<TopicsListRow> Topics = new();
+
+    public bool ShowInternalTopics 
+    { 
+        get => _showInternalTopics; 
+        set
+        {
+            _showInternalTopics = value;
+            UpdateTopics();
+        }
+    }
+
+    public string? SearchTopicName
+    {
+        get => _searchTopicName;
+        set
+        {
+            _searchTopicName = value;
+            UpdateTopics();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {        
@@ -118,10 +159,31 @@
             });
 
         // TODO: handle null
-        Topics = meta!.Topics
+        _topics = meta!.Topics
             .Select(meta => new TopicsListRow(meta))
             .ToList();
-        
+
+        UpdateTopics();
+
         await base.OnInitializedAsync();
-    }      
+    }       
+
+    private void UpdateTopics()
+    {
+        var qry = _topics.AsQueryable();
+
+        if (!_showInternalTopics)
+        {
+            qry = qry.Where(topic => !topic.TopicName.StartsWith("__"));
+        }
+
+        if (!string.IsNullOrEmpty(_searchTopicName))
+        {
+            qry = qry.Where(topic => topic.TopicName.Contains(_searchTopicName, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        Topics = qry.ToList();
+    } 
+
+    
 }
