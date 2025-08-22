@@ -1,165 +1,127 @@
-﻿@page "/topics"
-@using Confluent.Kafka
+﻿@using Confluent.Kafka
 @using Confluent.Kafka.Admin
+@using Kafkaf.Config
+@using Microsoft.Extensions.Caching.Memory
+@using Microsoft.Extensions.Options
+
+@page "/{clusterIdx:int}/topics"
 @rendermode InteractiveServer
+
+@inject IOptions<List<ClusterConfigOptions>> ClusterOptions;
+@inject IMemoryCache MemoryCache
 
 <PageTitle>Topics: List</PageTitle>
 
+<h1>Topics: List</h1>
+
 <div class="card">
   <div class="card-header">
-    <h3>Topics: List</h3>
+    <ul class="list-group list-group-horizontal">
+        <li class="list-group-item col-4">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">
+                            <i class="bi bi-gear"></i>
+                    </button>
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item col-2">
+            checkboxx
+        </li>
+    </ul>
   </div>
   <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+    <table class="table">
+        <thead>
+            <tr>
+                    <th>Topic Name</th>
+                    <th>Partitions</th>
+                    <th>Out of sync replicas</th>
+                    <th>Replication Factor</th>
+                    <th>Number of messages</th>
+                    <th>Size</th>
+            </tr>
+        </thead>            
+        <tbody>
+                @foreach (var topic in Topics)
+                {
+                    <tr>
+                        <td>@topic.TopicName</td>
+                        <td>@topic.Partitions</td>
+                        <td>@topic.OutOfSyncReplicas</td>
+                        <td>@topic.ReplicationFactor</td>
+                        <td>@topic.NumberOfMessages TODO</td>
+                        <td>@topic.Size TODO</td>
+                    </tr>
+                }
+        </tbody>
+    </table>
+
     
-
-    @foreach (var topic in Topics)
-    {
-        <details>
-            <summary>@topic.Topic</summary>
-
-            <h3>Topic Error:</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Reason</th>
-                            <th>IsFatal</th>
-                            <th>Code</th>
-                            <th>IsBrokerError</th>
-                            <th>IsError</th>
-                            <th>IsFatal</th>
-                            <th>IsLocalError</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>@topic.Error.Reason</td>
-                        <td>@topic.Error.IsFatal</td>
-                            <td>@topic.Error.Code</td>
-                            <td>@topic.Error.IsBrokerError</td>
-                            <td>@topic.Error.IsError</td>
-                            <td>@topic.Error.IsFatal</td>
-                            <td>@topic.Error.IsLocalError</td>                            
-                    </tr>
-                </tbody>
-            </table>
-
-            <h3>Topic Partitions</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                            <th>PartitionId</th>
-                            <th>Leader</th>
-                            <th>Error</th>
-                            <th>Replicas</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach(var p in @topic.Partitions)
-                        {
-                            <tr>
-                                <td>@p.PartitionId</td>
-                                <td>@p.Leader</td>
-                                <td>@p.Error</td>
-                                <td>@p.Replicas</td>
-                            </tr>
-                        }
-                    </tbody>
-            </table>
-
-            <p>
-                <button class="btn btn-danger" @onclick="async () => await HandleDeleteTopicAsync(topic.Topic)">                        
-                    Delete Topic
-                </button>
-            </p>
-        </details>
-    }
     
   </div>
   <div class="card-footer">      
-        <a href="/topics/create" class="btn btn-primary">Create Topic</a>
+        cluster no: #@clusterIdx
   </div>
 </div>
 
 
-
 @code {
-    public List<TopicMetadata> Topics = new List<TopicMetadata>();    
-
-    protected override Task OnInitializedAsync()
-    {        
-        Topics = LoadTopicMetadata();        
-
-        return base.OnInitializedAsync();
-    }  
-
-    private async Task HandleDeleteTopicAsync(string topicName)
+    public struct TopicsListRow
     {
-        var config = new AdminClientConfig
+        public string TopicName { get; set; }
+        public int Partitions { get; set; }
+        public int OutOfSyncReplicas { get; set; }
+        public string ReplicationFactor { get; set; }
+        public int NumberOfMessages { get; set; }
+        public int Size { get; set; }
+
+        public TopicsListRow(TopicMetadata meta)
         {
-            BootstrapServers = "localhost:9092"
-        };
+            TopicName = meta.Topic;
+            Partitions = meta.Partitions.Count;
 
-        using var adminClient = new AdminClientBuilder(config).Build();
-
-        try
-        {
-            // Create a list of topics to delete
-            var topicsToDelete = new List<string> { topicName };
-
-            // Delete the topic(s) asynchronously
-            await adminClient.DeleteTopicsAsync(topicsToDelete);
-
-            Console.WriteLine($"Topic '{topicName}' successfully deleted.");
-
-            //ReloadComponent();
-            Topics = LoadTopicMetadata();
-        }
-        catch (DeleteTopicsException ex)
-        {
-            Console.WriteLine($"Error deleting topic '{topicName}': {ex.Message}");
-            foreach (var error in ex.Results)
+            if (meta.Partitions.Count > 0)
             {
-                Console.WriteLine($"  Topic: {error.Topic}, Error: {error.Error.Reason}");
+                ReplicationFactor = meta.Partitions[0].Replicas.Length.ToString();
+                OutOfSyncReplicas = meta.Partitions
+                    .Sum(partition => partition.Replicas[0] - partition.InSyncReplicas[0]);
             }
+            else
+            {
+                ReplicationFactor = "0";
+                OutOfSyncReplicas = 0;
+            }
+
+            NumberOfMessages = 0; // TODO
+            Size = 0; //TODO
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"An unexpected error occurred: {ex.Message}");
-        }        
     }
 
+    [Parameter]
+    public int clusterIdx { get; set; }
 
-    // private void ReloadComponent()
-    // {
-    //     var uri = Nav.Uri;
-    //     Nav.NavigateTo(uri, forceLoad: false); triggers re-render
-    // }
+    public List<TopicsListRow> Topics = new();
 
-    private List<TopicMetadata> LoadTopicMetadata()
-    {
-        var config = new AdminClientConfig
-        {
-            BootstrapServers = "localhost:9092"
-        };
+    protected override async Task OnInitializedAsync()
+    {        
+        var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
+        var meta = await MemoryCache.GetOrCreateAsync(
+            clusterConfig.CacheKey(),
+            async cacheEntry =>
+            {
+                cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(60);
 
-        using var adminClient = new AdminClientBuilder(config).Build();
+                return await KafkaUtils.GetMetadata(clusterConfig);
+            });
 
-
-        // Get cluster metadata including topics
-        var metadata = adminClient.GetMetadata(TimeSpan.FromSeconds(10));
-        var topicNames = metadata.Topics.Select(t => t.Topic);
-
-
-        // Describe topics for detailed info
-        //var descriptions = await
-        // var topics = TopicCollection.OfTopicNames(topicNames);
-        // adminClient.DescribeTopicsAsync(topics).ContinueWith(a =>
-        // {
-        //     var foo = a;
-        // });
-
-        return metadata.Topics;
-    }
+        // TODO: handle null
+        Topics = meta!.Topics
+            .Select(meta => new TopicsListRow(meta))
+            .ToList();
+        
+        await base.OnInitializedAsync();
+    }      
 }
