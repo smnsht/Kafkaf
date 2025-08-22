@@ -1,4 +1,4 @@
-﻿@page "/{clusterId:int}/brokers"
+﻿@page "/{clusterId:int}/brokers/{brokerIdx:int}"
 @rendermode InteractiveServer
 
 <PageTitle>Brokers: Cluster #@clusterId</PageTitle>
@@ -8,4 +8,7 @@
 @code {
 	[Parameter]
 	public int clusterId { get; set; }
+
+	[Parameter]
+	public int brokerIdx { get; set; }
 }

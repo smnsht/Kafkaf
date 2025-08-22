@@ -1,10 +1,116 @@
-﻿@page "/brokers"
+﻿@using Confluent.Kafka
+@using Kafkaf.Config
+@using Microsoft.Extensions.Options
+
+@page "/{clusterIdx:int}/brokers"
 @rendermode InteractiveServer
+
+@inject IOptions<List<ClusterConfigOptions>> ClusterOptions;
 
 <PageTitle>Brokers: List</PageTitle>
 
 <h3>Brokers: List</h3>
 
-@code {
+<div class="card">
+    <div class="card-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-5">
+                    <h5>Uptime</h5>
+                    
+                    <ul class="list-group list-group-horizontal small w-100">
+                        <li class="list-group-item col-4">
+                            <div>Broker Count</div> 
+                            <span class="badge bg-secondary">TODO</span>
+                        </li>
+                        <li class="list-group-item col-4">
+                            <div>Active Controller</div> 
+                            <span class="badge bg-secondary">TODO</span>
+                        </li>
+                        <li class="list-group-item col-4">
+                            <div>Version</div> 
+                            <span class="badge bg-secondary">TODO</span>
+                        </li>
+                    </ul>                    
+                </div>
+                <div class="col-7">
+                    <h5>Partitions</h5>
 
+                    <ul class="list-group list-group-horizontal small w-100">
+                        <li class="list-group-item col-3">
+                            <div>Online</div> 
+                            <span class="badge bg-secondary">TODO</span>
+                        </li>
+                        <li class="list-group-item col-3">
+                            <div>URP</div> 
+                            <span class="badge bg-secondary">TODO</span>
+                        </li>
+                        <li class="list-group-item col-3">
+                            <div>In Sync Replicas</div> 
+                            <span class="badge bg-secondary">TODO</span>
+                        </li>
+                        <li class="list-group-item col-3">
+                            <div>Out Of Sync Replicas</div> 
+                            <span class="badge bg-secondary">TODO</span>
+                        </li>
+                    </ul>                    
+                </div>
+            </div>
+        </div>
+        <br />
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Broker ID</th>                                        
+                    <th>Host</th>
+                    <th>Port</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in brokers.OrderBy(b => b.BrokerId))
+                {
+                    <tr>
+                        <td>@row.BrokerId</td>                        
+                        <td>@row.Host</td>
+                        <td>@row.Port</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer">
+        clusterid: @clusterIdx
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int clusterIdx { get; set; }
+
+    public List<BrokerMetadata> brokers = new List<BrokerMetadata>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
+
+        brokers = await LoadBrokerMetadata(clusterConfig);
+        await base.OnInitializedAsync();
+    }
+
+    protected Task<List<BrokerMetadata>> LoadBrokerMetadata(ClusterConfigOptions clusterConfig)
+    {
+        var config = new AdminClientConfig
+        {
+            BootstrapServers = clusterConfig.Address
+        };        
+
+        return Task.Run(() =>
+        {
+            using var adminClient = new AdminClientBuilder(config).Build();
+            var meta = adminClient.GetMetadata(TimeSpan.FromSeconds(3));
+            return meta.Brokers;
+        });
+    }
 }
