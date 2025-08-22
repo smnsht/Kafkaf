@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddMemoryCache();
+
 builder.Services.Configure<List<ClusterConfigOptions>>(
     builder.Configuration.GetSection("Kafkaf:Clusters")
 );

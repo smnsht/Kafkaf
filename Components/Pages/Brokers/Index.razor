@@ -1,11 +1,13 @@
 ﻿@using Confluent.Kafka
 @using Kafkaf.Config
+@using Microsoft.Extensions.Caching.Memory
 @using Microsoft.Extensions.Options
 
 @page "/{clusterIdx:int}/brokers"
 @rendermode InteractiveServer
 
 @inject IOptions<List<ClusterConfigOptions>> ClusterOptions;
+@inject IMemoryCache MemoryCache
 
 <PageTitle>Brokers: List</PageTitle>
 
@@ -91,26 +93,21 @@
 
     public List<BrokerMetadata> brokers = new List<BrokerMetadata>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
+	protected override async Task OnInitializedAsync()
+	{
+		var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
+		var meta = await MemoryCache.GetOrCreateAsync(
+            clusterConfig.CacheKey(), 
+            async cacheEntry =>
+		    {
+			    cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(60);
 
-        brokers = await LoadBrokerMetadata(clusterConfig);
-        await base.OnInitializedAsync();
-    }
+			    return await KafkaUtils.GetMetadata(clusterConfig);
+		    });
 
-    protected Task<List<BrokerMetadata>> LoadBrokerMetadata(ClusterConfigOptions clusterConfig)
-    {
-        var config = new AdminClientConfig
-        {
-            BootstrapServers = clusterConfig.Address
-        };        
+		// TODO: handle null
+		brokers = meta!.Brokers;
 
-        return Task.Run(() =>
-        {
-            using var adminClient = new AdminClientBuilder(config).Build();
-            var meta = adminClient.GetMetadata(TimeSpan.FromSeconds(3));
-            return meta.Brokers;
-        });
-    }
+		await base.OnInitializedAsync();
+	}
 }
