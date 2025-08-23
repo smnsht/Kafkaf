@@ -62,15 +62,15 @@
 
 				<button type="button"
 						class="btn btn-outline-secondary me-1"
-						disabled="@(0 == @SelectedTopics.Count)"
+						disabled
 						@onclick="HandleCopyTopics">
-					Copy selected topics
+					Copy selected topics (TODO)
 				</button>
 
 				<button type="button"
 						class="btn btn-outline-secondary me-1"
 						disabled="@(0 == @SelectedTopics.Count)"
-						@onclick="HandlePurgeMessages">
+						@onclick="HandlePurgeMessagesAsync">
 					Purge messages of selected topics
 				</button>
 			</div>
@@ -114,8 +114,13 @@
 
 
 <p>
-	cluster no: #@clusterIdx
-	selected topics: @SelectedTopics.Count
+	
+	
+	<ul>
+		<li>cluster no: #@clusterIdx</li>
+		<li>selected topics: @SelectedTopics.Count</li>
+		<li>loading: @_loading</li>
+	</ul>
 </p>
 
 
@@ -123,6 +128,8 @@
 
 	[Parameter]
 	public int clusterIdx { get; set; }
+
+	private bool _loading = false;
 
 	private List<string> SelectedTopics = new();
 
@@ -204,16 +211,27 @@
 
 	private void HandleDeleteTopics()
 	{
+		var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
 
+		_loading = true;
+
+		KafkaUtils.DeleteTopics(clusterConfig, SelectedTopics)
+			.ContinueWith(t => _loading = false);
 	}
 
 	private void HandleCopyTopics()
 	{
-
+		// TODO
 	}
 
-	private void HandlePurgeMessages()
+	private async Task HandlePurgeMessagesAsync()
 	{
+		var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
 
+		_loading = true;
+
+		await KafkaUtils.PurgeMessages(clusterConfig, SelectedTopics);
+
+		_loading = false;		
 	}
 }
