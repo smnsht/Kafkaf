@@ -1,0 +1,147 @@
+﻿@using Kafkaf.Models
+
+<EditForm FormName="CreateTopicccc" Model="@Model">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<div class="row mb-4">
+		<div class="form-group">
+			<label for="topicName">Topic Name <span class="text-danger">*</span></label>
+			<InputText @bind-Value="Model.Name" class="form-control" id="topicName"></InputText>
+		</div>
+	</div>
+
+	<div class="row mb-4">
+		<div class="col">
+			<div class="form-group">
+				<label for="numPartitions">Number of Partitions <span class="text-danger">*</span></label>
+				<InputNumber @bind-Value="Model.NumPartitions" class="form-control" id="numPartitions"></InputNumber>
+			</div>
+		</div>
+		<div class="col">
+			<div class="form-group">
+				<label for="cleanupPolicy">Cleanup policy</label>
+				<InputSelect @bind-Value="Model.CleaupPolicy" class="form-control" id="cleanupPolicy">
+					@foreach (var opt in Model.CleanupPolicyOptions)
+					{
+						<option value="@opt.Key">@opt.Value</option>
+					}
+				</InputSelect>
+			</div>
+		</div>
+	</div>
+
+	<div class="row mb-4">
+		<div class="col">
+			<div class="form-group">
+				<label for="minInSyncReplicas">Min In Sync Replicas</label>
+				<InputNumber @bind-Value="Model.MinInSyncReplicas" class="form-control" id="minInSyncReplicas" />
+			</div>
+		</div>
+		<div class="col">
+			<div class="form-group">
+				<label for="replicationFactor">Replication Factor</label>
+				<InputNumber @bind-Value="Model.ReplicationFactor" class="form-control" id="replicationFactor" />
+			</div>
+		</div>
+	</div>
+
+	<div class="row mb-4">
+		<div class="col-6">
+			<div class="form-group">
+				<label for="timeToRetain">Time to retain data (in ms)</label>
+				<InputNumber @bind-Value="Model.TimeToRetain" class="form-control mb-2" id="timeToRetain" />
+				<div class="btn-group w-100" role="group" aria-label="Time to retain shortcuts">
+					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1">12 hours</button>
+					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1">1 day</button>
+					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1">2 days</button>
+					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1">7 days</button>
+					<button type="button" class="btn btn-sm btn-outline-secondary rounded">4 weeks</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row mb-4">
+		<div class="col">
+			<div class="form-group">
+				<label for="retentionBytes">Max size on disk in GB</label>				
+				<InputSelect @bind-Value="Model.RetentionBytes" class="form-control" id="retentionBytes">
+					<option value="">Not Set</option>
+					<option value="1">1 GB</option>
+					<option value="10">10 GB</option>
+					<option value="20">20 GB</option>
+					<option value="50">50 GB</option>
+				</InputSelect>
+			</div>
+		</div>
+		<div class="col">
+			<div class="form-group">
+				<label for="maxMessageBytes">Maximum message size in bytes</label>
+				<InputNumber @bind-Value="Model.MaxMessageBytes" class="form-control" id="maxMessageBytes" />
+			</div>
+		</div>
+	</div>
+
+	<h4>Custom parameters</h4>
+
+	<table>
+		<thead>
+			<tr>
+				<th>Key</th>
+				<th>Value</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var pair in Model.Configs)
+			{
+				<tr>
+					<td>@pair.Key</td>
+					<td>@pair.Value</td>
+					<td>
+						<button @onclick="() => HandleDeleteConfig(pair.Key)">Delete</button>
+					</td>
+				</tr>
+			}
+			<tr>
+				<td><InputText @bind-Value="newKey"></InputText></td>
+				<td><InputText @bind-Value="newValue"></InputText></td>
+				<td><button @onclick="@HandleAppendToConfigs">Append</button></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div class="mt-4">				
+		<NavLink class="nav-link" href="@UrlBack" style="display: inline;">			
+			<button type="button" class="btn btn-primary">Cancel</button>
+		</NavLink>
+		<button type="button" class="btn btn-light">Create</button>
+	</div>
+</EditForm>
+
+@code {
+	[Parameter]
+	public string UrlBack { get; set; } = string.Empty;
+
+	public CreateTopicModel Model { get; set; } = new CreateTopicModel();
+
+	private string newKey = string.Empty;
+	private string newValue = string.Empty;
+	
+	private void HandleAppendToConfigs()
+	{
+		Model.Configs.Add(newKey, newValue);
+		newKey = string.Empty;
+		newValue = string.Empty;
+	}
+
+	private void HandleDeleteConfig(string key)
+	{
+		if (Model.Configs.Remove(key))
+		{
+			// If needed, trigger UI refresh
+			//StateHasChanged();
+		}
+	}
+}

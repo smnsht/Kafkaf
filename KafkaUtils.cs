@@ -88,4 +88,26 @@ public static class KafkaUtils
                 });
         }
     }
+
+    public static async Task CreateTopicsAsync(ClusterConfigOptions clusterConfig, IEnumerable<TopicSpecification> topics, int timeoutSeconds = 10)
+    {
+        var config = new AdminClientConfig
+        {
+            BootstrapServers = clusterConfig.Address
+        };
+
+        var timeout = TimeSpan.FromSeconds(timeoutSeconds);
+
+        using var adminClient = new AdminClientBuilder(config)
+                .Build();
+
+        await adminClient.CreateTopicsAsync(topics, new CreateTopicsOptions() 
+        { 
+            RequestTimeout = timeout,
+            OperationTimeout = timeout
+        });               
+    }
+
+    public static async Task CreateTopicAsync(ClusterConfigOptions clusterConfig, TopicSpecification topic, int timeoutSeconds = 10) =>
+        await CreateTopicsAsync(clusterConfig, new List<TopicSpecification>() { topic }, timeoutSeconds);
 }
