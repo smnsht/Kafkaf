@@ -2,6 +2,7 @@
 @using Confluent.Kafka.Admin
 @using Kafkaf.Config
 @using Kafkaf.ViewModels
+@using Kafkaf.Components.UI;
 @using Microsoft.Extensions.Caching.Memory
 @using Microsoft.Extensions.Options
 
@@ -11,7 +12,7 @@
 @inject IOptions<List<ClusterConfigOptions>> ClusterOptions;
 @inject IMemoryCache MemoryCache
 
-<PageTitle>Topics: List</PageTitle>
+<PageTitle>Topics: Listt</PageTitle>
 
 <div class="container-fluid">
 	<div class="row">
@@ -27,8 +28,11 @@
 </div>
 
 <EditForm Model="@this">
-	<div class="container-fluid">
-		<div class="row">
+	<Alert Title="Error!" Notice=@_errorNotice AlertStyle=BootstrapAlertStyle.Danger></Alert>
+	<Alert Title="Success!" Notice=@_successNotice AlertStyle=BootstrapAlertStyle.Success />
+		
+	<div class="container-fluid">		
+		<div class="row">			
 			<div class="col-4">
 				<div class="input-group mb-3">
 					<InputText class="form-control" placeholder="Search by Topic Name" @bind-Value="SearchTopicName" />
@@ -50,33 +54,46 @@
 		</div>
 	</div>
 
-	<div class="container-fluid">
-		<div class="row">
-			<div class="btn-group-sm col-8" role="group" aria-label="Actions for selected topis">
-				<button type="button"
-						class="btn btn-outline-secondary me-1"
-						disabled="@(0 == @SelectedTopics.Count)"
-						@onclick="HandleDeleteTopics">
-					Delete selected topics
-				</button>
-
-				<button type="button"
-						class="btn btn-outline-secondary me-1"
-						disabled
-						@onclick="HandleCopyTopics">
-					Copy selected topics (TODO)
-				</button>
-
-				<button type="button"
-						class="btn btn-outline-secondary me-1"
-						disabled="@(0 == @SelectedTopics.Count)"
-						@onclick="HandlePurgeMessagesAsync">
-					Purge messages of selected topics
-				</button>
+	
+	@if (_loading)
+	{
+		<div class="text-center">
+			<div class="spinner-border" role="status">
+				<span class="sr-only">Loading...</span>
 			</div>
 		</div>
-	</div>
 
+	} 
+	else
+	{
+		<div class="container-fluid">
+			<div class="row">
+				<div class="btn-group-sm col-8" role="group" aria-label="Actions for selected topis">
+					<button type="button"
+							class="btn btn-outline-secondary me-1"
+							disabled="@(0 == @SelectedTopics.Count)"
+							@onclick="DeleteTopicsAsync">
+						Delete selected topics
+					</button>
+
+					<button type="button"
+							class="btn btn-outline-secondary me-1"
+							disabled
+							@onclick="HandleCopyTopics">
+						Copy selected topics (TODO)
+					</button>
+
+					<button type="button"
+							class="btn btn-outline-secondary me-1"
+							disabled="@(0 == @SelectedTopics.Count)"
+							@onclick="PurgeMessagesAsync">
+						Purge messages of selected topics
+					</button>
+				</div>
+			</div>
+		</div>
+	}
+	
 	<table class="table mt-4">
 		<thead>
 			<tr>
@@ -113,13 +130,12 @@
 </EditForm>
 
 
-<p>
-	
-	
+<p>		
 	<ul>
 		<li>cluster no: #@clusterIdx</li>
 		<li>selected topics: @SelectedTopics.Count</li>
 		<li>loading: @_loading</li>
+		<li>error: @_errorNotice</li>
 	</ul>
 </p>
 
@@ -157,6 +173,9 @@
 			UpdateTopics();
 		}
 	}
+
+	private string? _errorNotice;
+	private string? _successNotice;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -209,29 +228,37 @@
 		}
 	}
 
-	private void HandleDeleteTopics()
-	{
-		var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
+	private Task DeleteTopicsAsync() => WithLoadingAsync(KafkaUtils.DeleteTopics);	
 
-		_loading = true;
-
-		KafkaUtils.DeleteTopics(clusterConfig, SelectedTopics)
-			.ContinueWith(t => _loading = false);
-	}
+	private Task PurgeMessagesAsync() => WithLoadingAsync(KafkaUtils.PurgeMessages);
 
 	private void HandleCopyTopics()
 	{
 		// TODO
 	}
 
-	private async Task HandlePurgeMessagesAsync()
+	private async Task WithLoadingAsync(WithClusterConfigAndTopicsAsyncDelegate del)
 	{
 		var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
 
+		_errorNotice = null;
+		_successNotice = null;
 		_loading = true;
+		try
+		{
+			await del(clusterConfig, SelectedTopics);
 
-		await KafkaUtils.PurgeMessages(clusterConfig, SelectedTopics);
-
-		_loading = false;		
+			_successNotice = "Sucess";
+		}
+		catch(Exception e)
+		{			
+			_errorNotice = e.Message;
+		}
+		finally
+		{
+			_loading = false;
+		}
 	}
+
+	
 }

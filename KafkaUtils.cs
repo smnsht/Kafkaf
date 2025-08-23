@@ -4,6 +4,8 @@ using Kafkaf.Config;
 
 namespace Kafkaf;
 
+public delegate Task WithClusterConfigAndTopicsAsyncDelegate(ClusterConfigOptions cfg, IEnumerable<string> topics, int timeoutSeconds = 5);
+
 public static class KafkaUtils
 {
     public static Task<Metadata> GetMetadata(ClusterConfigOptions clusterConfig, int timeoutSeconds = 5)
@@ -29,13 +31,13 @@ public static class KafkaUtils
         if (topicNames?.Any() == true)
         {
             var configEntries = new List<ConfigEntry>
-        {
-            new ConfigEntry()
             {
-                Name = "retention.ms",
-                Value = "1000"
-            }
-        };
+                new ConfigEntry()
+                {
+                    Name = "retention.ms",
+                    Value = "1"
+                }
+            };
 
             var configs = topicNames.Aggregate(new Dictionary<ConfigResource, List<ConfigEntry>>(), (acc, topicName) =>
             {
@@ -60,32 +62,30 @@ public static class KafkaUtils
                     .Build();
 
             await adminClient.AlterConfigsAsync(configs);
-        }               
+        }
     }
 
-    public static Task DeleteTopics(ClusterConfigOptions clusterConfig, IEnumerable<string> topicNames, int timeoutSeconds = 5)
+    public static async Task DeleteTopics(ClusterConfigOptions clusterConfig, IEnumerable<string> topicNames, int timeoutSeconds = 5)
     {
-        if (topicNames == null || topicNames.Count() == 0)
+        if (topicNames?.Count() > 0)
         {
-            return Task.CompletedTask;
-        }
+            var config = new AdminClientConfig
+            {
+                BootstrapServers = clusterConfig.Address
+            };
 
-        var config = new AdminClientConfig
-        {
-            BootstrapServers = clusterConfig.Address
-        };
+            var timeout = TimeSpan.FromSeconds(timeoutSeconds);
 
-        var timeout = TimeSpan.FromSeconds(timeoutSeconds);
-
-        return Task.Run(() =>
-        {
             using var adminClient = new AdminClientBuilder(config)
-                .Build();
+                    .Build();
 
-            return adminClient.DeleteTopicsAsync(topicNames, new DeleteTopicsOptions() 
-            { 
-                OperationTimeout = timeout 
-            });
-        });
+            await adminClient.DeleteTopicsAsync(
+                topicNames,
+                new DeleteTopicsOptions()
+                {
+                    OperationTimeout = timeout,
+                    RequestTimeout = timeout
+                });
+        }
     }
 }

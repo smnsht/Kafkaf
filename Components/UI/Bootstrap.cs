@@ -26,6 +26,18 @@ public enum BootstrapButtonSize
     Small, Large
 }
 
+public enum BootstrapAlertStyle
+{
+    Primary,
+    Secondary,
+    Success,
+    Danger,
+    Warning,
+    Info,
+    Light,
+    Dark
+}
+
 public static class BootstrapExtensions
 {
     public static string ToCssClass(this BootstrapButtonStyle style) =>
@@ -60,4 +72,19 @@ public static class BootstrapExtensions
             BootstrapButtonSize.Large => "btn-lg",
             _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
         };
+
+    public static string ToCssClass(this BootstrapAlertStyle style) =>
+        style switch
+        {
+            BootstrapAlertStyle.Primary => "alert-primary",
+            BootstrapAlertStyle.Secondary => "alert-secondary",
+            BootstrapAlertStyle.Success => "alert-success",
+            BootstrapAlertStyle.Danger => "alert-danger",
+            BootstrapAlertStyle.Warning => "alert-warning",
+            BootstrapAlertStyle.Info => "alert-info",
+            BootstrapAlertStyle.Light => "alert-light",
+            BootstrapAlertStyle.Dark => "alert-dark",            
+            _ => throw new ArgumentOutOfRangeException(nameof(style), style, null)
+        };
+
 }
