@@ -1,6 +1,7 @@
 ﻿@using Confluent.Kafka
 @using Confluent.Kafka.Admin
 @using Kafkaf.Config
+@using Kafkaf.ViewModels
 @using Microsoft.Extensions.Caching.Memory
 @using Microsoft.Extensions.Options
 
@@ -13,177 +14,206 @@
 <PageTitle>Topics: List</PageTitle>
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col">
-            <h1>Topics: List</h1>
-        </div>
-        <div class="col text-end">            
-            <NavLink class="nav-link" href="@($"/{clusterIdx}/topics/create")">                
-                <button class="btn btn-primary">Add a Topic</button>
-            </NavLink>
-        </div>
-    </div>
+	<div class="row">
+		<div class="col">
+			<h1>Topics: List</h1>
+		</div>
+		<div class="col text-end">
+			<NavLink class="nav-link" href="@($"/{clusterIdx}/topics/create")">
+				<button class="btn btn-primary">Add a Topic</button>
+			</NavLink>
+		</div>
+	</div>
 </div>
 
-<div class="card">
-  <div class="card-header">
-    <ul class="list-group list-group-horizontal">
-        <li class="list-group-item col-4">
-            <InputText @bind-Value="SearchTopicName" 
-                       class="form-control" 
-                       placeholder="Search by Topic Name">
-            </InputText>
-        </li>
-        <li class="list-group-item">
-            <button class="btn btn-primary" @onclick="() => { SearchTopicName = null; }">Clear</button>
-        </li>
-        <li class="list-group-item">
-            <label>Show Internal Topics</label>
-            <InputCheckbox @bind-Value="ShowInternalTopics" />
-        </li>
-    </ul>
-    <br />
-  </div>
-  <div class="card-body">
-      <EditForm Model="@SelectedTopics">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>&nbsp;</th>
-                        <th>Topic Name</th>
-                        <th>Partitions</th>
-                        <th>Out of sync replicas</th>
-                        <th>Replication Factor</th>
-                        <th>Number of messages</th>
-                        <th>Size</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var topic in Topics)
-                    {
-                        var isChecked = SelectedTopics.Contains(topic.TopicName);
+<EditForm Model="@this">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-4">
+				<div class="input-group mb-3">
+					<InputText class="form-control" placeholder="Search by Topic Name" @bind-Value="SearchTopicName" />
+					<div class="input-group-append">
+						<button class="btn btn-outline-secondary" type="button" @onclick="() => SearchTopicName = null">x</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-8">
+				<div class="form-check form-switch">
+					<InputCheckbox class="form-check-input"
+								   id="flexSwitchCheckDefault"
+								   @bind-Value="ShowInternalTopics" />
 
-                        <tr>
-                            <td> @isChecked </td>
-                            <td>@topic.TopicName</td>
-                            <td>@topic.Partitions</td>
-                            <td>@topic.OutOfSyncReplicas</td>
-                            <td>@topic.ReplicationFactor</td>
-                            <td>@topic.NumberOfMessages TODO</td>
-                            <td>@topic.Size TODO</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </EditForm>
-    
-  </div>
-  <div class="card-footer">      
-        cluster no: #@clusterIdx        
-  </div>
-</div>
+					<label class="form-check-label"
+						   for="flexSwitchCheckDefault">Show Internal Topics</label>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		<div class="row">
+			<div class="btn-group-sm col-8" role="group" aria-label="Actions for selected topis">
+				<button type="button"
+						class="btn btn-outline-secondary me-1"
+						disabled="@(0 == @SelectedTopics.Count)"
+						@onclick="HandleDeleteTopics">
+					Delete selected topics
+				</button>
+
+				<button type="button"
+						class="btn btn-outline-secondary me-1"
+						disabled="@(0 == @SelectedTopics.Count)"
+						@onclick="HandleCopyTopics">
+					Copy selected topics
+				</button>
+
+				<button type="button"
+						class="btn btn-outline-secondary me-1"
+						disabled="@(0 == @SelectedTopics.Count)"
+						@onclick="HandlePurgeMessages">
+					Purge messages of selected topics
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<table class="table mt-4">
+		<thead>
+			<tr>
+				<th>&nbsp;</th>
+				<th>Topic Name</th>
+				<th>Partitions</th>
+				<th>Out of sync replicas</th>
+				<th>Replication Factor</th>
+				<th>Number of messages</th>
+				<th>Size</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var topic in Topics)
+			{
+				var isChecked = SelectedTopics.Contains(topic.TopicName);
+
+				<tr>
+					<td>
+						<input type="checkbox"
+							   checked="@isChecked"
+							   @onchange="e => HandleTopicChecked(e, topic.TopicName)" />
+					</td>
+					<td>@topic.TopicName</td>
+					<td>@topic.Partitions</td>
+					<td>@topic.OutOfSyncReplicas</td>
+					<td>@topic.ReplicationFactor</td>
+					<td>@topic.NumberOfMessages TODO</td>
+					<td>@topic.Size TODO</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</EditForm>
+
+
+<p>
+	cluster no: #@clusterIdx
+	selected topics: @SelectedTopics.Count
+</p>
 
 
 @code {
-    public struct TopicsListRow
-    {
-        public string TopicName { get; set; }
-        public int Partitions { get; set; }
-        public int OutOfSyncReplicas { get; set; }
-        public string ReplicationFactor { get; set; }
-        public int NumberOfMessages { get; set; }
-        public int Size { get; set; }        
 
-        public TopicsListRow(TopicMetadata meta)
-        {
-            TopicName = meta.Topic;
-            Partitions = meta.Partitions.Count;
+	[Parameter]
+	public int clusterIdx { get; set; }
 
-            if (meta.Partitions.Count > 0)
-            {
-                ReplicationFactor = meta.Partitions[0].Replicas.Length.ToString();
-                OutOfSyncReplicas = meta.Partitions
-                    .Sum(partition => partition.Replicas[0] - partition.InSyncReplicas[0]);
-            }
-            else
-            {
-                ReplicationFactor = "0";
-                OutOfSyncReplicas = 0;
-            }
+	private List<string> SelectedTopics = new();
 
-            NumberOfMessages = 0; // TODO
-            Size = 0; //TODO
-        }
-    }
+	private List<TopicsListViewModel> _topics = new();
+	private List<TopicsListViewModel> Topics = new();
 
-    private List<string> SelectedTopics = new();
-    private List<TopicsListRow> _topics = new();
-    private bool _showInternalTopics = true;
-    private string? _searchTopicName = null;
+	private bool _showInternalTopics = true;
+	private bool ShowInternalTopics
+	{
+		get => _showInternalTopics;
+		set
+		{
+			_showInternalTopics = value;
+			UpdateTopics();
+		}
+	}
 
-    [Parameter]
-    public int clusterIdx { get; set; }
+	private string? _searchTopicName = null;
+	public string? SearchTopicName
+	{
+		get => _searchTopicName;
+		set
+		{
+			_searchTopicName = value;
+			UpdateTopics();
+		}
+	}
 
-    public List<TopicsListRow> Topics = new();
+	protected override async Task OnInitializedAsync()
+	{
+		var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
+		var meta = await MemoryCache.GetOrCreateAsync(
+			clusterConfig.CacheKey(),
+			async cacheEntry =>
+			{
+				cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(60);
 
-    public bool ShowInternalTopics 
-    { 
-        get => _showInternalTopics; 
-        set
-        {
-            _showInternalTopics = value;
-            UpdateTopics();
-        }
-    }
+				return await KafkaUtils.GetMetadata(clusterConfig);
+			});
 
-    public string? SearchTopicName
-    {
-        get => _searchTopicName;
-        set
-        {
-            _searchTopicName = value;
-            UpdateTopics();
-        }
-    }
+		// TODO: handle null
+		_topics = meta!.Topics
+			.Select(meta => new TopicsListViewModel(meta))
+			.ToList();
 
-    protected override async Task OnInitializedAsync()
-    {        
-        var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
-        var meta = await MemoryCache.GetOrCreateAsync(
-            clusterConfig.CacheKey(),
-            async cacheEntry =>
-            {
-                cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(60);
+		UpdateTopics();
 
-                return await KafkaUtils.GetMetadata(clusterConfig);
-            });
+		await base.OnInitializedAsync();
+	}
 
-        // TODO: handle null
-        _topics = meta!.Topics
-            .Select(meta => new TopicsListRow(meta))
-            .ToList();
+	private void UpdateTopics()
+	{
+		var qry = _topics.AsQueryable();
 
-        UpdateTopics();
+		if (!_showInternalTopics)
+		{
+			qry = qry.Where(topic => !topic.TopicName.StartsWith("__"));
+		}
 
-        await base.OnInitializedAsync();
-    }       
+		if (!string.IsNullOrEmpty(_searchTopicName))
+		{
+			qry = qry.Where(topic => topic.TopicName.Contains(_searchTopicName, StringComparison.InvariantCultureIgnoreCase));
+		}
 
-    private void UpdateTopics()
-    {
-        var qry = _topics.AsQueryable();
+		Topics = qry.ToList();
+	}
 
-        if (!_showInternalTopics)
-        {
-            qry = qry.Where(topic => !topic.TopicName.StartsWith("__"));
-        }
+	private void HandleTopicChecked(ChangeEventArgs e, string topicName)
+	{
+		if (e.Value is true)
+		{
+			SelectedTopics.Add(topicName);
+		}
+		else
+		{
+			SelectedTopics.Remove(topicName);
+		}
+	}
 
-        if (!string.IsNullOrEmpty(_searchTopicName))
-        {
-            qry = qry.Where(topic => topic.TopicName.Contains(_searchTopicName, StringComparison.InvariantCultureIgnoreCase));
-        }
+	private void HandleDeleteTopics()
+	{
 
-        Topics = qry.ToList();
-    } 
+	}
 
-    
+	private void HandleCopyTopics()
+	{
+
+	}
+
+	private void HandlePurgeMessages()
+	{
+
+	}
 }
