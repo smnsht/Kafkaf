@@ -1,0 +1,65 @@
+﻿@using Kafkaf.Models
+
+<h4>Custom parameters</h4>
+
+<EditForm FormName="CustomParameters" Model="CustomParameter" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<table>
+		<thead>
+			<tr>
+				<th>Key</th>
+				<th>Value</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var pair in CustomParameterList)
+			{
+				<tr>
+					<td>@pair.Key</td>
+					<td>@pair.Value</td>
+					<td>
+						<button type="button" @onclick="() => HandleDelete(pair.Key!)">Delete</button>
+					</td>
+				</tr>
+			}
+			<tr>
+				<td>
+					<InputSelect @bind-Value="CustomParameter.Key">
+						<option value="">--Select--</option>
+						@foreach (var property in KafkaTopicProperties.GetKeys())
+						{
+							<option value="@property">@property</option>
+						}
+					</InputSelect>
+				</td>
+				<td>
+					<InputText @bind-Value="CustomParameter.Value"></InputText>
+				</td>
+				<td><button type="submit">Append</button></td>
+			</tr>
+		</tbody>
+	</table>
+
+</EditForm>
+
+@code {
+	private TopicCustomParameterModel CustomParameter = new();
+	private List<TopicCustomParameterModel> CustomParameterList = new();
+
+	private void HandleValidSubmit()
+	{
+		CustomParameterList.Add((TopicCustomParameterModel)CustomParameter.Clone());
+		CustomParameter.Reset();
+	}
+
+	private void HandleDelete(string key)
+	{
+		if (CustomParameterList.FirstOrDefault(p => p.Key == key) is TopicCustomParameterModel customParameter)
+		{
+			CustomParameterList.Remove(customParameter);
+		}		
+	}
+}

@@ -1,6 +1,7 @@
 ﻿@using Kafkaf.Models
+@using System.ComponentModel.DataAnnotations
 
-<EditForm FormName="CreateTopicccc" Model="@Model">
+<EditForm FormName="CreateTopicForm" Model="@Model">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
@@ -51,6 +52,7 @@
 			<div class="form-group">
 				<label for="timeToRetain">Time to retain data (in ms)</label>
 				<InputNumber @bind-Value="Model.TimeToRetain" class="form-control mb-2" id="timeToRetain" />
+
 				<div class="btn-group w-100" role="group" aria-label="Time to retain shortcuts">
 					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1">12 hours</button>
 					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1">1 day</button>
@@ -81,67 +83,9 @@
 				<InputNumber @bind-Value="Model.MaxMessageBytes" class="form-control" id="maxMessageBytes" />
 			</div>
 		</div>
-	</div>
-
-	<h4>Custom parameters</h4>
-
-	<table>
-		<thead>
-			<tr>
-				<th>Key</th>
-				<th>Value</th>
-				<th>Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var pair in Model.Configs)
-			{
-				<tr>
-					<td>@pair.Key</td>
-					<td>@pair.Value</td>
-					<td>
-						<button @onclick="() => HandleDeleteConfig(pair.Key)">Delete</button>
-					</td>
-				</tr>
-			}
-			<tr>
-				<td><InputText @bind-Value="newKey"></InputText></td>
-				<td><InputText @bind-Value="newValue"></InputText></td>
-				<td><button @onclick="@HandleAppendToConfigs">Append</button></td>
-			</tr>
-		</tbody>
-	</table>
-
-	<div class="mt-4">				
-		<NavLink class="nav-link" href="@UrlBack" style="display: inline;">			
-			<button type="button" class="btn btn-primary">Cancel</button>
-		</NavLink>
-		<button type="button" class="btn btn-light">Create</button>
-	</div>
+	</div>	
 </EditForm>
 
-@code {
-	[Parameter]
-	public string UrlBack { get; set; } = string.Empty;
-
-	public CreateTopicModel Model { get; set; } = new CreateTopicModel();
-
-	private string newKey = string.Empty;
-	private string newValue = string.Empty;
-	
-	private void HandleAppendToConfigs()
-	{
-		Model.Configs.Add(newKey, newValue);
-		newKey = string.Empty;
-		newValue = string.Empty;
-	}
-
-	private void HandleDeleteConfig(string key)
-	{
-		if (Model.Configs.Remove(key))
-		{
-			// If needed, trigger UI refresh
-			//StateHasChanged();
-		}
-	}
+@code {	
+	private CreateTopicModel Model = new();		
 }

@@ -22,7 +22,8 @@ public class CreateTopicModel
     public short ReplicationFactor { get; set; } = -1;
     public int? RetentionBytes { get; set; }
     public int MaxMessageBytes { get; set; }
-    public Dictionary<string, string> Configs = new Dictionary<string, string>();    
+    //public Dictionary<string, string> Configs = new Dictionary<string, string>();    
+    public List<TopicCustomParameterModel> CustomParameters { get; set; } = new List<TopicCustomParameterModel>();
 
     public IEnumerable<KeyValuePair<string, string>> CleanupPolicyOptions
     {
@@ -35,7 +36,7 @@ public class CreateTopicModel
             yield return new KeyValuePair<string, string>("Compact", compact);
             yield return new KeyValuePair<string, string>("Compact,Delete", $"{compact},{delete}");
         }
-    }
+    }    
 }
 
 public static class CreateTopicModelExtensions

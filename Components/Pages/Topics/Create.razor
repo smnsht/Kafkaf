@@ -19,7 +19,15 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-8 mt-4">
-            <_CreateTopicForm UrlBack="@UrlBack" />
+            <_CreateTopicForm />
+            <_CustomParametersForm />
+
+            <div class="mt-4">
+                <NavLink class="nav-link" href="@UrlBack" style="display: inline;">
+                    <button type="button" class="btn btn-primary">Cancel</button>
+                </NavLink>
+                <button type="button" class="btn btn-light">Create</button>
+            </div>
         </div>
     </div>
 </div>
@@ -48,19 +56,7 @@
 
 @code {
     [Parameter]
-    public int clusterIdx { get; set; }
-
-    // private string TopicName { get; set; } = String.Empty;
-    // private int NumPartitions { get; set; } = -1;
-    // private short ReplicationFactor { get; set; } = -1;
-    // private Dictionary<string, string> Configs = new Dictionary<string, string>();
-    // private Dictionary<int, List<int>> ReplicasAssignments = new Dictionary<int, List<int>>();
-
-    // private string newKey = string.Empty;
-    // private string newValue = string.Empty;
-
-    // private int newReplicaKey = -1;
-    // private string newReplicaValue = string.Empty;
+    public int clusterIdx { get; set; }    
 
     private string? successNotice;
     private string? errorNotice;
