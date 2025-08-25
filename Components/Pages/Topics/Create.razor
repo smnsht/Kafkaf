@@ -2,6 +2,7 @@
 @using Confluent.Kafka.Admin
 @using Kafkaf.Config
 @using Kafkaf.Models
+@using Kafkaf.Components.UI;
 @using Microsoft.Extensions.Caching.Memory
 @using Microsoft.Extensions.Options
 
@@ -16,6 +17,9 @@
 
 
 <h3>Create Topic</h3>
+
+<DismissibleAlertError @ref="@alertError" />
+<DismissibleAlertSuccess @ref="@alertSuccess"/>
 
 <div class="container-fluid">
     <div class="row">
@@ -34,44 +38,18 @@
     </div>
 </div>
 
-@if (!string.IsNullOrEmpty(successNotice))
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>Success!</strong> @successNotice
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-
-    <p>
-        <NavLink href="/topics">
-            Return to topics
-        </NavLink>
-    </p>
-}
-
-@if(!string.IsNullOrEmpty(errorNotice))
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong>Error!</strong> @errorNotice
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
 
 @code {
     [Parameter]
     public int clusterIdx { get; set; }    
 
     private CreateTopicModel TopicModel = new();
-    private _CreateTopicForm? childCreateTopicForm;        
-
-    private string? successNotice;
-    private string? errorNotice;
+    private _CreateTopicForm? childCreateTopicForm;
+    private DismissibleAlertError? alertError;
+    private DismissibleAlertSuccess? alertSuccess;
 
     private async Task HandleValidSubmitAsync()
-    {
-        // clear notices
-        errorNotice = null;
-        successNotice = null;        
-
+    {        
         if (childCreateTopicForm?.Validate() != true)
         {            
             return;
@@ -94,19 +72,21 @@
 
             await KafkaUtils.CreateTopicAsync(clusterConfig, newTopic);
 
-            successNotice = $"Topic '{newTopic.Name}' created successfully.";
-            
+            var successNotice = $"Topic '{newTopic.Name}' created successfully.";
+            alertSuccess?.SetNotice(successNotice);
 
             // invalidate cache
             MemoryCache.Remove(clusterConfig.CacheKey());
         }
         catch (CreateTopicsException e)
-        {            
-            errorNotice = $"An error occurred creating topic '{newTopic.Name}': {e.Results[0].Error.Reason}";
+        {
+            var errorNotice = $"An error occurred creating topic '{newTopic.Name}': {e.Results[0].Error.Reason}";
+            alertError?.SetNotice(errorNotice);
         }
         catch (Exception ex)
         {            
-            errorNotice = $"An unexpected error occurred: {ex.Message}";
+            var errorNotice = $"An unexpected error occurred: {ex.Message}";
+            alertError?.SetNotice(errorNotice);
         }
     }    
 
