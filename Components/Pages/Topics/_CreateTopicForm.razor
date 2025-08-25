@@ -1,7 +1,7 @@
 ﻿@using Kafkaf.Models
 @using System.ComponentModel.DataAnnotations
 
-<EditForm FormName="CreateTopicForm" Model="@Model">
+<EditForm FormName="CreateTopicForm" EditContext="@editContext">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
@@ -54,11 +54,11 @@
 				<InputNumber @bind-Value="Model.TimeToRetain" class="form-control mb-2" id="timeToRetain" />
 
 				<div class="btn-group w-100" role="group" aria-label="Time to retain shortcuts">
-					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1">12 hours</button>
-					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1">1 day</button>
-					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1">2 days</button>
-					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1">7 days</button>
-					<button type="button" class="btn btn-sm btn-outline-secondary rounded">4 weeks</button>
+					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1" @onclick="() => AddTimeToRetain(0.5f)">12 hours</button>
+					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1" @onclick="() => AddTimeToRetain(1)">1 day</button>
+					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1" @onclick="() => AddTimeToRetain(2)">2 days</button>
+					<button type="button" class="btn btn-sm btn-outline-secondary rounded me-1" @onclick="() => AddTimeToRetain(7)">7 days</button>
+					<button type="button" class="btn btn-sm btn-outline-secondary rounded" @onclick="() => AddTimeToRetain(28)">4 weeks</button>
 				</div>
 			</div>
 		</div>
@@ -67,7 +67,7 @@
 	<div class="row mb-4">
 		<div class="col">
 			<div class="form-group">
-				<label for="retentionBytes">Max size on disk in GB</label>				
+				<label for="retentionBytes">Max size on disk in GB</label>
 				<InputSelect @bind-Value="Model.RetentionBytes" class="form-control" id="retentionBytes">
 					<option value="">Not Set</option>
 					<option value="1">1 GB</option>
@@ -83,9 +83,27 @@
 				<InputNumber @bind-Value="Model.MaxMessageBytes" class="form-control" id="maxMessageBytes" />
 			</div>
 		</div>
-	</div>	
+	</div>
 </EditForm>
 
-@code {	
-	private CreateTopicModel Model = new();		
+@code {
+	[Parameter]
+	public required CreateTopicModel Model { get; set; }
+
+	private EditContext? editContext;
+
+	protected override void OnInitialized()
+	{
+		editContext = new EditContext(Model);
+
+		base.OnInitialized();
+	}
+
+	public bool Validate() => editContext!.Validate();
+
+	private void AddTimeToRetain(float days)
+	{
+		int hours = (int)(days * 24);
+		Model.TimeToRetain = hours * 60 * 60 * 1000;
+	}
 }

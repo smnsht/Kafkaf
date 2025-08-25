@@ -1,6 +1,7 @@
 ﻿@using Confluent.Kafka
 @using Confluent.Kafka.Admin
 @using Kafkaf.Config
+@using Kafkaf.Models
 @using Microsoft.Extensions.Caching.Memory
 @using Microsoft.Extensions.Options
 
@@ -19,15 +20,16 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-8 mt-4">
-            <_CreateTopicForm />
-            <_CustomParametersForm />
+            <_CreateTopicForm Model="@TopicModel" @ref="childCreateTopicForm" />
+            <_CustomParametersForm CustomParameterList="@TopicModel.CustomParameters" />
 
             <div class="mt-4">
                 <NavLink class="nav-link" href="@UrlBack" style="display: inline;">
                     <button type="button" class="btn btn-primary">Cancel</button>
                 </NavLink>
-                <button type="button" class="btn btn-light">Create</button>
+                <button type="button" class="btn btn-light" @onclick="HandleValidSubmitAsync">Create</button>
             </div>
+            
         </div>
     </div>
 </div>
@@ -58,6 +60,9 @@
     [Parameter]
     public int clusterIdx { get; set; }    
 
+    private CreateTopicModel TopicModel = new();
+    private _CreateTopicForm? childCreateTopicForm;        
+
     private string? successNotice;
     private string? errorNotice;
 
@@ -65,14 +70,19 @@
     {
         // clear notices
         errorNotice = null;
-        successNotice = null;
+        successNotice = null;        
+
+        if (childCreateTopicForm?.Validate() != true)
+        {            
+            return;
+        }
 
         // Process the submitted data
         var newTopic = new TopicSpecification
         {
-            Name = "", //TopicName,
-            NumPartitions = 1, //NumPartitions,
-            ReplicationFactor = 1, //ReplicationFactor,
+            Name = TopicModel.Name,
+            NumPartitions = TopicModel.NumPartitions,
+            ReplicationFactor = TopicModel.ReplicationFactor,
             //Configs = Configs,
             //ReplicasAssignments = ReplicasAssignments
         };
@@ -85,12 +95,7 @@
             await KafkaUtils.CreateTopicAsync(clusterConfig, newTopic);
 
             successNotice = $"Topic '{newTopic.Name}' created successfully.";
-
-            // TopicName = string.Empty;
-            // NumPartitions = -1;
-            // ReplicationFactor = -1;
-            // Configs.Clear();
-            // ReplicasAssignments.Clear();
+            
 
             // invalidate cache
             MemoryCache.Remove(clusterConfig.CacheKey());
@@ -108,21 +113,5 @@
     private string UrlBack
     {
         get => $"/{clusterIdx}/topics";
-    }
-    // private void HandleAppendToConfigs()
-    // {
-    //     Configs.Add(newKey, newValue);
-    //     newKey = string.Empty;
-    //     newValue = string.Empty;
-    // }
-
-
-    // private void HandleDeleteConfig(string key)
-    // {
-    //     if (Configs.Remove(key))
-    //     {
-    //         If needed, trigger UI refresh
-    //         StateHasChanged();
-    //     }
-    // }    
+    }        
 }

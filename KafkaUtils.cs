@@ -108,6 +108,6 @@ public static class KafkaUtils
         });               
     }
 
-    public static async Task CreateTopicAsync(ClusterConfigOptions clusterConfig, TopicSpecification topic, int timeoutSeconds = 10) =>
+    public static async Task CreateTopicAsync(ClusterConfigOptions clusterConfig, TopicSpecification topic, int timeoutSeconds = 30) =>
         await CreateTopicsAsync(clusterConfig, new List<TopicSpecification>() { topic }, timeoutSeconds);
 }
