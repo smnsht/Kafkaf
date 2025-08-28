@@ -1,5 +1,113 @@
-﻿<h3>Messages</h3>
+﻿@using Kafkaf.ViewModels
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col px-1">
+			<label>Seek Type</label>
+			<select class="form-control">
+				<option>Offset</option>
+				<option>Timestamp</option>
+			</select>
+		</div>
+		<div class="col px-1">
+			<label>&nbsp;</label>
+			<input type="text" placeholder="Offset" class="form-control" />
+		</div>
+		<div class="col px-1">
+			<label>Partitions</label>
+			<select class="form-control">
+				<option>a</option>
+				<option>b</option>
+			</select>
+		</div>
+		<div class="col px-1">
+			<label>Key Serde</label>
+			<select class="form-control">
+				<option>a</option>
+				<option>b</option>
+			</select>
+		</div>
+		<div class="col px-1">
+			<label>Key Serde</label>
+			<select class="form-control">
+				<option>a</option>
+				<option>b</option>
+			</select>
+		</div>
+		<div class="col px-1">
+			<label>Sort</label>
+			<select class="form-control">
+				<option>Oldest First</option>
+				<option>Newest First</option>
+			</select>
+		</div>
+		<div class="col px-1">
+			<label>&nbsp;</label>
+			<div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-light">&times;</button>
+					<button class="btn btn-primary">Submit</button>
+				</div>
+			</div>			
+		</div>
+	</div>
+</div>
+
+<div class="container-fluid mt-2">
+	<div class="row">
+		<div class="col-3 px-1">
+			<input type="text"  class="form-control" placeholder="search"/>
+		</div>
+		<div class="col-3">
+			<button type="button" class="btn btn-secondary" disabled>+ Add Filters</button>
+		</div>
+	</div>
+</div>
+
+<table class="table mt-5">
+	<thead>
+		<tr>
+			<th>Offset</th>
+			<th>Partition</th>
+			<th>Timestamp</th>
+			<th>Key</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var msg in SearchMessages())
+		{
+			<tr>
+				<td>@msg.Offset</td>
+				<td>@msg.Partition</td>
+				<td>@msg.Timestamp</td>
+				<td>@msg.Key</td>
+				<td>@msg.Value</td>
+			</tr>
+		}
+	</tbody>
+</table>
 
 @code {
+	
+	public IEnumerable<MessageViewModel<string, string>> SearchMessages()
+	{
+		yield return new MessageViewModel<string, string>()
+			{
+				Key = "1",
+				Value = "asdfasdf",
+				Offset = 1,
+				Partition = 0,
+				Timestamp = DateTime.Now
+			};
 
+		yield return new MessageViewModel<string, string>()
+		{
+			Key = "2",
+			Value = "asdfasdf afasdfasdfasd f",
+			Offset = 2,
+			Partition = 0,
+			Timestamp = DateTime.Now
+		};
+	}
 }
