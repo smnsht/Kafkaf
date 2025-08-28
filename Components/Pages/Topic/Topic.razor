@@ -1,0 +1,136 @@
+﻿@page "/{clusterIdx:int}/topics/{topicName}"
+
+@inject NavigationManager Navigation
+
+@inherits ClusterIndexAwarePage
+@rendermode InteractiveServer
+
+<SectionContent SectionName="before-h1">
+	<NavLinkTopics ClusterIdx="@clusterIdx"
+				   ButtonStyle="BootstrapButtonStyle.Link"
+				   Text="Topics" />
+	<b class="me-2">/</b>
+</SectionContent>
+
+<SectionContent SectionName="text-end">
+	<details>
+		<summary>Produce Message...</summary>
+		<div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+			<button class="btn btn-primary"
+					type="button"
+					data-bs-toggle="offcanvas"
+					data-bs-target="#offcanvasRight"
+					aria-controls="offcanvasRight">
+				Produce Message
+			</button>
+			<button class="btn btn-primary">Edit Settings</button>
+			<button class="btn btn-danger">Clear Messages</button>
+			<button class="btn btn-danger">Recreate Topic</button>
+			<button class="btn btn-danger">Remove Topic</button>
+		</div>
+	</details>
+</SectionContent>
+
+<KafkafPageHeader Title="@Title" H1="@topicName" />
+
+<_ProduceMessageForm />
+
+<ul class="nav nav-tabs mb-3">
+	<li class="nav-item">
+		<button class="@ButtonClasses(TopicsTabs.Overview)"
+				@onclick="() => selectedTab = TopicsTabs.Overview">
+			Overview
+		</button>
+	</li>
+	<li class="nav-item">
+		<button class="@ButtonClasses(TopicsTabs.Messages)"
+				@onclick="() => selectedTab = TopicsTabs.Messages">
+			Messages
+		</button>
+	</li>
+	<li class="nav-item">
+		<button class="@ButtonClasses(TopicsTabs.Consumers)"
+				@onclick="() => selectedTab = TopicsTabs.Consumers">
+			Consumers
+		</button>
+	</li>
+	<li class="nav-item">
+		<button class="@ButtonClasses(TopicsTabs.Settings)"
+				@onclick="() => selectedTab = TopicsTabs.Settings">
+			Settings
+		</button>
+	</li>
+	<li class="nav-item">
+		<button type="button" class="@ButtonClasses(TopicsTabs.Statistics)"
+				@onclick="() => selectedTab = TopicsTabs.Statistics">
+			Statistics
+		</button>
+	</li>
+</ul>
+
+@switch (selectedTab)
+{
+	case TopicsTabs.Overview:
+		<_Overview />
+		break;
+
+	case TopicsTabs.Messages:
+		<_Messages />
+		break;
+
+	case TopicsTabs.Consumers:
+		<_Consumers />
+		break;
+
+	case TopicsTabs.Settings:
+		<_Settings />
+		break;
+
+	case TopicsTabs.Statistics:
+		<_Statistics />
+		break;
+
+	default:
+		break;
+}
+
+@code {
+	private enum TopicsTabs
+	{
+		Overview,
+		Messages,
+		Consumers,
+		Settings,
+		Statistics
+	};
+
+	[Parameter]
+	public string topicName { get; set; } = string.Empty;
+
+	private string Title
+	{
+		get => $"Topics: {topicName}";
+	}
+
+	private TopicsTabs? selectedTab;
+
+	private string ButtonClasses(TopicsTabs? tab) => tab == selectedTab ? "nav-link active" : "nav-link";
+
+	protected override void OnInitialized()
+	{
+		var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+		var queryParams = System.Web.HttpUtility.ParseQueryString(uri.Query);
+		
+		selectedTab = queryParams["tab"]?.ToLower() switch
+		{			
+			"overview" => TopicsTabs.Overview,
+			"messages" => TopicsTabs.Messages,
+			"consumers" => TopicsTabs.Consumers,
+			"settings" => TopicsTabs.Settings,
+			"statistics" => TopicsTabs.Statistics,
+			_ => TopicsTabs.Overview
+		};
+
+		base.OnInitialized();
+	}
+}
