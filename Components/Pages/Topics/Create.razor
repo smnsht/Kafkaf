@@ -27,13 +27,27 @@
             <_CreateTopicForm Model="@TopicModel" @ref="childCreateTopicForm" />
             <_CustomParametersForm CustomParameterList="@TopicModel.CustomParameters" />
 
-            <div class="mt-4">
-                <NavLink class="nav-link" href="@UrlBack" style="display: inline;">
-                    <button type="button" class="btn btn-primary">Cancel</button>
-                </NavLink>
-                <button type="button" class="btn btn-light" @onclick="HandleValidSubmitAsync">Create</button>
-            </div>
+            @if(loading) 
+            {
+                <Spinner />
+            } 
             
+            @if(!loading && !created)
+            {
+                <div class="mt-4">
+                    <NavLink class="nav-link" href="@UrlBack" style="display: inline;">
+                        <button type="button" class="btn btn-primary">Cancel</button>
+                    </NavLink>
+                    <button type="button" class="btn btn-light" @onclick="HandleValidSubmitAsync">Create</button>
+                </div>
+            }
+
+            @if(created)
+            {
+                <NavLink class="nav-link" href="@UrlBack" style="">
+                    <button type="button" class="btn btn-primary">Back to topics</button>
+                </NavLink>
+            }
         </div>
     </div>
 </div>
@@ -48,6 +62,9 @@
     private DismissibleAlertError? alertError;
     private DismissibleAlertSuccess? alertSuccess;
 
+    private bool loading = false;
+    private bool created = false;
+
     private async Task HandleValidSubmitAsync()
     {        
         if (childCreateTopicForm?.Validate() != true)
@@ -56,24 +73,20 @@
         }
 
         // Process the submitted data
-        var newTopic = new TopicSpecification
-        {
-            Name = TopicModel.Name,
-            NumPartitions = TopicModel.NumPartitions,
-            ReplicationFactor = TopicModel.ReplicationFactor,
-            //Configs = Configs,
-            //ReplicasAssignments = ReplicasAssignments
-        };
-
+        var newTopic = TopicModel.ToTopicSpecification();        
         var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
 
         try
         {
+            loading = true;
 
             await KafkaUtils.CreateTopicAsync(clusterConfig, newTopic);
 
             var successNotice = $"Topic '{newTopic.Name}' created successfully.";
             alertSuccess?.SetNotice(successNotice);
+
+            // set flag
+            created = true;
 
             // invalidate cache
             MemoryCache.Remove(clusterConfig.CacheKey());
@@ -84,9 +97,9 @@
             alertError?.SetNotice(errorNotice);
         }
         catch (Exception ex)
-        {            
-            var errorNotice = $"An unexpected error occurred: {ex.Message}";
-            alertError?.SetNotice(errorNotice);
+        {                        
+            alertError?.SetNotice($"An unexpected error occurred: {ex.Message}");
+            loading = false;
         }
     }    
 

@@ -12,17 +12,16 @@
 @inject IOptions<List<ClusterConfigOptions>> ClusterOptions;
 @inject IMemoryCache MemoryCache
 
-<PageTitle>Topics: Listt</PageTitle>
+
+<PageTitle>Topics: List</PageTitle>
 
 <div class="container-fluid">
 	<div class="row">
 		<div class="col">
 			<h1>Topics: List</h1>
 		</div>
-		<div class="col text-end">
-			<NavLink class="nav-link" href="@($"/{clusterIdx}/topics/create")">
-				<button class="btn btn-primary">Add a Topic</button>
-			</NavLink>
+		<div class="col text-end">			
+			<NavLinkTopics ClusterIdx="@clusterIdx" Text="Add a Topic" TopicId="create" />
 		</div>
 	</div>
 </div>
@@ -117,7 +116,12 @@
 							   checked="@isChecked"
 							   @onchange="e => HandleTopicChecked(e, topic.TopicName)" />
 					</td>
-					<td>@topic.TopicName</td>
+					<td>						
+						<NavLinkTopics ClusterIdx="@clusterIdx" 
+									    ButtonStyle="BootstrapButtonStyle.Link" 
+										Text="@topic.TopicName" 
+										TopicId="@topic.TopicName" />
+					</td>
 					<td>@topic.Partitions</td>
 					<td>@topic.OutOfSyncReplicas</td>
 					<td>@topic.ReplicationFactor</td>

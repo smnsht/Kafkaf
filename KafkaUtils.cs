@@ -103,8 +103,8 @@ public static class KafkaUtils
 
         await adminClient.CreateTopicsAsync(topics, new CreateTopicsOptions() 
         { 
-            RequestTimeout = timeout,
-            OperationTimeout = timeout
+            //RequestTimeout = timeout,
+            //OperationTimeout = timeout
         });               
     }
 

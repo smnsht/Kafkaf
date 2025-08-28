@@ -7,9 +7,9 @@ public static class KafkaTopicProperties
     public static readonly KafkaTopicConfig TopicConfigs = new KafkaTopicConfig
     {
         // Cleanup and Retention
-        { "cleanup.policy", ("string", "delete") },
-        { "retention.ms", ("long", "604800000") }, // 7 days
-        { "retention.bytes", ("long", "-1") }, // unlimited
+        //{ "cleanup.policy", ("string", "delete") },
+        //{ "retention.ms", ("long", "604800000") }, // 7 days
+        //{ "retention.bytes", ("long", "-1") }, // unlimited
         { "delete.retention.ms", ("long", "86400000") }, // 1 day
         { "min.cleanable.dirty.ratio", ("double", "0.5") },
         { "file.delete.delay.ms", ("long", "60000") },
@@ -38,7 +38,7 @@ public static class KafkaTopicProperties
         { "leader.replication.throttled.replicas", ("list", "[]") },
 
         // Message Size and Timestamps
-        { "max.message.bytes", ("int", "1048588") }, // 1 MB
+        //{ "max.message.bytes", ("int", "1048588") }, // 1 MB
         { "message.downconversion.enable", ("boolean", "true") },
         { "message.timestamp.type", ("string", "CreateTime") },
         { "message.timestamp.difference.max.ms", ("long", "9223372036854775807") }, // Long.MaxValue
