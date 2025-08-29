@@ -1,4 +1,5 @@
-﻿using Confluent.Kafka;
+﻿using System.Collections.Generic;
+using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using Kafkaf.Config;
 
@@ -24,6 +25,41 @@ public static class KafkaUtils
 
             return adminClient.GetMetadata(timeout);
         });
+    }
+
+    public static IEnumerable<Message<string, string>> ReadMessages(ClusterConfigOptions clusterConfig, Metadata meta, string topicName, int timeoutSeconds = 5)
+    {
+        var config = new ConsumerConfig
+        {
+            BootstrapServers = clusterConfig.Address,
+            EnableAutoCommit = false,
+            GroupId = Guid.NewGuid().ToString(), // Optional: use random ID to avoid reuse
+            AutoOffsetReset = AutoOffsetReset.Earliest
+        };
+
+        using var consumer = new ConsumerBuilder<string, string>(config).Build();
+
+        // Get metadata to discover partitions        
+        var partitions = meta.Topics.First().Partitions.Select(p =>
+            new TopicPartitionOffset(topicName, p.PartitionId, Offset.Beginning)).ToList();
+
+        // Assign manually
+        consumer.Assign(partitions);
+
+        var results = new List<Message<string, string>>();
+
+        // Read messages
+        for (int i = 0; i<10; i++)
+        {
+            var cr = consumer.Consume(TimeSpan.FromMilliseconds(100));
+            
+            if (cr != null)
+            {
+                results.Add(cr.Message);
+            }
+        }
+
+        return results;
     }
 
     public static async Task PurgeMessages(ClusterConfigOptions clusterConfig, IEnumerable<string> topicNames, int timeoutSeconds = 5)

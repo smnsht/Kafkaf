@@ -68,31 +68,36 @@
 	</li>
 </ul>
 
-@switch (selectedTab)
-{
-	case TopicsTabs.Overview:
-		<_Overview />
-		break;
+clusterIdx: @clusterIdx
 
-	case TopicsTabs.Messages:
-		<_Messages />
-		break;
+<CascadingValue Value="@topicName" Name="TopicName">
+	@switch (selectedTab)
+	{
+		case TopicsTabs.Overview:
+			<_Overview />
+			break;
 
-	case TopicsTabs.Consumers:
-		<_Consumers />
-		break;
+		case TopicsTabs.Messages:
+			<_Messages />
+			break;
 
-	case TopicsTabs.Settings:
-		<_Settings />
-		break;
+		case TopicsTabs.Consumers:
+			<_Consumers />
+			break;
 
-	case TopicsTabs.Statistics:
-		<_Statistics />
-		break;
+		case TopicsTabs.Settings:
+			<_Settings />
+			break;
 
-	default:
-		break;
-}
+		case TopicsTabs.Statistics:
+			<_Statistics />
+			break;
+
+		default:
+			break;
+	}
+</CascadingValue>
+
 
 @code {
 	private enum TopicsTabs
