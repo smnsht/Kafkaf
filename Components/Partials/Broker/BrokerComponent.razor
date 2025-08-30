@@ -1,18 +1,14 @@
-﻿@page "/{clusterIdx:int}/brokers/{brokerIdx:int}"
-@rendermode InteractiveServer
-@inherits ClusterIndexAwarePage
-
-<SectionContent SectionName="before-h1">
-    <a href=@($"/{clusterIdx}/brokers")>Brokers</a>
+﻿<SectionContent SectionName="before-h1">
+    <a href=@($"/{ClusterIdx}/brokers")>Brokers</a>
     <b class="ms-2 me-2">/</b>
 </SectionContent>
 
-<KafkafPageHeader Title=@($"Broker #{brokerIdx} on cluster #{clusterIdx}")
-				  H1=@($"Broker #{brokerIdx}") />
+<KafkafPageHeader Title=@($"Broker #{BrokerIdx} on cluster #{ClusterIdx}")
+                  H1=@($"Broker #{BrokerIdx}") />
 
 <div class="container-fluid pt-2 pb-3 rounded" style="background-color: #cacaca;">
-	<div class="row">
-		<ul class="list-group list-group-horizontal small w-100">
+    <div class="row">
+        <ul class="list-group list-group-horizontal small w-100">
             <li class="list-group-item col-2">
                 <div>Segment Size</div>
                 <span class="badge bg-secondary">TODO</span>
@@ -29,8 +25,8 @@
                 <div>Host</div>
                 <span class="badge bg-secondary">TODO</span>
             </li>
-		</ul>
-	</div>
+        </ul>
+    </div>
 </div>
 
 <ul class="nav nav-tabs mt-3">
@@ -42,10 +38,19 @@
     </li>
     <li class="nav-item">
         <a class="nav-link" href="#">Metrics</a>
-    </li>    
+    </li>
 </ul>
 
 @code {
-	[Parameter]
-	public int brokerIdx { get; set; }
+    [Parameter]
+    public int ClusterIdx { get; set; }
+
+    [Parameter]
+    public int BrokerIdx { get; set; }
+
+    [Parameter]
+    public string PageTitle { get; set; } = "?";
+
+    [Parameter]
+    public string PageHeading { get; set; } = "?";
 }

@@ -1,113 +1,75 @@
-﻿@using Confluent.Kafka
-@using Kafkaf.Config
-@using Microsoft.Extensions.Caching.Memory
-@using Microsoft.Extensions.Options
-
-@page "/{clusterIdx:int}/brokers"
+﻿@page "/{clusterIdx:int}/brokers"
 @rendermode InteractiveServer
+@inherits ClusterIndexAwarePage
 
-@inject IOptions<List<ClusterConfigOptions>> ClusterOptions;
-@inject IMemoryCache MemoryCache
+<KafkafPageHeader Title="Brokers: List" H1="Brokers: List" />
 
-<PageTitle>Brokers: List</PageTitle>
+<div class="container-fluid pt-2 pb-3 rounded" style="background-color: #cacaca;">
+    <div class="row">
+        <div class="col-5">
+            <h5>Uptime</h5>
 
-<h3>Brokers: List</h3>
-
-<div class="card">
-    <div class="card-header">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-5">
-                    <h5>Uptime</h5>
-                    
-                    <ul class="list-group list-group-horizontal small w-100">
-                        <li class="list-group-item col-4">
-                            <div>Broker Count</div> 
-                            <span class="badge bg-secondary">TODO</span>
-                        </li>
-                        <li class="list-group-item col-4">
-                            <div>Active Controller</div> 
-                            <span class="badge bg-secondary">TODO</span>
-                        </li>
-                        <li class="list-group-item col-4">
-                            <div>Version</div> 
-                            <span class="badge bg-secondary">TODO</span>
-                        </li>
-                    </ul>                    
-                </div>
-                <div class="col-7">
-                    <h5>Partitions</h5>
-
-                    <ul class="list-group list-group-horizontal small w-100">
-                        <li class="list-group-item col-3">
-                            <div>Online</div> 
-                            <span class="badge bg-secondary">TODO</span>
-                        </li>
-                        <li class="list-group-item col-3">
-                            <div>URP</div> 
-                            <span class="badge bg-secondary">TODO</span>
-                        </li>
-                        <li class="list-group-item col-3">
-                            <div>In Sync Replicas</div> 
-                            <span class="badge bg-secondary">TODO</span>
-                        </li>
-                        <li class="list-group-item col-3">
-                            <div>Out Of Sync Replicas</div> 
-                            <span class="badge bg-secondary">TODO</span>
-                        </li>
-                    </ul>                    
-                </div>
-            </div>
+            <ul class="list-group list-group-horizontal small w-100">
+                <li class="list-group-item col-4">
+                    <div>Broker Count</div>
+                    <span class="badge bg-secondary">TODO</span>
+                </li>
+                <li class="list-group-item col-4">
+                    <div>Active Controller</div>
+                    <span class="badge bg-secondary">TODO</span>
+                </li>
+                <li class="list-group-item col-4">
+                    <div>Version</div>
+                    <span class="badge bg-secondary">TODO</span>
+                </li>
+            </ul>
         </div>
-        <br />
-    </div>
-    <div class="card-body">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Broker ID</th>                                        
-                    <th>Host</th>
-                    <th>Port</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var row in brokers.OrderBy(b => b.BrokerId))
-                {
-                    <tr>
-                        <td>@row.BrokerId</td>                        
-                        <td>@row.Host</td>
-                        <td>@row.Port</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-    <div class="card-footer">
-        clusterid: @clusterIdx
+        <div class="col-7">
+            <h5>Partitions</h5>
+
+            <ul class="list-group list-group-horizontal small w-100">
+                <li class="list-group-item col-3">
+                    <div>Online</div>
+                    <span class="badge bg-secondary">TODO</span>
+                </li>
+                <li class="list-group-item col-3">
+                    <div>URP</div>
+                    <span class="badge bg-secondary">TODO</span>
+                </li>
+                <li class="list-group-item col-3">
+                    <div>In Sync Replicas</div>
+                    <span class="badge bg-secondary">TODO</span>
+                </li>
+                <li class="list-group-item col-3">
+                    <div>Out Of Sync Replicas</div>
+                    <span class="badge bg-secondary">TODO</span>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
+<br />
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Broker ID</th>
+            <th>Host</th>
+            <th>Port</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in brokers.OrderBy(b => b.BrokerId))
+        {
+            <tr>
+                <td><a href=@($"/{clusterIdx}/brokers/{row.BrokerId}")>@row.BrokerId</a></td>
+                <td>@row.Host</td>
+                <td>@row.Port</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
-    [Parameter]
-    public int clusterIdx { get; set; }
-
-    public List<BrokerMetadata> brokers = new List<BrokerMetadata>();
-
-	protected override async Task OnInitializedAsync()
-	{
-		var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
-		var meta = await MemoryCache.GetOrCreateAsync(
-            clusterConfig.CacheKey(), 
-            async cacheEntry =>
-		    {
-			    cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(60);
-
-			    return await KafkaUtils.GetMetadata(clusterConfig);
-		    });
-
-		// TODO: handle null
-		brokers = meta!.Brokers;
-
-		await base.OnInitializedAsync();
-	}
+    
 }

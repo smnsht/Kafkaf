@@ -13,6 +13,7 @@ public class ClusterIndexAwarePage: ComponentBase
     [Inject]
     public required IOptions<List<ClusterConfigOptions>> ClusterOptions { get; set; }
 
+    [Inject]
     public required IMemoryCache MemoryCache { get; set; }
 
     protected ClusterConfigOptions ClusterConfig
