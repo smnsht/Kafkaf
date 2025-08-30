@@ -119,8 +119,8 @@
 					<td>						
 						<NavLinkTopics ClusterIdx="@clusterIdx" 
 									    ButtonStyle="BootstrapButtonStyle.Link" 
-										Text="@topic.TopicName" 
-										TopicId="@topic.TopicName" />
+										Text="@topic.TopicName"
+									   TopicId=@($"{topic.TopicName}/overview") />
 					</td>
 					<td>@topic.Partitions</td>
 					<td>@topic.OutOfSyncReplicas</td>

@@ -11,7 +11,7 @@ public enum TopicsTabs
     Statistics
 };
 
-public partial class TopicComponent
+public partial class TopicComponent : ComponentBase
 {
     public const string PATH_PART_OVERVIEW = "overview";
     public const string PATH_PART_MESSAGES = "messages";
@@ -38,7 +38,7 @@ public partial class TopicComponent
 
     [Parameter]
     public string CurrentPathPart { get; set; } = "?";
-
+    
     private Dictionary<TopicsTabs, Tuple<string, string>> TabsConfig = new()
     {
         { TopicsTabs.Overview, new (PATH_PART_OVERVIEW, "Overview") },

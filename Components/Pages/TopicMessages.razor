@@ -1,18 +1,107 @@
 ﻿@using Kafkaf.Components.Topic
+@using Kafkaf.ViewModels
 
 @inherits ClusterIndexAwarePage
 @rendermode InteractiveServer
-@attribute [Route(TopicComponent.ROUTE_MESSAGES)]
 
 <TopicComponent ClusterIdx="@clusterIdx"
 				PageTitle=@($"Topic {topicName}: Messages")
 				TopicName="@topicName"
 				CurrentPathPart="@TopicComponent.PATH_PART_MESSAGES" />
 
-<h3>this is topic messages</h3>
 
+<div class="container-fluid">
+	<div class="row">
+		<div class="col px-1">
+			<label>Seek Type</label>
+			<KafkafEnumSelect EnumType="@typeof(SeekType)"
+							  Value="@seekType"
+							  ValueChanged="HandleSeekTypeChanged" />
+		</div>
+		<div class="col px-1">
+			<label>&nbsp;</label>
+			<input type="text"
+				   placeholder="@seekType"
+				   class="form-control" />
+		</div>
+		<div class="col px-1">
+			<label>Partitions</label>
+			<select class="form-control">
+				<option>a</option>
+				<option>b</option>
+			</select>
+		</div>
+		<div class="col px-1">
+			<label>Key Serde</label>
+			<KafkafEnumSelect EnumType="@typeof(SerdeKind)"
+							  Value="@keySerde"
+							  ValueChanged="HandleKeySerdeChanged" />
+		</div>
+		<div class="col px-1">
+			<label>Value Serde</label>
+			<KafkafEnumSelect EnumType="@typeof(SerdeKind)"
+							  Value="@valueSerde"
+							  ValueChanged="HandleValueSerdeChanged" />
+		</div>
+		<div class="col px-1">
+			<label>Sort</label>
+			<KafkafEnumSelect EnumType="@typeof(SortKind)"
+							  Value="@sortKind"
+							  ValueChanged="HandleSortKindChanged" />
+		</div>
+		<div class="col px-1">
+			<label>&nbsp;</label>
+			<div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-light" @onclick="HandleClear">&times;</button>
+					<button class="btn btn-primary" @onclick="HandleSearchAsync">Submit</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container-fluid mt-2">
+	<div class="row">
+		<div class="col-3 px-1">
+			<input type="text"
+				   @bind="@searchText"
+				   class="form-control"
+				   placeholder="search" />
+		</div>
+		<div class="col-3">
+			<button type="button" class="btn btn-secondary" disabled>+ Add Filters</button>
+		</div>
+	</div>
+</div>
+
+@if (rows != null)
+{
+	<table class="table mt-5">
+		<thead>
+			<tr>
+				<th>Offset</th>
+				<th>Partition</th>
+				<th>Timestamp</th>
+				<th>Key</th>
+				<th>Value</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var msg in rows)
+			{
+				<tr>
+					<td>@msg.Offset</td>
+					<td>@msg.Partition</td>
+					<td>@msg.Timestamp</td>
+					<td>@msg.Key</td>
+					<td>@msg.Value</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
 
 @code {
-	[Parameter]
-	public string topicName { get; set; } = string.Empty;	
+
 }

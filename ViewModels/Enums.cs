@@ -1,14 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Kafkaf.ViewModels;
-public enum SeekType
-{
-    [Display(Name = "Offset")]
-    Offset,
-
-    [Display(Name = "Timestamp")]
-    Timestamp
-}
 
 public enum SortKind
 {
