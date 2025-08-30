@@ -1,7 +1,8 @@
 ﻿@using Kafkaf.Config
 @using Microsoft.Extensions.Options
-@inject IOptions<List<ClusterConfigOptions>> ClusterOptions;
 
+@inject IOptions<List<ClusterConfigOptions>> ClusterOptions;
+@inject NavigationManager Navigation
 
 <div class="accordion" id="accordionDashboard">
 	@for (var i = 0; i < Clusters.Count; i++)
@@ -9,6 +10,7 @@
 		var cluster = @Clusters[i];
 		var headerId = $"heading{i + 1}";
 		var collapseId = $"collapse{i + 1}";
+		var isCurrent = (clusterId.HasValue && (clusterId.Value - 1) == i);
 
 		<div class="accordion-item">
 			<h4 class="accordion-header" id="@headerId">
@@ -20,6 +22,11 @@
 						aria-expanded="false"
 						aria-controls="@collapseId">
 					@cluster.Alias
+
+					@if (isCurrent)
+					{						
+						<span class="badge bg-success rounded-circle ms-2">&nbsp;</span>
+					}
 				</button>
 			</h4>
 
@@ -48,19 +55,32 @@
 							<span class="" aria-hidden="true"></span> Consumers
 						</NavLink>
 					</div>
+
+					<button type="button" class="btn btn-secondary" disabled title="TODO">Clear Cache</button>
 				</div>
 			</div>
 		</div>
-
 	}
 </div>
 
 @code {
 	private List<ClusterConfigOptions> Clusters = new List<ClusterConfigOptions>();
+	private int? clusterId { get; set; }
 
 	protected override void OnInitialized()
 	{
 		Clusters = ClusterOptions.Value;
+
+		var uri = new Uri(Navigation.Uri);
+		var firstSegment = uri.LocalPath
+			.Split('/')
+			.Where(s => !string.IsNullOrEmpty(s))
+			.FirstOrDefault();
+
+		if (int.TryParse(firstSegment, out int i))
+		{
+			clusterId = i;
+		}
 
 		base.OnInitialized();
 	}
