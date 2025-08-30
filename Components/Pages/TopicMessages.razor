@@ -1,0 +1,15 @@
+﻿@page "/{clusterIdx:int}/topics/{topicName}/messages"
+
+@inherits ClusterIndexAwarePage
+@rendermode InteractiveServer
+
+<Kafkaf.Components.Topic.TopicComponent ClusterIdx="@clusterIdx"
+										PageTitle="page title messages"
+										TopicName="@topicName" CurrentPathPart="messages" />
+
+<h3>this is topic messages</h3>
+
+@code {
+	[Parameter]
+	public string topicName { get; set; } = string.Empty;
+}
