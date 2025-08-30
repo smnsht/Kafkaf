@@ -3,11 +3,10 @@
     <b class="ms-2 me-2">/</b>
 </SectionContent>
 
-<KafkafPageHeader Title=@($"Broker #{BrokerIdx} on cluster #{ClusterIdx}")
-                  H1=@($"Broker #{BrokerIdx}") />
+<KafkafPageHeader Title=@PageTitle H1=@PageHeading />
 
 <div class="container-fluid pt-2 pb-3 rounded" style="background-color: #cacaca;">
-    <div class="row">
+    <div class="row ms-2">
         <ul class="list-group list-group-horizontal small w-100">
             <li class="list-group-item col-2">
                 <div>Segment Size</div>
@@ -30,27 +29,17 @@
 </div>
 
 <ul class="nav nav-tabs mt-3">
-    <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="#">Log directories</a>
+    <li class="nav-item">        
+        @linkForTab(BrokerTabs.LogDirectories)
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Configs</a>
+        @linkForTab(BrokerTabs.Configs)        
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Metrics</a>
+        @linkForTab(BrokerTabs.Metrics)
     </li>
 </ul>
 
 @code {
-    [Parameter]
-    public int ClusterIdx { get; set; }
 
-    [Parameter]
-    public int BrokerIdx { get; set; }
-
-    [Parameter]
-    public string PageTitle { get; set; } = "?";
-
-    [Parameter]
-    public string PageHeading { get; set; } = "?";
 }
