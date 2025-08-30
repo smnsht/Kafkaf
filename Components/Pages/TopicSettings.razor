@@ -1,15 +1,17 @@
-﻿@page "/{clusterIdx:int}/topics/{topicName}/settings"
+﻿@using Kafkaf.Components.Topic
 
 @inherits ClusterIndexAwarePage
 @rendermode InteractiveServer
+@attribute [Route(TopicComponent.ROUTE_SETTINGS)]
 
-<Kafkaf.Components.Topic.TopicComponent ClusterIdx="@clusterIdx"
-										PageTitle="page title settings"
-										TopicName="@topicName" CurrentPathPart="settings" />
+<TopicComponent ClusterIdx="@clusterIdx"
+				PageTitle=@($"Topic {topicName}: Settings")
+				TopicName="@topicName"
+				CurrentPathPart="@TopicComponent.PATH_PART_SETTINGS" />
 
 <h3>this is topic settings</h3>
 
 @code {
 	[Parameter]
-	public string topicName { get; set; } = string.Empty;
+	public string topicName { get; set; } = string.Empty;	
 }

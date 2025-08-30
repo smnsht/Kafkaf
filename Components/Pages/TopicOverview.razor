@@ -1,11 +1,13 @@
-﻿@page "/{clusterIdx:int}/topics/{topicName}/overview"
+﻿@using Kafkaf.Components.Topic
 
 @inherits ClusterIndexAwarePage
 @rendermode InteractiveServer
+@attribute [Route(TopicComponent.ROUTE_OVERVIEW)]
 
-<Kafkaf.Components.Topic.TopicComponent ClusterIdx="@clusterIdx"
-										PageTitle="page title"
-										TopicName="@topicName" CurrentPathPart="overview" />
+<TopicComponent ClusterIdx="@clusterIdx"
+				PageTitle=@($"Topic: {topicName}")
+				TopicName="@topicName"
+				CurrentPathPart="@TopicComponent.PATH_PART_OVERVIEW" />
 
 <h3>this is topic overview</h3>
 

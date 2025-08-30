@@ -1,5 +1,4 @@
-﻿
-<SectionContent SectionName="before-h1">
+﻿<SectionContent SectionName="before-h1">
 	<NavLinkTopics ClusterIdx="@ClusterIdx"
 				   ButtonStyle="BootstrapButtonStyle.Link"
 				   Text="Topics" />
@@ -48,44 +47,6 @@
 </ul>
 
 @code {
-	private enum TopicsTabs
-	{
-		Overview,
-		Messages,
-		Consumers,
-		Settings,
-		Statistics
-	};
-
-	private Dictionary<TopicsTabs, Tuple<string, string>> TabsConfig = new()
-	{
-		{ TopicsTabs.Overview, new ("overview", "Overview") },
-		{ TopicsTabs.Messages, new ("messages", "Messages") },
-		{ TopicsTabs.Consumers, new ("consumers", "Consumers") },
-		{ TopicsTabs.Settings, new ("settings", "Settings") },
-		{ TopicsTabs.Statistics, new ("statistics", "Statistics") }
-	};
-
-	[Parameter]
-	public int ClusterIdx { get; set; }
-
-	[Parameter]
-	public string PageTitle { get; set; } = "?";
-
-	[Parameter]
-	public string TopicName { get; set; } = "?";
-
-	[Parameter]
-	public string CurrentPathPart { get; set; } = "?";
-
-	private MarkupString linkForTab(TopicsTabs tab)
-	{
-		var (pathPart, linkText) = TabsConfig[tab];
-		var clazz = pathPart == CurrentPathPart 
-			? "nav-link active" 
-			: "nav-link";
-		var url = $"/{ClusterIdx}/topics/{TopicName}/{pathPart}";
+	
 		
-		return new MarkupString($"<a class=\"{clazz}\" href=\"{url}\">{linkText}</a>");
-	}	
 }

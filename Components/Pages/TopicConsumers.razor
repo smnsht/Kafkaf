@@ -2,16 +2,17 @@
 
 @inherits ClusterIndexAwarePage
 @rendermode InteractiveServer
-@attribute [Route(TopicComponent.ROUTE_STATISTICS)]
+@attribute [Route(TopicComponent.ROUTE_CONSUMERS)]
 
 <TopicComponent ClusterIdx="@clusterIdx"
-				PageTitle=@($"Topic {topicName}: Statistics")
+				PageTitle=@($"Topic {topicName}: Consumers")
 				TopicName="@topicName"
-				CurrentPathPart="@TopicComponent.PATH_PART_STATISTICS" />
+				CurrentPathPart="@TopicComponent.PATH_PART_CONSUMERS" />
 
-<h3>this is topic statistics</h3>
+<h3>this is topic consumers</h3>
 
-@code {
+@code {	
+
 	[Parameter]
 	public string topicName { get; set; } = string.Empty;
 }
