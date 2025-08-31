@@ -4,51 +4,15 @@
 
 <KafkafPageHeader Title="Brokers: List" H1="Brokers: List" />
 
-<div class="container-fluid pt-2 pb-3 rounded" style="background-color: #cacaca;">
-    <div class="row">
-        <div class="col-5">
-            <h5>Uptime</h5>
+<KafkafStatsCard2 ColATitle="Uptime" ColAWidth="5" ColBTitle="Partitions" ColBWidth="7">
+    <ColA>
+        <KafkafStatsCard ColWidth="4" StatsItems=@StatsItemsA />
+    </ColA>
 
-            <ul class="list-group list-group-horizontal small w-100">
-                <li class="list-group-item col-4">
-                    <div>Broker Count</div>
-                    <span class="badge bg-secondary">TODO</span>
-                </li>
-                <li class="list-group-item col-4">
-                    <div>Active Controller</div>
-                    <span class="badge bg-secondary">TODO</span>
-                </li>
-                <li class="list-group-item col-4">
-                    <div>Version</div>
-                    <span class="badge bg-secondary">TODO</span>
-                </li>
-            </ul>
-        </div>
-        <div class="col-7">
-            <h5>Partitions</h5>
-
-            <ul class="list-group list-group-horizontal small w-100">
-                <li class="list-group-item col-3">
-                    <div>Online</div>
-                    <span class="badge bg-secondary">TODO</span>
-                </li>
-                <li class="list-group-item col-3">
-                    <div>URP</div>
-                    <span class="badge bg-secondary">TODO</span>
-                </li>
-                <li class="list-group-item col-3">
-                    <div>In Sync Replicas</div>
-                    <span class="badge bg-secondary">TODO</span>
-                </li>
-                <li class="list-group-item col-3">
-                    <div>Out Of Sync Replicas</div>
-                    <span class="badge bg-secondary">TODO</span>
-                </li>
-            </ul>
-        </div>
-    </div>
-</div>
-<br />
+    <ColB>
+        <KafkafStatsCard ColWidth="3" StatsItems=@StatsItemsB />
+    </ColB>
+</KafkafStatsCard2>
 
 <table class="table table-hover">
     <thead>
@@ -71,5 +35,18 @@
 </table>
 
 @code {
-    
+    private List<KeyValuePair<string, string>> StatsItemsA = new()
+    {
+        new KeyValuePair<string, string>("Broker Count", "TODO"),
+        new KeyValuePair<string, string>("Active Controller", "TODO"),
+        new KeyValuePair<string, string>("Version", "TODO")
+    };
+
+    private List<KeyValuePair<string, string>> StatsItemsB = new()
+    {
+        new KeyValuePair<string, string>("Online", "TODO"),
+        new KeyValuePair<string, string>("URP", "TODO"),
+        new KeyValuePair<string, string>("In Sync Replicas", "TODO"),
+        new KeyValuePair<string, string>("Out Of Sync Replicas", "TOOD")
+    };
 }

@@ -5,28 +5,7 @@
 
 <KafkafPageHeader Title=@PageTitle H1=@PageHeading />
 
-<div class="container-fluid pt-2 pb-3 rounded" style="background-color: #cacaca;">
-    <div class="row ms-2">
-        <ul class="list-group list-group-horizontal small w-100">
-            <li class="list-group-item col-2">
-                <div>Segment Size</div>
-                <span class="badge bg-secondary">TODO</span>
-            </li>
-            <li class="list-group-item col-2">
-                <div>Segment Count</div>
-                <span class="badge bg-secondary">TODO</span>
-            </li>
-            <li class="list-group-item col-2">
-                <div>Port</div>
-                <span class="badge bg-secondary">TODO</span>
-            </li>
-            <li class="list-group-item col-2">
-                <div>Host</div>
-                <span class="badge bg-secondary">TODO</span>
-            </li>
-        </ul>
-    </div>
-</div>
+<KafkafStatsCard ColWidth="2" StatsItems=@BrokerStatsItems />
 
 <ul class="nav nav-tabs mt-3 mb-2">
     <li class="nav-item">        
@@ -41,5 +20,11 @@
 </ul>
 
 @code {
-
+    private List<KeyValuePair<string, string>> BrokerStatsItems = new()
+    {
+        new KeyValuePair<string, string>("Segment Size", "TODO"),
+        new KeyValuePair<string, string>("Segment Count", "TODO"),
+        new KeyValuePair<string, string>("Port", "TODO"),
+        new KeyValuePair<string, string>("Host", "TOOD")
+    };
 }

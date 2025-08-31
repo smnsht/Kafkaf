@@ -9,6 +9,17 @@
 				TopicName="@topicName"
 				CurrentPathPart="@TopicComponent.PATH_PART_OVERVIEW" />
 
+<KafkafStatsCard ColWidth="2" StatsItems=@TopicStatsItems />
+
+<details>
+	<summary>More details...</summary>
+	<ul>
+		<li><b>URP:</b> TODO</li>
+		<li><b>Type:</b> TODO</li>
+		<li><b>Clean Up Policy:</b> TODO</li>
+	</ul>
+</details>
+
 <h5>DUMMY DATA</h5>
 
 <table class="table table-hover">
@@ -37,4 +48,14 @@
 @code {
 	[Parameter]
 	public string topicName { get; set; } = string.Empty;
+
+	private List<KeyValuePair<string, string>> TopicStatsItems = new()
+	{		
+		new KeyValuePair<string, string>("Partitions", "TOOD"),
+		new KeyValuePair<string, string>("Replication Factor", "1"),		
+		new KeyValuePair<string, string>("In Sync Replicas", "1 of 1"),
+		new KeyValuePair<string, string>("Segment Size", "TOOD"),
+		new KeyValuePair<string, string>("Segment Count", "TOOD"),
+		new KeyValuePair<string, string>("Message Count", "TODO"),
+	};
 }
