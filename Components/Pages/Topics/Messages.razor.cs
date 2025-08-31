@@ -4,7 +4,7 @@ using Kafkaf.Components.UI;
 using Kafkaf.ViewModels;
 using Microsoft.AspNetCore.Components;
 
-namespace Kafkaf.Components.Pages;
+namespace Kafkaf.Components.Pages.Topics;
 
 public enum SeekType
 {
@@ -16,7 +16,7 @@ public enum SeekType
 }
 
 [Route(TopicComponent.ROUTE_MESSAGES)]
-public partial class TopicMessages : ClusterIndexAwarePage
+public partial class Messages : ClusterIndexAwarePage
 {
     [Parameter]
     public string topicName { get; set; } = string.Empty;
@@ -29,10 +29,10 @@ public partial class TopicMessages : ClusterIndexAwarePage
 
     private MessageViewModel<string, string>[]? rows;
 
-    private void HandleSeekTypeChanged(Object e) => seekType = (SeekType)e;
-    private void HandleKeySerdeChanged(Object e) => keySerde = (SerdeKind)e;
-    private void HandleValueSerdeChanged(Object e) => valueSerde = (SerdeKind)e;
-    private void HandleSortKindChanged(Object e) => sortKind = (SortKind)e;
+    private void HandleSeekTypeChanged(object e) => seekType = (SeekType)e;
+    private void HandleKeySerdeChanged(object e) => keySerde = (SerdeKind)e;
+    private void HandleValueSerdeChanged(object e) => valueSerde = (SerdeKind)e;
+    private void HandleSortKindChanged(object e) => sortKind = (SortKind)e;
 
     private void HandleClear()
     {

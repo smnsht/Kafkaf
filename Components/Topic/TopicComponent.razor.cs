@@ -13,7 +13,7 @@ public enum TopicsTabs
 
 public partial class TopicComponent : ComponentBase
 {
-    public const string PATH_PART_OVERVIEW = "overview";
+    public const string PATH_PART_OVERVIEW = "";
     public const string PATH_PART_MESSAGES = "messages";
     public const string PATH_PART_CONSUMERS = "consumers";
     public const string PATH_PART_SETTINGS = "settings";

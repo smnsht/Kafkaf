@@ -120,7 +120,7 @@
 						<NavLinkTopics ClusterIdx="@clusterIdx" 
 									    ButtonStyle="BootstrapButtonStyle.Link" 
 										Text="@topic.TopicName"
-									   TopicId=@($"{topic.TopicName}/overview") />
+									    TopicId=@($"{topic.TopicName}") />
 					</td>
 					<td>@topic.Partitions</td>
 					<td>@topic.OutOfSyncReplicas</td>
@@ -132,16 +132,6 @@
 		</tbody>
 	</table>
 </EditForm>
-
-
-<p>		
-	<ul>
-		<li>cluster no: #@clusterIdx</li>
-		<li>selected topics: @SelectedTopics.Count</li>
-		<li>loading: @_loading</li>
-		<li>error: @_errorNotice</li>
-	</ul>
-</p>
 
 
 @code {
