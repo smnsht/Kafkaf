@@ -1,0 +1,21 @@
+﻿@using Kafkaf.UI.Components.Topic
+@using Kafkaf.UI.Components.UI
+
+@inherits ClusterIndexAwarePage
+@rendermode InteractiveServer
+@attribute [Route(TopicComponent.ROUTE_STATISTICS)]
+
+<TopicComponent ClusterIdx="@clusterIdx"
+				PageTitle=@($"Topic {topicName}: Statistics")
+				TopicName="@topicName"
+				CurrentPathPart="@TopicComponent.PATH_PART_STATISTICS" />
+
+
+<p>
+	<button type="button" class="btn btn-primary" disabled>Start Analysis</button>
+</p>
+
+@code {
+	[Parameter]
+	public string topicName { get; set; } = string.Empty;
+}

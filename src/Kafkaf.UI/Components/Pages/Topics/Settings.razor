@@ -1,0 +1,39 @@
+﻿@using Kafkaf.UI.Components.Topic
+@using Kafkaf.UI.Components.UI
+
+@inherits ClusterIndexAwarePage
+@rendermode InteractiveServer
+@attribute [Route(TopicComponent.ROUTE_SETTINGS)]
+
+<TopicComponent ClusterIdx="@clusterIdx"
+				PageTitle=@($"Topic {topicName}: Settings")
+				TopicName="@topicName"
+				CurrentPathPart="@TopicComponent.PATH_PART_SETTINGS" />
+
+<table class="table table-hover">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Value</th>
+			<th>Default Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>a</td>
+			<td>b</td>
+			<td>c</td>
+		</tr>
+		<tr>
+			<td>2a</td>
+			<td>2b</td>
+			<td>2c</td>
+		</tr>
+	</tbody>
+</table>
+
+
+@code {
+	[Parameter]
+	public string topicName { get; set; } = string.Empty;	
+}

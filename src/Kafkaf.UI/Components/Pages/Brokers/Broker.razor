@@ -1,0 +1,42 @@
+﻿@page "/{clusterIdx:int}/brokers/{brokerIdx:int}"
+@rendermode InteractiveServer
+@inherits ClusterIndexAwarePage
+@using Kafkaf.UI.Components.Partials.Broker
+@using Kafkaf.UI.Components.UI
+
+<BrokerComponent ClusterIdx="clusterIdx"
+				 BrokerIdx="brokerIdx"
+				 PageTitle=@($"Broker #{brokerIdx} on cluster #{clusterIdx}")
+				 PageHeading=@($"Broker #{brokerIdx}")
+				 CurrentPathPart="" />
+
+<h5>DUMMY DATA</h5>
+<table class="table table-hover">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Error</th>
+			<th>Topics</th>
+			<th>Partitions</th>
+		</tr>
+	</thead>
+	<tr>
+		<td>/foo/bar/baz</td>
+		<td>&nbsp</td>
+		<td>2</td>
+		<td>1</td>
+	</tr>
+	<tr>
+		<td>/bitnami/kafka/data</td>
+		<td>&nbsp</td>
+		<td>1</td>
+		<td>3</td>
+	</tr>
+	<tbody>
+	</tbody>
+</table>
+
+@code {
+	[Parameter]
+	public int brokerIdx { get; set; }
+}
