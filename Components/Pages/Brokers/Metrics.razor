@@ -6,8 +6,13 @@
 				 BrokerIdx="brokerIdx"
 				 PageTitle=@($"Metrics For Broker #{brokerIdx} on cluster #{clusterIdx}")
 				 PageHeading=@($"Metrics For Broker #{brokerIdx}")
-				 CurrentPathPart="@BrokerComponent.ROUTE_METRICS" />
-<p>Metrics</p>
+				 CurrentPathPart="@BrokerComponent.PATH_PART_METRICS" />
+
+<pre>
+{
+	"metrics": []
+}
+</pre>
 
 @code {
 	
