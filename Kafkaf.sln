@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafkaf.DataAccess", "src\Ka
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafkaf.Web", "src\Kafkaf.Web\Kafkaf.Web.csproj", "{AC1C3A21-30FD-0EC8-0701-911F5FBF058F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafkaf.UI", "src\Kafkaf.UI\Kafkaf.UI.csproj", "{715C1EB1-E8F8-4CCE-A059-3A4A9AFD26DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{AC1C3A21-30FD-0EC8-0701-911F5FBF058F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC1C3A21-30FD-0EC8-0701-911F5FBF058F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC1C3A21-30FD-0EC8-0701-911F5FBF058F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{715C1EB1-E8F8-4CCE-A059-3A4A9AFD26DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{715C1EB1-E8F8-4CCE-A059-3A4A9AFD26DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{715C1EB1-E8F8-4CCE-A059-3A4A9AFD26DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{715C1EB1-E8F8-4CCE-A059-3A4A9AFD26DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
