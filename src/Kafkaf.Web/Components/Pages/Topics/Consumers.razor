@@ -1,0 +1,41 @@
+﻿@using Kafkaf.Web.Components.Topic
+@using Kafkaf.Web.Components.UI
+
+@inherits ClusterIndexAwarePage
+@rendermode InteractiveServer
+@attribute [Route(TopicComponent.ROUTE_CONSUMERS)]
+
+<TopicComponent ClusterIdx="@clusterIdx"
+				PageTitle=@($"Topic {topicName}: Consumers")
+				TopicName="@topicName"
+				CurrentPathPart="@TopicComponent.PATH_PART_CONSUMERS" />
+
+
+<div class="container-fluid mb-2">
+	<div class="row">
+		<div class="col-4">
+			<input type="search" class="form-control" placeholder="Search by Consumer Name" />
+		</div>
+	</div>
+</div>
+
+<table class="table table-hover">
+	<thead>
+		<tr>
+			<th>Consumer Group ID</th>
+			<th>Active Consumers</th>
+			<th>Consumer Lag</th>
+			<th>Coordinator</th>
+			<th>State</th>
+		</tr>
+	</thead>
+	<tbody>
+
+	</tbody>
+</table>
+
+@code {	
+
+	[Parameter]
+	public string topicName { get; set; } = string.Empty;
+}

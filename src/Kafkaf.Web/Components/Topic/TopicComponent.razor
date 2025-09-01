@@ -1,0 +1,52 @@
+﻿@using Kafkaf.Web.Components.UI
+<SectionContent SectionName="before-h1">
+	<NavLinkTopics ClusterIdx="@ClusterIdx"
+				   ButtonStyle="BootstrapButtonStyle.Link"
+				   Text="Topics" />
+	<b class="me-2">/</b>
+</SectionContent>
+
+<SectionContent SectionName="text-end">
+	<details>
+		<summary>Produce Message...</summary>
+		<div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+			<button class="btn btn-primary"
+					type="button"
+					data-bs-toggle="offcanvas"
+					data-bs-target="#offcanvasRight"
+					aria-controls="offcanvasRight">
+				Produce Message
+			</button>
+			<button class="btn btn-primary">Edit Settings</button>
+			<button class="btn btn-danger">Clear Messages</button>
+			<button class="btn btn-danger">Recreate Topic</button>
+			<button class="btn btn-danger">Remove Topic</button>
+		</div>
+	</details>
+</SectionContent>
+
+<KafkafPageHeader Title="@PageTitle" H1="@TopicName" />
+
+<ProduceMessageForm />
+
+<ul class="nav nav-tabs mb-3">
+	<li class="nav-item">
+		@linkForTab(TopicsTabs.Overview)		
+	</li>
+	<li class="nav-item">
+		@linkForTab(TopicsTabs.Messages)
+	</li>
+	<li class="nav-item">
+		@linkForTab(TopicsTabs.Consumers)
+	</li>
+	<li class="nav-item">
+		@linkForTab(TopicsTabs.Settings)
+	</li>
+	<li class="nav-item">
+		@linkForTab(TopicsTabs.Statistics)
+	</li>
+</ul>
+
+@code {
+
+}

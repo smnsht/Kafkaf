@@ -1,0 +1,48 @@
+﻿@using Kafkaf.Web.Components.UI
+<NavLink class="nav-link" href="@Href">
+	<button class="@ButtonClasses">@Text</button>
+</NavLink>
+
+@code {
+	[Parameter]
+	public int ClusterIdx { get; set; }
+
+	[Parameter]
+	public string Text { get; set; } = "Topics";
+
+	[Parameter]
+	public string? TopicId { get; set; }
+
+	[Parameter]
+	public BootstrapButtonStyle ButtonStyle { get; set; } = BootstrapButtonStyle.Primary;
+
+	[Parameter]
+	public BootstrapButtonSize? ButtonSize { get; set; }
+
+	public string Href
+	{
+		get => string.IsNullOrEmpty(TopicId) 
+			? $"/{ClusterIdx}/topics" 
+			: $"/{ClusterIdx}/topics/{TopicId}";
+	}
+
+	private string ButtonClasses
+	{
+		get
+		{
+			var classes = new List<string>() 
+			{ 
+				"btn",
+				ButtonStyle.ToCssClass()
+			};
+
+			if(ButtonSize?.ToCssClass() is string className)
+			{
+				classes.Add(className);
+			}
+
+			return string.Join(' ', classes);	
+		}
+	}
+
+}

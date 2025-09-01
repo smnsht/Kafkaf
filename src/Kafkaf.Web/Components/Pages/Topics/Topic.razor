@@ -1,0 +1,62 @@
+﻿@using Kafkaf.Web.Components.Topic
+@using Kafkaf.Web.Components.UI
+
+@inherits ClusterIndexAwarePage
+@rendermode InteractiveServer
+@attribute [Route(TopicComponent.ROUTE_OVERVIEW)]
+
+<TopicComponent ClusterIdx="@clusterIdx"
+				PageTitle=@($"Topic: {topicName}")
+				TopicName="@topicName"
+				CurrentPathPart="@TopicComponent.PATH_PART_OVERVIEW" />
+
+<KafkafStatsCard ColWidth="2" StatsItems=@TopicStatsItems />
+
+<details>
+	<summary>More details...</summary>
+	<ul>
+		<li><b>URP:</b> TODO</li>
+		<li><b>Type:</b> TODO</li>
+		<li><b>Clean Up Policy:</b> TODO</li>
+	</ul>
+</details>
+
+<h5>DUMMY DATA</h5>
+
+<table class="table table-hover">
+	<thead>
+		<tr>
+			<th>Partition ID</th>
+			<th>Replicas</th>
+			<th>First Offset</th>
+			<th>Next Offset</th>
+			<th>Message Count</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>0</td>
+			<td>2</td>
+			<td>0</td>
+			<td>2</td>
+			<td>2</td>
+			<td>&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+
+@code {
+	[Parameter]
+	public string topicName { get; set; } = string.Empty;
+
+	private List<KeyValuePair<string, string>> TopicStatsItems = new()
+	{		
+		new KeyValuePair<string, string>("Partitions", "TOOD"),
+		new KeyValuePair<string, string>("Replication Factor", "1"),		
+		new KeyValuePair<string, string>("In Sync Replicas", "1 of 1"),
+		new KeyValuePair<string, string>("Segment Size", "TOOD"),
+		new KeyValuePair<string, string>("Segment Count", "TOOD"),
+		new KeyValuePair<string, string>("Message Count", "TODO"),
+	};
+}

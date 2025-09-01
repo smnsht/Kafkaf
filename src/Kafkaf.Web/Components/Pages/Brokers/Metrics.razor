@@ -1,0 +1,20 @@
+﻿@rendermode InteractiveServer
+@inherits ClusterIndexAwarePage
+@using Kafkaf.Web.Components.Partials.Broker
+@using Kafkaf.Web.Components.UI
+
+<BrokerComponent ClusterIdx="clusterIdx"
+				 BrokerIdx="brokerIdx"
+				 PageTitle=@($"Metrics For Broker #{brokerIdx} on cluster #{clusterIdx}")
+				 PageHeading=@($"Metrics For Broker #{brokerIdx}")
+				 CurrentPathPart="@BrokerComponent.PATH_PART_METRICS" />
+
+<pre>
+{
+	"metrics": []
+}
+</pre>
+
+@code {
+	
+}

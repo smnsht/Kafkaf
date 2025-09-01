@@ -1,0 +1,13 @@
+﻿<div class="container-fluid pt-2 pb-2 ps-2 rounded" style="background-color: #cacaca;">
+    <div class="row ms-2">
+        <KafkafStatsCardUL StatsItems=@StatsItems ColWidth=@ColWidth />        
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, string>> StatsItems { get; set; } = new List<KeyValuePair<string, string>>();
+
+    [Parameter]
+    public int ColWidth { get; set; } = 2;    
+}

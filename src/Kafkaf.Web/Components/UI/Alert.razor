@@ -1,0 +1,23 @@
+﻿@if (!string.IsNullOrEmpty(Notice))
+{
+    <div class="alert @AlertStyle.ToCssClass() alert-dismissible fade show" role="alert">
+        <strong>@Title</strong> @Notice
+        <span class="float-end" @onclick="HandleClose">&times;</span>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "?";
+
+    [Parameter]
+    public string? Notice { get; set; }
+
+    [Parameter]
+    public BootstrapAlertStyle AlertStyle { get; set; } = BootstrapAlertStyle.Primary;
+
+    private void HandleClose()
+    {
+        Notice = null;
+    }
+}
