@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace Kafkaf.Web.Components.UI;
+namespace Kafkaf.Web;
 
 public class ClusterIndexAwarePage: ComponentBase
 {

@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Kafkaf.DataAccess\Kafkaf.DataAccess.csproj" />
+    <ProjectReference Include="..\Kafkaf.UI\Kafkaf.UI.csproj" />
   </ItemGroup>
 
 </Project>

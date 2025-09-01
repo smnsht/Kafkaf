@@ -1,6 +1,4 @@
 ﻿using Confluent.Kafka;
-using Kafkaf.Web;
-using Kafkaf.Web.Components.UI;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Kafkaf.Web.Components.Pages.Brokers;

@@ -1,4 +1,4 @@
-﻿namespace Kafkaf.Web.Components.UI;
+﻿namespace Kafkaf.UI;
 
 public enum BootstrapButtonStyle
 {    
