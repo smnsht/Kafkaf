@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafkaf.UI", "src\Kafkaf.UI\Kafkaf.UI.csproj", "{F2683B6C-B851-C3AD-ED53-EE36AB4DC91A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafkaf.DataAccess", "src\Kafkaf.DataAccess\Kafkaf.DataAccess.csproj", "{3D868377-3571-6896-E962-472E39132C70}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafkaf.Web", "src\Kafkaf.Web\Kafkaf.Web.csproj", "{AC1C3A21-30FD-0EC8-0701-911F5FBF058F}"
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F2683B6C-B851-C3AD-ED53-EE36AB4DC91A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F2683B6C-B851-C3AD-ED53-EE36AB4DC91A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F2683B6C-B851-C3AD-ED53-EE36AB4DC91A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F2683B6C-B851-C3AD-ED53-EE36AB4DC91A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3D868377-3571-6896-E962-472E39132C70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3D868377-3571-6896-E962-472E39132C70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D868377-3571-6896-E962-472E39132C70}.Release|Any CPU.ActiveCfg = Release|Any CPU
