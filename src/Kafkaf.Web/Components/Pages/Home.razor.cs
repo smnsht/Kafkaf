@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using Kafkaf.DataAccess;
 using Kafkaf.Web.Config;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Caching.Memory;
@@ -6,16 +7,23 @@ using Microsoft.Extensions.Options;
 
 namespace Kafkaf.Web.Components.Pages;
 
-public record ClusterInfoRow(
-        string ClusterName,
-        string Version = "",
-        int BrokersCount = 0,
-        int PartitionsCount = 0,
-        int TopicsCount = 0,
-        int Production = 0,
-        int Consumption = 0);
+public struct ClusterInfoRow
+{
+    public string ClusterName;
+    public string Version = "";
+    public DateTime? LastCheck = null;
+    public bool? ok = null;
+    public int? BrokersCount = null;
+    public int? PartitionsCount = null;
+    public int? TopicsCount = null;
+    public int? Production = null;
+    public int? Consumption = null;
 
-public record OfflineCluster(string alias, string address);
+    public ClusterInfoRow(string clusterName)
+    {
+        ClusterName = clusterName;
+    }
+};
 
 public partial class Home : ComponentBase
 {
@@ -26,49 +34,45 @@ public partial class Home : ComponentBase
     public required IMemoryCache MemoryCache { get; set; }
 
     public bool loading = false;
-    public List<OfflineCluster> offlineClusters = new List<OfflineCluster>();
-    public List<ClusterInfoRow> onlineClusters = new List<ClusterInfoRow>();
 
-    protected override async Task OnInitializedAsync()
+    public ClusterInfoRow[] clusters = [];
+
+    protected override void OnInitialized()
+    {
+        clusters = ClusterOptions.Value
+            .Select(opt => new ClusterInfoRow(opt.Alias))
+            .ToArray();
+
+        base.OnInitialized();
+    }
+
+    private async Task HandlePingServers()
     {
         loading = true;
 
-        var tasks = ClusterOptions.Value.Select(opt =>
+        var pingService = new ClusterPingService();
+
+        for (int i = 0; i < clusters.Length; i++)
         {
-            var config = new AdminClientConfig
+            var opt = ClusterOptions.Value[i];
+            var (m, ex) = await pingService.PingServerAsync(opt.Address);
+            //var tableRow = clusters[i];
+            var cacheKey = opt.CacheKey();
+
+            clusters[i].LastCheck = DateTime.Now;
+
+            if (m is Metadata meta)
             {
-                BootstrapServers = opt.Address,
-            };
-
-            return Task.Run(() =>
+                clusters[i].ok = true;
+                MemoryCache.Set(cacheKey, meta, TimeSpan.FromMinutes(60));// TODO
+            }
+            else
             {
-                try
-                {
-                    using var adminClient = new AdminClientBuilder(config).Build();
+                clusters[i].ok = false;
+                MemoryCache.Remove(cacheKey);
+            }
+        }               
 
-                    var meta = adminClient.GetMetadata(TimeSpan.FromSeconds(3));
-                    var infoRow = new ClusterInfoRow(
-                        ClusterName: opt.Alias,
-                        BrokersCount: meta.Brokers.Count,
-                        TopicsCount: meta.Topics.Count);
-
-                    onlineClusters.Add(infoRow);
-                }
-                catch (KafkaException ex)
-                {
-                    Console.WriteLine(ex.StackTrace);
-                    offlineClusters.Add(new OfflineCluster(alias: opt.Alias, address: opt.Address));
-                }
-            });
-        });
-
-        if (tasks?.Count() > 0) 
-        {             
-            await Task.WhenAll(tasks);
-        }
-
-        await base.OnInitializedAsync();
-
-        loading = false;
+        loading = false;        
     }
 }

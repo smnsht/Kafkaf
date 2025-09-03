@@ -14,7 +14,7 @@ public partial class Index : ClusterIndexAwarePage
             clusterConfig.CacheKey(),
             async cacheEntry =>
             {
-                cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(60);
+                cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(60);// TODO
 
                 return await KafkaUtils.GetMetadata(clusterConfig);
             });
