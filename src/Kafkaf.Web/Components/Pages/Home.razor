@@ -1,7 +1,10 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@inherits ClusterIndexAwarePage
 
 <KafkafPageHeader Title="Kafkaf: Home" H1="Kafkaf: Home" />
+
+<DismissibleAlertError2 Error="@error" />
 
 <table class="table">
     <thead>
@@ -38,7 +41,7 @@
                             break;
 
                         case false:
-                            <span class="badge badge-bg-danger me-1">Down</span>
+                            <span class="badge text-bg-danger me-1">Down</span>
                             <i title="Last checked" class="small">(@infoRow.LastCheck?.ToShortTimeString())</i>
                             break;
 

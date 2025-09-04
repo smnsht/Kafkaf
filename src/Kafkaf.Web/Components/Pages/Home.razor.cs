@@ -1,9 +1,6 @@
 ﻿using Confluent.Kafka;
 using Kafkaf.DataAccess;
-using Kafkaf.Web.Config;
-using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 
 namespace Kafkaf.Web.Components.Pages;
 
@@ -25,16 +22,8 @@ public struct ClusterInfoRow
     }
 };
 
-public partial class Home : ComponentBase
+public partial class Home : ClusterIndexAwarePage
 {
-    [Inject]
-    public required IOptions<List<ClusterConfigOptions>> ClusterOptions { get; set; }
-
-    [Inject]
-    public required IMemoryCache MemoryCache { get; set; }
-
-    public bool loading = false;
-
     public ClusterInfoRow[] clusters = [];
 
     protected override void OnInitialized()
@@ -48,31 +37,35 @@ public partial class Home : ComponentBase
 
     private async Task HandlePingServers()
     {
-        loading = true;
-
-        var pingService = new ClusterPingService();
-
-        for (int i = 0; i < clusters.Length; i++)
+        await RunWithLoadingAsync(async () =>
         {
-            var opt = ClusterOptions.Value[i];
-            var (m, ex) = await pingService.PingServerAsync(opt.Address);
-            //var tableRow = clusters[i];
-            var cacheKey = opt.CacheKey();
+            var pingService = new ClusterPingService();
+            var clusterOptions = ClusterOptions.Value.ToList();
 
-            clusters[i].LastCheck = DateTime.Now;
+            var pingTasks = clusterOptions
+                .Select(opt => pingService.PingServerAsync(opt.Address))
+                .ToList();
+            var pingResults = await Task.WhenAll(pingTasks);            
 
-            if (m is Metadata meta)
+            for (int i = 0; i < clusterOptions.Count; i++)
             {
-                clusters[i].ok = true;
-                MemoryCache.Set(cacheKey, meta, TimeSpan.FromMinutes(60));// TODO
-            }
-            else
-            {
-                clusters[i].ok = false;
-                MemoryCache.Remove(cacheKey);
-            }
-        }               
+                var opt = clusterOptions[i];
+                var cacheKey = opt.CacheKey();
+                var (m, _) = pingResults[i];
 
-        loading = false;        
+                clusters[i].LastCheck = DateTime.Now;
+
+                if (m is Metadata meta)
+                {
+                    clusters[i].ok = true;
+                    MemoryCache.Set(cacheKey, meta, TimeSpan.FromMinutes(60)); // TODO: make configurable
+                }
+                else
+                {
+                    clusters[i].ok = false;
+                    MemoryCache.Remove(cacheKey);
+                }
+            }
+        });
     }
 }

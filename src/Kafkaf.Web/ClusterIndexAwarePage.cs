@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace Kafkaf.Web;
 
-public class ClusterIndexAwarePage: ComponentBase
+public class ClusterIndexAwarePage : ComponentBase
 {
     [Parameter]
     public int clusterIdx { get; set; }
@@ -16,8 +16,38 @@ public class ClusterIndexAwarePage: ComponentBase
     [Inject]
     public required IMemoryCache MemoryCache { get; set; }
 
+    public bool loading = false;
+    public Exception? error = null;
+
     protected ClusterConfigOptions ClusterConfig
     {
         get => ClusterOptions.Value[clusterIdx - 1];
+    }
+
+    public async Task<bool> RunWithLoadingAsync(Func<Task> action, bool rethrow = false)
+    {
+        loading = true;
+        error = null;        
+
+        try
+        {
+            await action();
+            return true;
+        }
+        catch (Exception e)
+        {
+            error = e;
+
+            if (rethrow)
+            {
+                throw;
+            }
+
+            return false;
+        }
+        finally
+        {
+            loading = false;
+        }
     }
 }

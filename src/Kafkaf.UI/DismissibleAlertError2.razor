@@ -1,0 +1,42 @@
+﻿@if (Error is Exception ex)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>@Heading</strong>
+        @if (DebugMode)
+        {
+            <details>
+                <summary>Error details</summary>
+                <ul>
+                    <li><b>Message:</b> @ex.Message</li>
+                    <li><b>Exception type:</b> @ex.GetType()</li>
+                </ul>
+
+                <label>StackTrace:</label>
+                <pre>@ex.StackTrace</pre>                
+            </details>
+        }
+        Unexpected error.
+        <button type="button" 
+                class="btn-close" 
+                data-bs-dismiss="alert" 
+                aria-label="Close" @onclick="() => Error = null"></button>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public bool DebugMode { get; set; } = true;
+
+    [Parameter]
+    public string Heading { get; set; } = "Error!";
+
+    [Parameter]
+    public Exception? Error { get; set; }
+
+    public void SetError(Exception? e)
+    {
+        Error = e;
+        StateHasChanged();
+    }
+}
