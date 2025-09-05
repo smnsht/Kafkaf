@@ -22,7 +22,7 @@ public partial class Index : ClusterIndexAwarePage
         {
             _showInternalTopics = value;
 
-            UpdateTopics();
+            ApplyTopicFilters();
         }
     }
 
@@ -33,38 +33,21 @@ public partial class Index : ClusterIndexAwarePage
         set
         {
             _searchTopicName = value;
-            UpdateTopics();
+            ApplyTopicFilters();
         }
     }
 
-    //private string? _errorNotice;
-    //private string? _successNotice;
-
-
     protected override async Task OnInitializedAsync()
     {
-        var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
-        var meta = await MemoryCache.GetOrCreateAsync(
-            clusterConfig.CacheKey(),
-            async cacheEntry =>
-            {
-                cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(60);
+        await LoadTopics();
 
-                return await KafkaUtils.GetMetadata(clusterConfig);
-            });
-
-        // TODO: handle null
-        _topics = meta!.Topics
-            .Select(meta => new TopicsListViewModel(meta))
-            .ToList();
-
-        UpdateTopics();
+        ApplyTopicFilters();
 
         await base.OnInitializedAsync();
     }
 
 
-    private void UpdateTopics()
+    private void ApplyTopicFilters()
     {
         var qry = _topics.AsQueryable();
 
@@ -96,12 +79,14 @@ public partial class Index : ClusterIndexAwarePage
 
     private async Task DeleteTopicsAsync()
     {
+        var cfg = ClusterConfig;
+
         await RunWithLoadingAsync(async () =>
         {
-            await adminService.DeleteTopicsAsync(ClusterConfig, SelectedTopics);
+            await adminService.DeleteTopicsAsync(cfg, SelectedTopics);
+            await RefreshTopicsAsync(cfg.CacheKey());
 
             notice = "Topic(s) deleted!";
-            SelectedTopics.Clear();
         });
     }
 
@@ -113,36 +98,46 @@ public partial class Index : ClusterIndexAwarePage
 
             notice = "Messages purged!";
             SelectedTopics.Clear();
+            // RefreshTopicsAsync????
         });
     }
-
 
     private void HandleCopyTopics()
     {
         // TODO
     }
 
-    //private async Task WithLoadingAsync(WithClusterConfigAndTopicsAsyncDelegate del)
-    //{
-    //    var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
+    private async Task LoadTopics()
+    {
+        var clusterConfig = ClusterConfig;
+        var meta = await MemoryCache.GetOrCreateAsync(
+            clusterConfig.CacheKey(),
+            async cacheEntry =>
+            {
+                cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(60);
 
-    //    _errorNotice = null;
-    //    _successNotice = null;
-    //    loading = true;
-    //    try
-    //    {
-    //        await del(clusterConfig, SelectedTopics);
+                return await KafkaUtils.GetMetadata(clusterConfig);
+            });
 
-    //        _successNotice = "Sucess";
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        _errorNotice = e.Message;
-    //    }
-    //    finally
-    //    {
-    //        loading = false;
-    //    }
-    //}
+        var counts = KafkaUtils.CountMessages(clusterConfig, meta!.Topics);
 
+        // TODO: handle null
+        _topics = meta!.Topics
+            .Select((meta, i) => 
+            {
+                return new TopicsListViewModel(meta)
+                {
+                    NumberOfMessages = (int)counts[i]
+                };
+            })
+            .ToList();        
+    }
+
+    private async Task RefreshTopicsAsync(string cacheKey)
+    {
+        SelectedTopics.Clear();
+        MemoryCache.Remove(cacheKey);
+        await LoadTopics();
+        ApplyTopicFilters();
+    }
 }

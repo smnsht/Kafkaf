@@ -1,8 +1,12 @@
 ﻿@using Kafkaf.Web.Config
+@using Microsoft.Extensions.Caching.Memory
 @using Microsoft.Extensions.Options
 
-@inject IOptions<List<ClusterConfigOptions>> ClusterOptions;
+@inject IOptions<List<ClusterConfigOptions>> ClusterOptions
+@inject IMemoryCache MemoryCache
 @inject NavigationManager Navigation
+@inject IJSRuntime JsRuntime
+@rendermode InteractiveServer
 
 <div class="accordion" id="accordionDashboard">
 	@for (var i = 0; i < Clusters.Count; i++)
@@ -24,7 +28,7 @@
 					@cluster.Alias
 
 					@if (isCurrent)
-					{						
+					{
 						<span class="badge bg-success rounded-circle ms-2">&nbsp;</span>
 					}
 				</button>
@@ -41,7 +45,7 @@
 					</p>
 
 					<div class="nav-item px-3 mt-2 mb-2">
-						<NavLink class="nav-link" href="@($"/{i+1}/brokers")">
+						<NavLink class="nav-link" href="@($"/{i + 1}/brokers")">
 							<span class="" aria-hidden="true"></span> Brokers
 						</NavLink>
 					</div>
@@ -56,16 +60,20 @@
 						</NavLink>
 					</div>
 
-					<button type="button" class="btn btn-secondary" disabled title="TODO">Clear Cache</button>
+					<button type="button"
+							class="btn btn-secondary"
+							@onclick="() => HandleClearCacheAsync(cluster, i)">
+						Clear Cache
+					</button>										
 				</div>
 			</div>
 		</div>
-	}
+	}	
 </div>
 
 @code {
 	private List<ClusterConfigOptions> Clusters = new List<ClusterConfigOptions>();
-	private int? clusterId { get; set; }
+	private int? clusterId { get; set; }	
 
 	protected override void OnInitialized()
 	{
@@ -83,5 +91,12 @@
 		}
 
 		base.OnInitialized();
+	}
+
+	private async Task HandleClearCacheAsync(ClusterConfigOptions opt, int idx)
+	{		
+		MemoryCache.Remove(opt.CacheKey());	
+
+		await JsRuntime.InvokeVoidAsync("alert", $"Cache for server {opt.Alias} has been cleared.");
 	}
 }

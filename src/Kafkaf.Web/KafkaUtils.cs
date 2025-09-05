@@ -1,4 +1,5 @@
-﻿using Confluent.Kafka;
+﻿using System.Collections.Concurrent;
+using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using Kafkaf.Web.Config;
 
@@ -145,4 +146,36 @@ public static class KafkaUtils
 
     public static async Task CreateTopicAsync(ClusterConfigOptions clusterConfig, TopicSpecification topic, int timeoutSeconds = 30) =>
         await CreateTopicsAsync(clusterConfig, new List<TopicSpecification>() { topic }, timeoutSeconds);
+
+
+    public static long[] CountMessages(ClusterConfigOptions clusterConfig, List<TopicMetadata> topics)
+    {
+        var config = new ConsumerConfig
+        {
+            BootstrapServers = clusterConfig.Address,
+            GroupId = "offset-checker",
+            EnableAutoCommit = false
+        };
+
+        using var consumer = new ConsumerBuilder<Ignore, Ignore>(config).Build();
+
+        List<long> results = new List<long>();
+
+        foreach (var topic in topics) 
+        {
+            var topicPartitions = topic.Partitions
+                .Select(p => new TopicPartition(topic.Topic, p.PartitionId))
+                .ToList();
+
+            long total = 0;
+            foreach (var tp in topicPartitions)
+            {                                
+                var offs = consumer.QueryWatermarkOffsets(tp, TimeSpan.FromSeconds(5));
+                total += (offs.High - offs.Low);
+            }
+            results.Add(total);
+        }
+
+        return results.ToArray();
+    }
 }
