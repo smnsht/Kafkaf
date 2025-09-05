@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
-using Kafkaf.DataAccess;
+using Kafkaf.Web.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Kafkaf.Web.Components.Pages;
@@ -26,6 +27,11 @@ public partial class Home : ClusterIndexAwarePage
 {
     public ClusterInfoRow[] clusters = [];
 
+    [Inject]
+    public required ClusterPingService pingService {  get; set; }
+
+    public ClusterPingService PingService { get => pingService; set => pingService = value; }
+
     protected override void OnInitialized()
     {
         clusters = ClusterOptions.Value
@@ -38,14 +44,13 @@ public partial class Home : ClusterIndexAwarePage
     private async Task HandlePingServers()
     {
         await RunWithLoadingAsync(async () =>
-        {
-            var pingService = new ClusterPingService();
+        {            
             var clusterOptions = ClusterOptions.Value.ToList();
 
             var pingTasks = clusterOptions
                 .Select(opt => pingService.PingServerAsync(opt.Address))
                 .ToList();
-            var pingResults = await Task.WhenAll(pingTasks);            
+            var pingResults = await Task.WhenAll(pingTasks);
 
             for (int i = 0; i < clusterOptions.Count; i++)
             {

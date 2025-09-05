@@ -1,5 +1,6 @@
 using Kafkaf.Web.Components;
 using Kafkaf.Web.Config;
+using Kafkaf.Web.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ builder.Services.AddMemoryCache();
 builder.Services.Configure<List<ClusterConfigOptions>>(
     builder.Configuration.GetSection("Kafkaf:Clusters")
 );
+
+builder.Services.AddKafkafClusterPingService(builder.Configuration);
 
 var app = builder.Build();
 
