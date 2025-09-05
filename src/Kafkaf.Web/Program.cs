@@ -11,11 +11,15 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMemoryCache();
 
-builder.Services.Configure<List<ClusterConfigOptions>>(
-    builder.Configuration.GetSection("Kafkaf:Clusters")
-);
+//builder.Services.Configure<List<ClusterConfigOptions>>(
+//    builder.Configuration.GetSection("Kafkaf:Clusters")
+//);
+builder.ConfigureClusterConfigOptions();
+builder.AddClusterPingServiceOptions();
+builder.AddAdminClientConfigOptions();
 
-builder.Services.AddKafkafClusterPingService(builder.Configuration);
+builder.Services.AddTransient<ClusterPingService>();
+builder.Services.AddTransient<KafkaAdminService>();
 
 var app = builder.Build();
 

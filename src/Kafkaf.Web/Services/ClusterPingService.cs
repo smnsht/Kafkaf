@@ -1,19 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Confluent.Kafka;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Confluent.Kafka;
+using Kafkaf.Web.Config;
 using Microsoft.Extensions.Options;
 
 namespace Kafkaf.Web.Services;
 
 using ClusterPingResult = Tuple<Metadata?, Exception?>;
-
-public class ClusterPingServiceOptions
-{
-    public const long DefaultTimeoutInSeconds = 5;
-
-    [Range(5, 60, ErrorMessage = "ClusterPingService: TimeoutInSeconds must be between 5 and 60 seconds")]
-    public long TimeoutInSeconds { get; set; } = DefaultTimeoutInSeconds;
-}
 
 
 public class ClusterPingService
@@ -50,23 +41,4 @@ public class ClusterPingService
 
     public Task<ClusterPingResult> PingServerAsync(string bootstrapServers) 
         => Task.Run(() => PingServer(bootstrapServers));
-}
-
-
-public static class ClusterPingServiceExtensions
-{
-    public static IServiceCollection AddKafkafClusterPingService(this IServiceCollection services, IConfiguration configuration)
-    {
-        var sectionName = $"Kafkaf:{nameof(ClusterPingService)}";
-
-        services
-            .AddOptions<ClusterPingServiceOptions>()
-            .Bind(configuration.GetSection(sectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-        
-        services.AddTransient<ClusterPingService>();
-
-        return services;
-    }
 }

@@ -8,10 +8,7 @@
 
 @page "/{clusterIdx:int}/topics"
 @rendermode InteractiveServer
-
-@inject IOptions<List<ClusterConfigOptions>> ClusterOptions;
-@inject IMemoryCache MemoryCache
-
+@inherits ClusterIndexAwarePage
 
 <PageTitle>Topics: List</PageTitle>
 
@@ -26,9 +23,9 @@
 	</div>
 </div>
 
-<EditForm Model="@this">
-	<KafkafAlert Title="Error!" Notice=@_errorNotice AlertStyle=BootstrapAlertStyle.Danger></KafkafAlert>
-	<KafkafAlert Title="Success!" Notice=@_successNotice AlertStyle=BootstrapAlertStyle.Success />
+<EditForm Model="@this">	
+	<DismissibleAlertError2 Error="error" />
+	<KafkafAlert Title="Success!" Notice=@notice AlertStyle=BootstrapAlertStyle.Success />
 		
 	<div class="container-fluid">		
 		<div class="row">			
@@ -54,7 +51,7 @@
 	</div>
 
 	
-	@if (_loading)
+	@if (loading)
 	{
 		<div class="text-center">
 			<div class="spinner-border" role="status">
@@ -135,124 +132,5 @@
 
 
 @code {
-
-	[Parameter]
-	public int clusterIdx { get; set; }
-
-	private bool _loading = false;
-
-	private List<string> SelectedTopics = new();
-
-	private List<TopicsListViewModel> _topics = new();
-	private List<TopicsListViewModel> Topics = new();
-
-	private bool _showInternalTopics = true;
-	private bool ShowInternalTopics
-	{
-		get => _showInternalTopics;
-		set
-		{
-			_showInternalTopics = value;
-			UpdateTopics();
-		}
-	}
-
-	private string? _searchTopicName = null;
-	public string? SearchTopicName
-	{
-		get => _searchTopicName;
-		set
-		{
-			_searchTopicName = value;
-			UpdateTopics();
-		}
-	}
-
-	private string? _errorNotice;
-	private string? _successNotice;
-
-	protected override async Task OnInitializedAsync()
-	{
-		var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
-		var meta = await MemoryCache.GetOrCreateAsync(
-			clusterConfig.CacheKey(),
-			async cacheEntry =>
-			{
-				cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(60);
-
-				return await KafkaUtils.GetMetadata(clusterConfig);
-			});
-
-		// TODO: handle null
-		_topics = meta!.Topics
-			.Select(meta => new TopicsListViewModel(meta))
-			.ToList();
-
-		UpdateTopics();
-
-		await base.OnInitializedAsync();
-	}
-
-	private void UpdateTopics()
-	{
-		var qry = _topics.AsQueryable();
-
-		if (!_showInternalTopics)
-		{
-			qry = qry.Where(topic => !topic.TopicName.StartsWith("__"));
-		}
-
-		if (!string.IsNullOrEmpty(_searchTopicName))
-		{
-			qry = qry.Where(topic => topic.TopicName.Contains(_searchTopicName, StringComparison.InvariantCultureIgnoreCase));
-		}
-
-		Topics = qry.ToList();
-	}
-
-	private void HandleTopicChecked(ChangeEventArgs e, string topicName)
-	{
-		if (e.Value is true)
-		{
-			SelectedTopics.Add(topicName);
-		}
-		else
-		{
-			SelectedTopics.Remove(topicName);
-		}
-	}
-
-	private Task DeleteTopicsAsync() => WithLoadingAsync(KafkaUtils.DeleteTopics);	
-
-	private Task PurgeMessagesAsync() => WithLoadingAsync(KafkaUtils.PurgeMessages);
-
-	private void HandleCopyTopics()
-	{
-		// TODO
-	}
-
-	private async Task WithLoadingAsync(WithClusterConfigAndTopicsAsyncDelegate del)
-	{
-		var clusterConfig = ClusterOptions.Value[clusterIdx - 1];
-
-		_errorNotice = null;
-		_successNotice = null;
-		_loading = true;
-		try
-		{
-			await del(clusterConfig, SelectedTopics);
-
-			_successNotice = "Sucess";
-		}
-		catch(Exception e)
-		{			
-			_errorNotice = e.Message;
-		}
-		finally
-		{
-			_loading = false;
-		}
-	}
-
 	
 }
