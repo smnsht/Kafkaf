@@ -31,5 +31,10 @@ public struct TopicsListViewModel
         NumberOfMessages = 0; // TODO
         Size = 0; //TODO
     }
+
+    public bool IsInternal
+    {
+        get => TopicName.StartsWith("__");
+    }
 }
 

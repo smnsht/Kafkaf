@@ -55,7 +55,21 @@
 
 @code {
     [Parameter]
-    public int clusterIdx { get; set; }    
+    public int clusterIdx { get; set; }   
+
+
+    [SupplyParameterFromQuery]
+    public string? TopicName { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Size { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? ReplicationFactor { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Partitions { get; set; }
+
 
     private CreateTopicModel TopicModel = new();
     private _CreateTopicForm? childCreateTopicForm;
@@ -64,6 +78,21 @@
 
     private bool loading = false;
     private bool created = false;
+
+    protected override void OnParametersSet()
+    {
+        if(!string.IsNullOrEmpty(TopicName))
+        {
+            TopicModel.Name = TopicName;
+        }
+
+        if (Partitions.HasValue)
+        {
+            TopicModel.NumPartitions = Partitions.Value;
+        }
+
+        base.OnParametersSet();
+    }
 
     private async Task HandleValidSubmitAsync()
     {        

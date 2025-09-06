@@ -10,11 +10,14 @@ public partial class Index : ClusterIndexAwarePage
     [Inject]
     public required KafkaAdminService adminService { get; set; }
 
+    [Inject]
+    public required NavigationManager NavManager { get; set; }
+
     private List<string> SelectedTopics = new();
     private List<TopicsListViewModel> _topics = new();
     private List<TopicsListViewModel> Topics = new();
 
-    private bool _showInternalTopics = true;
+    private bool _showInternalTopics = false;
     private bool ShowInternalTopics
     {
         get => _showInternalTopics;
@@ -74,7 +77,7 @@ public partial class Index : ClusterIndexAwarePage
         else
         {
             SelectedTopics.Remove(topicName);
-        }
+        }        
     }
 
     private async Task DeleteTopicsAsync()
@@ -103,8 +106,23 @@ public partial class Index : ClusterIndexAwarePage
     }
 
     private void HandleCopyTopics()
-    {
-        // TODO
+    {        
+        if (SelectedTopics.Count() == 1 && 
+            SelectedTopics.First() is string topicName && 
+            _topics.FirstOrDefault(t => t.TopicName == topicName) is TopicsListViewModel topic)
+        {
+            var filterParams = new Dictionary<string, object>
+            {
+                ["TopicName"] = topic.TopicName,
+                ["Size"] = topic.Size,
+                ["ReplicationFactor"] = topic.ReplicationFactor,
+                ["Partitions"] = topic.Partitions
+            };            
+            
+            var newUri = NavManager.GetUriWithQueryParameters($"{NavManager.Uri}/create", filterParams!);
+
+            NavManager.NavigateTo(newUri);
+        }
     }
 
     private async Task LoadTopics()

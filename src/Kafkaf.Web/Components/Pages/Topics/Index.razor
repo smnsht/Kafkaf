@@ -70,9 +70,9 @@
 
 					<button type="button"
 							class="btn btn-outline-secondary me-1"
-							disabled
+							disabled=@(SelectedTopics.Count != 1)
 							@onclick="HandleCopyTopics">
-						Copy selected topics (TODO)
+						Copy selected topic
 					</button>
 
 					<button type="button"
@@ -104,22 +104,24 @@
 				var isChecked = SelectedTopics.Contains(topic.TopicName);
 
 				<tr>
-					<td>
+					<td>						
 						<input type="checkbox"
 							   checked="@isChecked"
+							   disabled=@topic.IsInternal
 							   @onchange="e => HandleTopicChecked(e, topic.TopicName)" />
 					</td>
 					<td>						
 						<NavLinkTopics ClusterIdx="@clusterIdx" 
 									    ButtonStyle="BootstrapButtonStyle.Link" 
 										Text="@topic.TopicName"
+										IsInternal="@topic.IsInternal"
 									    TopicId=@($"{topic.TopicName}") />
 					</td>
 					<td>@topic.Partitions</td>
 					<td>@topic.OutOfSyncReplicas</td>
 					<td>@topic.ReplicationFactor</td>
 					<td>@topic.NumberOfMessages</td>
-					<td>@topic.Size TODO</td>
+					<td>TODO</td>
 				</tr>
 			}
 		</tbody>

@@ -1,5 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Components.Routing
 <NavLink class="nav-link" href="@Href">
+	@if (IsInternal)
+	{
+		<span class="badge bg-light text-dark">IN</span>		
+	}
 	<button class="@ButtonClasses">@Text</button>
 </NavLink>
 
@@ -18,6 +22,9 @@
 
 	[Parameter]
 	public BootstrapButtonSize? ButtonSize { get; set; }
+
+	[Parameter]
+	public bool IsInternal { get; set; } = false;
 
 	public string Href
 	{
