@@ -15,7 +15,7 @@ public static class ServiceExtensions
 
     public static WebApplicationBuilder AddAdminClientConfigOptions(this WebApplicationBuilder builder)
     {
-        var sectionName = $"Kafkaf:{nameof(KafkaAdminService)}";
+        var sectionName = $"Kafkaf:{nameof(AdminClientService)}";
 
         builder.Services
             .AddOptions<AdminClientConfigOptions>()

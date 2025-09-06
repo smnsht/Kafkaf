@@ -6,9 +6,9 @@ using Microsoft.Extensions.Caching.Memory;
 namespace Kafkaf.Web.Components.Pages.Topics;
 
 public partial class Index : ClusterIndexAwarePage
-{
+{    
     [Inject]
-    public required KafkaAdminService adminService { get; set; }
+    public required TopicsService TopicsService { get; set; }
 
     [Inject]
     public required NavigationManager NavManager { get; set; }
@@ -44,7 +44,7 @@ public partial class Index : ClusterIndexAwarePage
     {
         await LoadTopics();
 
-        ApplyTopicFilters();
+        ApplyTopicFilters();        
 
         await base.OnInitializedAsync();
     }
@@ -81,13 +81,14 @@ public partial class Index : ClusterIndexAwarePage
     }
 
     private async Task DeleteTopicsAsync()
-    {
-        var cfg = ClusterConfig;
-
+    {                
         await RunWithLoadingAsync(async () =>
-        {
-            await adminService.DeleteTopicsAsync(cfg, SelectedTopics);
-            await RefreshTopicsAsync(cfg.CacheKey());
+        {            
+            await TopicsService
+                .SetClusterConfigOptions(ClusterConfig)
+                .DeleteTopicsAsync(SelectedTopics);
+
+            await RefreshTopicsAsync(ClusterConfig.CacheKey());
 
             notice = "Topic(s) deleted!";
         });
@@ -97,8 +98,10 @@ public partial class Index : ClusterIndexAwarePage
     {
         await RunWithLoadingAsync(async () =>
         {
-            await adminService.PurgeMessagesAsync(ClusterConfig, SelectedTopics);
-
+            await TopicsService
+                .SetClusterConfigOptions(ClusterConfig)
+                .PurgeMessagesAsync(SelectedTopics);
+            
             notice = "Messages purged!";
             SelectedTopics.Clear();
             // RefreshTopicsAsync????

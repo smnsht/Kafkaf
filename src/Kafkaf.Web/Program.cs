@@ -19,7 +19,8 @@ builder.AddClusterPingServiceOptions();
 builder.AddAdminClientConfigOptions();
 
 builder.Services.AddTransient<ClusterPingService>();
-builder.Services.AddTransient<KafkaAdminService>();
+builder.Services.AddTransient<AdminClientService>();
+builder.Services.AddTransient<TopicsService>();
 
 var app = builder.Build();
 
