@@ -1,8 +1,12 @@
 ﻿@using Kafkaf.Web.Components.Topic
+@using Kafkaf.Web.Services
+@using Kafkaf.Web.ViewModels
 
 @inherits ClusterIndexAwarePage
 @rendermode InteractiveServer
 @attribute [Route(TopicComponent.ROUTE_OVERVIEW)]
+
+@inject TopicsService topicsService
 
 <TopicComponent ClusterIdx="@clusterIdx"
 				PageTitle=@($"Topic: {topicName}")
@@ -14,40 +18,48 @@
 <details>
 	<summary>More details...</summary>
 	<ul>
-		<li><b>URP:</b> TODO</li>
-		<li><b>Type:</b> TODO</li>
-		<li><b>Clean Up Policy:</b> TODO</li>
+		<li><b>URP:</b> @Model?.UnderReplicatedPartitions</li>
+		<li><b>Type:</b> @TopicType() </li>
+		<li><b>Clean Up Policy:</b> @Model?.CleanUpPolicy</li>
 	</ul>
 </details>
 
-<h5>DUMMY DATA</h5>
+@if (Model?.Partitions is List<PartitionInfo> partitions)
+{
+	<h5>Partitions</h5>
 
-<table class="table table-hover">
-	<thead>
-		<tr>
-			<th>Partition ID</th>
-			<th>Replicas</th>
-			<th>First Offset</th>
-			<th>Next Offset</th>
-			<th>Message Count</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>0</td>
-			<td>2</td>
-			<td>0</td>
-			<td>2</td>
-			<td>2</td>
-			<td>&nbsp;</td>
-		</tr>
-	</tbody>
-</table>
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>Partition ID</th>
+				<th>Replicas</th>
+				<th>First Offset</th>
+				<th>Next Offset</th>
+				<th>Message Count</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var row in partitions)
+			{
+				<tr>
+					<td>@row.Partition</td>
+					<td>@row.Replicas.Count</td>
+					<td>?</td>
+					<td>?</td>
+					<td>@(row.OffsetMax - row.OffsetMin)</td>
+					<td>&nbsp;</td>
+				</tr>
+			}			
+		</tbody>
+	</table>
+}
 
 @code {
 	[Parameter]
 	public string topicName { get; set; } = string.Empty;
+
+	public TopicDetailsViewModel? Model { get; set; }
 
 	private List<KeyValuePair<string, string>> TopicStatsItems = new()
 	{		
@@ -58,4 +70,38 @@
 		new KeyValuePair<string, string>("Segment Count", "TOOD"),
 		new KeyValuePair<string, string>("Message Count", "TODO"),
 	};
+
+	public string TopicType() => Model?.Internal switch
+	{
+		true => "Internal",
+		false => "External",
+		_ => "?"
+	};	
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (!string.IsNullOrEmpty(topicName))
+		{
+			var cfg = ClusterConfig;
+
+			var topicDetails = await topicsService
+				.SetClusterConfigOptions(cfg)
+				.GetTopicDetailsAsync(topicName);			
+
+			List<KeyValuePair<string, string>> statsItems = new()
+			{
+				new KeyValuePair<string, string>("Partitions", "TOOD"),
+				new KeyValuePair<string, string>("Replication Factor", topicDetails.ReplicationFactor.ToString()),
+				new KeyValuePair<string, string>("In Sync Replicas", topicDetails.InSyncReplicas.ToString()),
+				new KeyValuePair<string, string>("Segment Size", "TOOD"),
+				new KeyValuePair<string, string>("Segment Count", "TOOD"),
+				new KeyValuePair<string, string>("Message Count", "TODO"),
+			};
+
+			TopicStatsItems = statsItems;
+			Model = topicDetails;
+		}
+
+		await base.OnInitializedAsync();
+	}
 }

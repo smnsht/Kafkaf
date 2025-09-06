@@ -1,6 +1,7 @@
 ﻿using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using Kafkaf.Web.Config;
+using Kafkaf.Web.Mappers;
 using Kafkaf.Web.ViewModels;
 
 namespace Kafkaf.Web.Services;
@@ -141,13 +142,13 @@ public class TopicsService
     }
 
     public async Task<TopicDetailsViewModel> GetTopicDetailsAsync(string topicName)
-    {    
+    {
         var desc = await DescribeTopicAsync(topicName);
         var configs = await DescribeTopicConfigAsync(topicName);
 
-        if (desc == null || configs == null) 
+        if (desc == null || configs == null)
         {
-            string missingPart = (desc, configs) switch 
+            string missingPart = (desc, configs) switch
             {
                 (null, not null) => "description",
                 (not null, null) => "configuration",
@@ -162,82 +163,27 @@ public class TopicsService
         var cleanUpPolicy = configs.Entries
                 .FirstOrDefault(e => e.Key == "cleanup.policy")
                 .Value;
-        
-        if ( cleanUpPolicy == null)
+
+        if (cleanUpPolicy == null)
         {
-            _logger.LogWarning("No 'cleanup.policy' configuration found for topic '{TopicName}'. Using default value.", topicName);
+            _logger.LogWarning("No 'cleanup.policy' configuration found for topic '{TopicName}'. Using default value.", 
+                topicName);
         }
 
-        using var consumer = new ConsumerBuilder<Ignore, Ignore>(new ConsumerConfig
-        {
-            BootstrapServers = _clusterConfig!.Address,
-            GroupId = "__offset_query_group",
-            EnableAutoCommit = false
-        }).Build();
-
-        return new TopicDetailsViewModel() 
-        {
-            Name = desc.Name,
-            Internal = desc.IsInternal,
-            PartitionCount = desc.Partitions.Count,
-
-            Partitions = desc.Partitions.Select(p => 
+        return new TopicDetailsMapper()
+            .Map(topicName, desc, configs, (int partition) =>
             {
-                var tp = new TopicPartition(topicName, p.Partition);
+                using var consumer = new ConsumerBuilder<Ignore, Ignore>(new ConsumerConfig
+                {
+                    BootstrapServers = _clusterConfig!.Address,
+                    GroupId = "__offset_query_group",
+                    EnableAutoCommit = false
+                }).Build();
+
+                var tp = new TopicPartition(topicName, partition);
                 var offsets = consumer.QueryWatermarkOffsets(tp, TimeSpan.FromSeconds(5));
 
-                return new PartitionInfo() 
-                {
-                    // Partition number
-                    Partition = p.Partition,
-
-                    // Leader broker ID (Leader is a Node, so use Id)
-                    Leader = p.Leader?.Id ?? -1, // -1 if no leader
-
-                    // Build the list of ReplicaInfo objects for this partition.
-                    // Each "replica" here is a broker that holds a copy of the partition's data.
-                    Replicas = p.Replicas.Select(node => new ReplicaInfo()
-                    {
-                        // The broker ID that hosts this replica.
-                        Broker = node.Id,
-
-                        // True if this broker is the current leader for the partition.
-                        // Only one broker can be leader at a time — it handles all reads/writes.
-                        Leader = node.Id == (p.Leader?.Id ?? -1),
-
-                        // True if this broker's replica is fully caught up with the leader.
-                        // InSyncReplicas is the broker ID list that Kafka reports as "in sync".
-                        InSync = p.ISR.Any(isrNode => isrNode.Id == node.Id)
-                    }).ToList(),
-                    OffsetMin = offsets.Low,
-                    OffsetMax = offsets.High
-                };                               
-            }).ToList(),
-
-            // Replication factor: same for all partitions, so take from the first
-            ReplicationFactor = desc.Partitions.FirstOrDefault()?.Replicas.Count ?? 0,
-
-            // Total replicas across all partitions
-            Replicas = desc.Partitions.Sum(p => p.Replicas.Count),
-
-            // Total in-sync replicas across all partitions
-            InSyncReplicas = desc.Partitions.Sum(p => p.ISR.Count),
-
-            // Under-replicated partitions
-            UnderReplicatedPartitions = desc.Partitions.Count(
-                p => p.ISR.Count < p.Replicas.Count
-            ),
-
-            CleanUpPolicy = cleanUpPolicy?.Value ?? string.Empty,                
-
-            // These cannot be obtained from TopicMetadata directly:
-            // TODO: implement
-            BytesInPerSec = null,
-            BytesOutPerSec = null,
-            SegmentSize = 0,
-            SegmentCount = 0,
-            KeySerde = null,
-            ValueSerde = null            
-        };        
+                return (offsets.Low, offsets.High);
+            });
     }
 }
