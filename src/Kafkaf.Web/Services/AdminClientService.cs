@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Kafkaf.Web.Config;
 using Microsoft.Extensions.Options;
 
@@ -66,8 +67,8 @@ public class AdminClientService : IDisposable
         AssertAdminClient();
 
        await action(_adminClient!);
-    }        
-
+    }
+        
     internal IAdminClient BuildAdminClient()
     {
         if (ClusterConfig is ClusterConfigOptions cco)
