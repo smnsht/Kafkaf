@@ -45,9 +45,9 @@
 				<tr>
 					<td>@row.Partition</td>
 					<td>@row.Replicas.Count</td>
-					<td>?</td>
-					<td>?</td>
-					<td>@(row.OffsetMax - row.OffsetMin)</td>
+					<td>@row.OffsetMin</td>
+					<td>@row.OffsetMax</td>
+					<td>@row.MessagesCount</td>
 					<td>&nbsp;</td>
 				</tr>
 			}			
@@ -61,15 +61,7 @@
 
 	public TopicDetailsViewModel? Model { get; set; }
 
-	private List<KeyValuePair<string, string>> TopicStatsItems = new()
-	{		
-		new KeyValuePair<string, string>("Partitions", "TOOD"),
-		new KeyValuePair<string, string>("Replication Factor", "1"),		
-		new KeyValuePair<string, string>("In Sync Replicas", "1 of 1"),
-		new KeyValuePair<string, string>("Segment Size", "TOOD"),
-		new KeyValuePair<string, string>("Segment Count", "TOOD"),
-		new KeyValuePair<string, string>("Message Count", "TODO"),
-	};
+	private List<KeyValuePair<string, string>> TopicStatsItems = new();	
 
 	public string TopicType() => Model?.Internal switch
 	{
@@ -90,12 +82,12 @@
 
 			List<KeyValuePair<string, string>> statsItems = new()
 			{
-				new KeyValuePair<string, string>("Partitions", "TOOD"),
+				new KeyValuePair<string, string>("Partitions", topicDetails.PartitionCount.ToString()),
 				new KeyValuePair<string, string>("Replication Factor", topicDetails.ReplicationFactor.ToString()),
 				new KeyValuePair<string, string>("In Sync Replicas", topicDetails.InSyncReplicas.ToString()),
-				new KeyValuePair<string, string>("Segment Size", "TOOD"),
-				new KeyValuePair<string, string>("Segment Count", "TOOD"),
-				new KeyValuePair<string, string>("Message Count", "TODO"),
+				new KeyValuePair<string, string>("Segment Size", $"{topicDetails.SegmentSize} Bytes"),
+				new KeyValuePair<string, string>("Segment Count", topicDetails.SegmentCount.ToString()),
+				new KeyValuePair<string, string>("Message Count", topicDetails.MessageCount.ToString()),
 			};
 
 			TopicStatsItems = statsItems;

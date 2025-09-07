@@ -14,6 +14,7 @@ public class PartitionInfo
 	public List<ReplicaInfo> Replicas { get; set; } = new List<ReplicaInfo>();
 	public long OffsetMax { get; set; }
 	public long OffsetMin { get; set; }
+	public long MessagesCount => OffsetMax - OffsetMin;
 }
 
 
@@ -34,5 +35,6 @@ public class TopicDetailsViewModel
 	public required string CleanUpPolicy { get; set; }
 	public string? KeySerde { get; set; }
 	public string? ValueSerde { get; set; }
+	public long MessageCount => Partitions.Sum(p => p.MessagesCount);
 }
 

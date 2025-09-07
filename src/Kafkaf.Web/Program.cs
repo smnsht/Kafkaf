@@ -22,6 +22,7 @@ builder.AddAdminClientConfigOptions();
 builder.Services.AddTransient<ClusterPingService>();
 builder.Services.AddTransient<AdminClientService>();
 builder.Services.AddTransient<TopicsService>();
+builder.Services.AddTransient<MessagesService>();
 builder.Services.AddTransient<ITopicDetailsMapper, TopicDetailsMapper>();
 
 var app = builder.Build();

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Kafkaf.Web.Components.Topic;
+using Kafkaf.Web.Services;
 using Kafkaf.Web.ViewModels;
 using Microsoft.AspNetCore.Components;
 
@@ -19,6 +20,9 @@ public partial class Messages : ClusterIndexAwarePage
 {
     [Parameter]
     public string topicName { get; set; } = string.Empty;
+
+	[Inject]
+	public required MessagesService messagesService { get; set; }
 
     private SeekType seekType = SeekType.Offset;
     private SerdeKind keySerde = SerdeKind.String;
@@ -43,10 +47,17 @@ public partial class Messages : ClusterIndexAwarePage
         rows = null;
     }
 
-    private Task HandleSearchAsync()
+    private async Task HandleSearchAsync()
     {
-        rows = SearchMessages().ToArray();
-        return Task.CompletedTask;
+		var _ = await RunWithLoadingAsync(async () =>
+		{
+			rows = await messagesService
+				.SetClusterConfigOptions(ClusterConfig)
+				.ReadMessagesAsync(topicName);
+		});
+
+		//rows = SearchMessages().ToArray();
+        //return Task.CompletedTask;
     }
 
     public IEnumerable<MessageViewModel<string, string>> SearchMessages()
