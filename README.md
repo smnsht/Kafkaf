@@ -1,5 +1,7 @@
 ![Kafkaf logo](./images/logo.png "Kafkaf") 
 
+> ## 🚧 **Status: Draft – This project is in early development and not production-ready.**
+
 
 # Kafkaf: A C\# Web UI for Apache Kafka
 
