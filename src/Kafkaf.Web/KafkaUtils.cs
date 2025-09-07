@@ -157,9 +157,9 @@ public static class KafkaUtils
             EnableAutoCommit = false
         };
 
-        using var consumer = new ConsumerBuilder<Ignore, Ignore>(config).Build();
+		using var consumer = new ConsumerBuilder<Ignore, Ignore>(config).Build();
 
-        List<long> results = new List<long>();
+		var results = new List<long>();
 
         foreach (var topic in topics)
         {

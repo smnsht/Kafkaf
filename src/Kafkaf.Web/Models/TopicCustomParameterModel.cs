@@ -10,16 +10,13 @@ public class TopicCustomParameterModel : IValidatableObject, ICloneable
     [Required]
     public string? Value { get; set; }
 
-    public object Clone()
-    {
-        return new TopicCustomParameterModel
-        {
-            Key = Key,
-            Value = Value
-        };
-    }
+	public object Clone() => new TopicCustomParameterModel
+	{
+		Key = Key,
+		Value = Value
+	};
 
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         // Basic null/empty check for key and value
         if (Key is not string k || Value is not string v)

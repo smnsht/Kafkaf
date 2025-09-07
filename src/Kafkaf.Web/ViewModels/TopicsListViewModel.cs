@@ -32,9 +32,6 @@ public struct TopicsListViewModel
         Size = 0; //TODO
     }
 
-    public bool IsInternal
-    {
-        get => TopicName.StartsWith("__");
-    }
+	public bool IsInternal => TopicName.StartsWith("__");
 }
 

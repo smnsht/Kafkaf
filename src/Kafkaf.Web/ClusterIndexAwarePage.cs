@@ -20,12 +20,9 @@ public class ClusterIndexAwarePage : ComponentBase
     public Exception? error = null;
     public string? notice;
 
-    protected ClusterConfigOptions ClusterConfig
-    {
-        get => ClusterOptions.Value[clusterIdx - 1];
-    }
+	protected ClusterConfigOptions ClusterConfig => ClusterOptions.Value[clusterIdx - 1];
 
-    public async Task<bool> RunWithLoadingAsync(Func<Task> action, bool rethrow = false)
+	public async Task<bool> RunWithLoadingAsync(Func<Task> action, bool rethrow = false)
     {
         loading = true;
         error = null;

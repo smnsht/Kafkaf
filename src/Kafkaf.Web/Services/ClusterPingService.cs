@@ -6,17 +6,13 @@ namespace Kafkaf.Web.Services;
 
 using ClusterPingResult = Tuple<Metadata?, Exception?>;
 
-
 public class ClusterPingService
 {
     private readonly ClusterPingServiceOptions _options;
 
-    public ClusterPingService(IOptions<ClusterPingServiceOptions> options)
-    {
-        _options = options.Value;
-    }
+	public ClusterPingService(IOptions<ClusterPingServiceOptions> options) => _options = options.Value;
 
-    public ClusterPingResult PingServer(string bootstrapServers)
+	public ClusterPingResult PingServer(string bootstrapServers)
     {
         var adminConfig = new AdminClientConfig()
         {
