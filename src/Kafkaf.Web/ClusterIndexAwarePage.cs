@@ -28,7 +28,7 @@ public class ClusterIndexAwarePage : ComponentBase
     public async Task<bool> RunWithLoadingAsync(Func<Task> action, bool rethrow = false)
     {
         loading = true;
-        error = null;       
+        error = null;
         notice = null;
 
         try

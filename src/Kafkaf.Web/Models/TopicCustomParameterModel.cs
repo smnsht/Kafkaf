@@ -3,7 +3,7 @@
 namespace Kafkaf.Web.Models;
 
 public class TopicCustomParameterModel : IValidatableObject, ICloneable
-{   
+{
     [Required]
     public string? Key { get; set; }
 
@@ -12,10 +12,10 @@ public class TopicCustomParameterModel : IValidatableObject, ICloneable
 
     public object Clone()
     {
-        return new TopicCustomParameterModel 
-        { 
-            Key = Key, 
-            Value = Value 
+        return new TopicCustomParameterModel
+        {
+            Key = Key,
+            Value = Value
         };
     }
 
@@ -50,7 +50,7 @@ public class TopicCustomParameterModel : IValidatableObject, ICloneable
         {
             yield return new ValidationResult(
                 $"Value of custom property must be of type '{topicConfig.Type}'.");
-        }        
+        }
     }
 
     public void Reset()

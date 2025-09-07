@@ -10,7 +10,7 @@ public enum BrokerTabs
 }
 
 public partial class BrokerComponent : ComponentBase
-{    
+{
     public const string PATH_PART_CONFIGS = "configs";
     public const string PATH_PART_METRICS = "metrics";
 
@@ -24,7 +24,7 @@ public partial class BrokerComponent : ComponentBase
     {
         { BrokerTabs.LogDirectories, new ("", "Log directores") },
         { BrokerTabs.Configs, new (PATH_PART_CONFIGS, "Configs") },
-        { BrokerTabs.Metrics, new (PATH_PART_METRICS, "Metrics") }        
+        { BrokerTabs.Metrics, new (PATH_PART_METRICS, "Metrics") }
     };
 
     [Parameter]

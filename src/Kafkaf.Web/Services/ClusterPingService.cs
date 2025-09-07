@@ -33,12 +33,12 @@ public class ClusterPingService
 
             return new(adminClient.GetMetadata(timespan), null);
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             return new(null, ex);
         }
     }
 
-    public Task<ClusterPingResult> PingServerAsync(string bootstrapServers) 
+    public Task<ClusterPingResult> PingServerAsync(string bootstrapServers)
         => Task.Run(() => PingServer(bootstrapServers));
 }

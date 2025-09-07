@@ -14,9 +14,9 @@ public class TopicsService
 
     private ClusterConfigOptions? _clusterConfig;
 
-    public TopicsService(ILogger<TopicsService> logger, 
-        AdminClientService adminService, 
-        ITopicDetailsMapper topicDetailsMapper )
+    public TopicsService(ILogger<TopicsService> logger,
+        AdminClientService adminService,
+        ITopicDetailsMapper topicDetailsMapper)
     {
         _logger = logger;
         _adminService = adminService;

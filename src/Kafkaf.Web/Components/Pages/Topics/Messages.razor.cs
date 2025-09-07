@@ -50,7 +50,7 @@ public partial class Messages : ClusterIndexAwarePage
     }
 
     public IEnumerable<MessageViewModel<string, string>> SearchMessages()
-    {        
+    {
         yield return new MessageViewModel<string, string>()
         {
             Key = "1",

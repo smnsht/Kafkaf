@@ -49,10 +49,10 @@ public static class KafkaUtils
         var results = new List<Message<string, string>>();
 
         // Read messages
-        for (int i = 0; i<10; i++)
+        for (int i = 0; i < 10; i++)
         {
             var cr = consumer.Consume(TimeSpan.FromMilliseconds(100));
-            
+
             if (cr != null)
             {
                 results.Add(cr.Message);
@@ -137,11 +137,11 @@ public static class KafkaUtils
         using var adminClient = new AdminClientBuilder(config)
                 .Build();
 
-        await adminClient.CreateTopicsAsync(topics, new CreateTopicsOptions() 
-        { 
+        await adminClient.CreateTopicsAsync(topics, new CreateTopicsOptions()
+        {
             //RequestTimeout = timeout,
             //OperationTimeout = timeout
-        });               
+        });
     }
 
     public static async Task CreateTopicAsync(ClusterConfigOptions clusterConfig, TopicSpecification topic, int timeoutSeconds = 30) =>
@@ -161,7 +161,7 @@ public static class KafkaUtils
 
         List<long> results = new List<long>();
 
-        foreach (var topic in topics) 
+        foreach (var topic in topics)
         {
             var topicPartitions = topic.Partitions
                 .Select(p => new TopicPartition(topic.Topic, p.PartitionId))
@@ -169,7 +169,7 @@ public static class KafkaUtils
 
             long total = 0;
             foreach (var tp in topicPartitions)
-            {                                
+            {
                 var offs = consumer.QueryWatermarkOffsets(tp, TimeSpan.FromSeconds(5));
                 total += (offs.High - offs.Low);
             }

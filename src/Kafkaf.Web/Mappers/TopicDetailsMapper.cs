@@ -22,11 +22,11 @@ public class TopicDetailsMapper : ITopicDetailsMapper
         _logger = logger;
     }
 
-    public TopicDetailsViewModel Map(string topicName, 
-        TopicDescription desc, 
-        DescribeConfigsResult configs, 
+    public TopicDetailsViewModel Map(string topicName,
+        TopicDescription desc,
+        DescribeConfigsResult configs,
         Func<int, (long OffsetMin, long OffsetMax)>? offsetProvider = null)
-    {        
+    {
         var cleanUpPolicy = configs.Entries
                 .FirstOrDefault(e => e.Key == "cleanup.policy")
                 .Value.Value ?? string.Empty;

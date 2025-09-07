@@ -49,8 +49,8 @@ public static class KafkaTopicProperties
     };
 
     public static string[] GetKeys() => TopicConfigs.Keys.ToArray();
-    public static string? GetDefaultValue(string key) => 
-        TopicConfigs.TryGetValue(key, out var value) 
-            ? value.DefaultValue 
+    public static string? GetDefaultValue(string key) =>
+        TopicConfigs.TryGetValue(key, out var value)
+            ? value.DefaultValue
             : null;
 }

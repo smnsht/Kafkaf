@@ -6,7 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 namespace Kafkaf.Web.Components.Pages.Topics;
 
 public partial class Index : ClusterIndexAwarePage
-{    
+{
     [Inject]
     public required TopicsService TopicsService { get; set; }
 
@@ -44,7 +44,7 @@ public partial class Index : ClusterIndexAwarePage
     {
         await LoadTopics();
 
-        ApplyTopicFilters();        
+        ApplyTopicFilters();
 
         await base.OnInitializedAsync();
     }
@@ -77,13 +77,13 @@ public partial class Index : ClusterIndexAwarePage
         else
         {
             SelectedTopics.Remove(topicName);
-        }        
+        }
     }
 
     private async Task DeleteTopicsAsync()
-    {                
+    {
         await RunWithLoadingAsync(async () =>
-        {            
+        {
             await TopicsService
                 .SetClusterConfigOptions(ClusterConfig)
                 .DeleteTopicsAsync(SelectedTopics);
@@ -101,7 +101,7 @@ public partial class Index : ClusterIndexAwarePage
             await TopicsService
                 .SetClusterConfigOptions(ClusterConfig)
                 .PurgeMessagesAsync(SelectedTopics);
-            
+
             notice = "Messages purged!";
             SelectedTopics.Clear();
             // RefreshTopicsAsync????
@@ -109,9 +109,9 @@ public partial class Index : ClusterIndexAwarePage
     }
 
     private void HandleCopyTopics()
-    {        
-        if (SelectedTopics.Count() == 1 && 
-            SelectedTopics.First() is string topicName && 
+    {
+        if (SelectedTopics.Count() == 1 &&
+            SelectedTopics.First() is string topicName &&
             _topics.FirstOrDefault(t => t.TopicName == topicName) is TopicsListViewModel topic)
         {
             var filterParams = new Dictionary<string, object>
@@ -120,8 +120,8 @@ public partial class Index : ClusterIndexAwarePage
                 ["Size"] = topic.Size,
                 ["ReplicationFactor"] = topic.ReplicationFactor,
                 ["Partitions"] = topic.Partitions
-            };            
-            
+            };
+
             var newUri = NavManager.GetUriWithQueryParameters($"{NavManager.Uri}/create", filterParams!);
 
             NavManager.NavigateTo(newUri);
@@ -144,14 +144,14 @@ public partial class Index : ClusterIndexAwarePage
 
         // TODO: handle null
         _topics = meta!.Topics
-            .Select((meta, i) => 
+            .Select((meta, i) =>
             {
                 return new TopicsListViewModel(meta)
                 {
                     NumberOfMessages = (int)counts[i]
                 };
             })
-            .ToList();        
+            .ToList();
     }
 
     private async Task RefreshTopicsAsync(string cacheKey)

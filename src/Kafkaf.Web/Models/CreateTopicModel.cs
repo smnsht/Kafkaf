@@ -9,16 +9,16 @@ public enum TopicCleaupPolicy
 }
 
 public class CreateTopicModel
-{    
+{
     [Required]
     public string Name { get; set; } = string.Empty;
 
     public int NumPartitions { get; set; } = -1;
-    
-    [Required]    
+
+    [Required]
     public string CleaupPolicy { get; set; } = TopicCleaupPolicy.Delete.ToString();
 
-     public short ReplicationFactor { get; set; } = -1;
+    public short ReplicationFactor { get; set; } = -1;
 
     // TODO: 1 to max replicas
     public int? MinInSyncReplicas { get; set; }
@@ -28,7 +28,7 @@ public class CreateTopicModel
     public long? RetentionBytes { get; set; }
 
     public int? MaxMessageBytes { get; set; }
-    
+
     public List<TopicCustomParameterModel> CustomParameters { get; set; } = new List<TopicCustomParameterModel>();
 
     public IEnumerable<KeyValuePair<string, string>> CleanupPolicyOptions
@@ -42,8 +42,8 @@ public class CreateTopicModel
             yield return new KeyValuePair<string, string>("Compact", compact);
             yield return new KeyValuePair<string, string>("Compact,Delete", $"{compact},{delete}");
         }
-    } 
-    
+    }
+
     public TopicSpecification ToTopicSpecification()
     {
         var topic = new TopicSpecification()
@@ -53,27 +53,27 @@ public class CreateTopicModel
             ReplicationFactor = ReplicationFactor,
             Configs = CustomParameters
                 .Where(cp => !string.IsNullOrEmpty(cp.Value) && !string.IsNullOrEmpty(cp.Key))
-                .ToDictionary(cp => cp.Key!, cp => cp.Value!)                
+                .ToDictionary(cp => cp.Key!, cp => cp.Value!)
         };
 
         topic.Configs.Add("cleanup.policy", CleaupPolicy);
 
-        if(MinInSyncReplicas?.ToString() is string replicas)
+        if (MinInSyncReplicas?.ToString() is string replicas)
         {
             topic.Configs.Add("min.insync.replicas", replicas);
         }
 
-        if(TimeToRetain?.ToString() is string retention)
+        if (TimeToRetain?.ToString() is string retention)
         {
             topic.Configs.Add("retention.ms", retention);
         }
 
-        if(RetentionBytes?.ToString() is string retentionBytes) 
+        if (RetentionBytes?.ToString() is string retentionBytes)
         {
             topic.Configs.Add("retention.bytes", retentionBytes);
         }
 
-        if(MaxMessageBytes?.ToString() is string maxMessageBytes)
+        if (MaxMessageBytes?.ToString() is string maxMessageBytes)
         {
             topic.Configs.Add("max.message.bytes", maxMessageBytes);
         }

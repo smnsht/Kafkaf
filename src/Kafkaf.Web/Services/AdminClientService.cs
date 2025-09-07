@@ -24,7 +24,7 @@ public class AdminClientService : IDisposable
     public AdminClientService SetClusterConfigOptions(ClusterConfigOptions? clusterConfig)
     {
         if (!Equals(clusterConfig, _clusterConfig))
-        {            
+        {
             Dispose();
         }
 
@@ -43,7 +43,7 @@ public class AdminClientService : IDisposable
         AssertAdminClient();
 
         return Task.Run(() =>
-        {        
+        {
             var timeout = TimeSpan.FromSeconds(_options.TimeoutInSeconds);
 
             return _adminClient!.GetMetadata(timeout);
@@ -55,7 +55,7 @@ public class AdminClientService : IDisposable
         AssertAdminClient();
 
         return Task.Run(() =>
-        {            
+        {
             var timeout = TimeSpan.FromSeconds(_options.TimeoutInSeconds);
 
             return _adminClient!.GetMetadata(topic, timeout);
@@ -66,7 +66,7 @@ public class AdminClientService : IDisposable
     {
         AssertAdminClient();
 
-       await action(_adminClient!);
+        await action(_adminClient!);
     }
 
     public async Task<T> DoWithAdminClientAsync<T>(Func<IAdminClient, Task<T>> action)
@@ -102,7 +102,7 @@ public class AdminClientService : IDisposable
                 "Call SetClusterConfigOptions(...) with a valid ClusterConfigOptions instance " +
                 "before invoking this operation."
             );
-        }        
+        }
     }
 
     public void Dispose()

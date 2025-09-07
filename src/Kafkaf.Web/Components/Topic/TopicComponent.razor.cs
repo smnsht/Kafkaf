@@ -38,7 +38,7 @@ public partial class TopicComponent : ComponentBase
 
     [Parameter]
     public string CurrentPathPart { get; set; } = "?";
-    
+
     private Dictionary<TopicsTabs, Tuple<string, string>> TabsConfig = new()
     {
         { TopicsTabs.Overview, new (PATH_PART_OVERVIEW, "Overview") },
