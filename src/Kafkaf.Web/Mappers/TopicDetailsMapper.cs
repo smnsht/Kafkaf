@@ -15,14 +15,27 @@ public interface ITopicDetailsMapper
 
 public class TopicDetailsMapper : ITopicDetailsMapper
 {
+    private readonly ILogger<TopicDetailsMapper> _logger;
+
+    public TopicDetailsMapper(ILogger<TopicDetailsMapper> logger)
+    {
+        _logger = logger;
+    }
+
     public TopicDetailsViewModel Map(string topicName, 
         TopicDescription desc, 
         DescribeConfigsResult configs, 
         Func<int, (long OffsetMin, long OffsetMax)>? offsetProvider = null)
-    {
+    {        
         var cleanUpPolicy = configs.Entries
-            .FirstOrDefault(e => e.Key == "cleanup.policy")
-            .Value?.Value ?? string.Empty;
+                .FirstOrDefault(e => e.Key == "cleanup.policy")
+                .Value.Value ?? string.Empty;
+
+        if (string.IsNullOrEmpty(cleanUpPolicy))
+        {
+            _logger.LogWarning("No 'cleanup.policy' configuration found for topic '{TopicName}'. Using default value.",
+                topicName);
+        }
 
         return new TopicDetailsViewModel()
         {

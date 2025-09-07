@@ -10,13 +10,17 @@ public class TopicsService
 {
     private readonly ILogger<TopicsService> _logger;
     private readonly AdminClientService _adminService;
+    private readonly ITopicDetailsMapper _topicDetailsMapper;
 
     private ClusterConfigOptions? _clusterConfig;
 
-    public TopicsService(ILogger<TopicsService> logger, AdminClientService adminService)
+    public TopicsService(ILogger<TopicsService> logger, 
+        AdminClientService adminService, 
+        ITopicDetailsMapper topicDetailsMapper )
     {
         _logger = logger;
         _adminService = adminService;
+        _topicDetailsMapper = topicDetailsMapper;
     }
 
     public TopicsService SetClusterConfigOptions(ClusterConfigOptions clusterConfig)
@@ -158,7 +162,6 @@ public class TopicsService
         var desc = await DescribeTopicAsync(topicName);
         var configs = await DescribeTopicConfigAsync(topicName);
 
-        var mapper = new TopicDetailsMapper();        
         var cleanUpPolicy = configs.Entries
                 .FirstOrDefault(e => e.Key == "cleanup.policy")
                 .Value;
@@ -169,7 +172,7 @@ public class TopicsService
                 topicName);
         }
 
-        return mapper
+        return _topicDetailsMapper
             .Map(topicName, desc, configs, (int partition) =>
             {
                 using var consumer = new ConsumerBuilder<Ignore, Ignore>(new ConsumerConfig

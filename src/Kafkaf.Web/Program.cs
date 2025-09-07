@@ -1,5 +1,6 @@
 using Kafkaf.Web.Components;
 using Kafkaf.Web.Config;
+using Kafkaf.Web.Mappers;
 using Kafkaf.Web.Services;
 
 
@@ -21,6 +22,7 @@ builder.AddAdminClientConfigOptions();
 builder.Services.AddTransient<ClusterPingService>();
 builder.Services.AddTransient<AdminClientService>();
 builder.Services.AddTransient<TopicsService>();
+builder.Services.AddTransient<ITopicDetailsMapper, TopicDetailsMapper>();
 
 var app = builder.Build();
 
