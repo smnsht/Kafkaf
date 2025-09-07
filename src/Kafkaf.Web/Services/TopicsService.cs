@@ -106,24 +106,33 @@ public class TopicsService
         );
     }
 
-    public async Task<TopicDescription?> DescribeTopicAsync(string topicName)
+    public async Task<TopicDescription> DescribeTopicAsync(string topicName)
     {
-        DescribeTopicsResult? result = null;
-        await _adminService.DoWithAdminClientAsync(async client =>
+        var result = await _adminService.DoWithAdminClientAsync(async client =>
         {
-            var topics = TopicCollection.OfTopicNames([topicName]);
             //DescribeTopicsOptions options = new DescribeTopicsOptions()
             //{
             //    IncludeAuthorizedOperations = true,
             //    RequestTimeout = TimeSpan.FromSeconds(5)
             //}
-            result = await client.DescribeTopicsAsync(topics);
+
+            var topics = TopicCollection.OfTopicNames([topicName]);
+            return await client.DescribeTopicsAsync(topics);
         });
 
-        return result?.TopicDescriptions.FirstOrDefault();
+        if (result?.TopicDescriptions.FirstOrDefault() is TopicDescription td)
+        {
+            if (td.Error.Code != ErrorCode.NoError)
+            {
+                throw new KafkaException(td.Error);
+            }
+            return td;
+        }
+
+        throw new InvalidOperationException($"Failed to retrieve description for topic '{topicName}'.");
     }
 
-    public async Task<DescribeConfigsResult?> DescribeTopicConfigAsync(string topicName)
+    public async Task<DescribeConfigsResult> DescribeTopicConfigAsync(string topicName)
     {
         var resource = new ConfigResource
         {
@@ -131,14 +140,17 @@ public class TopicsService
             Name = topicName
         };
 
-        DescribeConfigsResult? result = null;
-        await _adminService.DoWithAdminClientAsync(async client =>
+        var results = await _adminService.DoWithAdminClientAsync(async client =>
         {
-            var results = await client.DescribeConfigsAsync([resource]);
-            result = results.FirstOrDefault();
+            return await client.DescribeConfigsAsync([resource]);
         });
 
-        return result;
+        if (results?.FirstOrDefault() is DescribeConfigsResult cr)
+        {
+            return cr;
+        }
+
+        throw new InvalidOperationException($"Failed to retrieve configs for topic '{topicName}'.");
     }
 
     public async Task<TopicDetailsViewModel> GetTopicDetailsAsync(string topicName)
@@ -146,31 +158,18 @@ public class TopicsService
         var desc = await DescribeTopicAsync(topicName);
         var configs = await DescribeTopicConfigAsync(topicName);
 
-        if (desc == null || configs == null)
-        {
-            string missingPart = (desc, configs) switch
-            {
-                (null, not null) => "description",
-                (not null, null) => "configuration",
-                _ => "description and configuration"
-            };
-
-            _logger.LogError($"Failed to retrieve {missingPart} for topic '{topicName}'. Cannot continue.");
-
-            throw new ArgumentException($"Topic '{topicName}' is missing required {missingPart}.");
-        }
-
+        var mapper = new TopicDetailsMapper();        
         var cleanUpPolicy = configs.Entries
                 .FirstOrDefault(e => e.Key == "cleanup.policy")
                 .Value;
 
         if (cleanUpPolicy == null)
         {
-            _logger.LogWarning("No 'cleanup.policy' configuration found for topic '{TopicName}'. Using default value.", 
+            _logger.LogWarning("No 'cleanup.policy' configuration found for topic '{TopicName}'. Using default value.",
                 topicName);
         }
 
-        return new TopicDetailsMapper()
+        return mapper
             .Map(topicName, desc, configs, (int partition) =>
             {
                 using var consumer = new ConsumerBuilder<Ignore, Ignore>(new ConsumerConfig

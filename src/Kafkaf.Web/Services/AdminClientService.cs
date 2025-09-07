@@ -68,7 +68,14 @@ public class AdminClientService : IDisposable
 
        await action(_adminClient!);
     }
-        
+
+    public async Task<T> DoWithAdminClientAsync<T>(Func<IAdminClient, Task<T>> action)
+    {
+        AssertAdminClient();
+
+        return await action(_adminClient!);
+    }
+
     internal IAdminClient BuildAdminClient()
     {
         if (ClusterConfig is ClusterConfigOptions cco)
