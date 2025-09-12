@@ -183,7 +183,7 @@ public class TopicsService
                 }).Build();
 
                 var tp = new TopicPartition(topicName, partition);
-                var offsets = consumer.QueryWatermarkOffsets(tp, TimeSpan.FromSeconds(5));
+                var offsets = consumer.QueryWatermarkOffsets(tp, TimeSpan.FromSeconds(10));
 
                 return (offsets.Low, offsets.High);
             });

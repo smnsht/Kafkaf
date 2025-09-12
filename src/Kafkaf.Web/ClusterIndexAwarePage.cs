@@ -28,6 +28,8 @@ public class ClusterIndexAwarePage : ComponentBase
         error = null;
         notice = null;
 
+		StateHasChanged();
+
         try
         {
             await action();

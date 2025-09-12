@@ -47,37 +47,28 @@ public partial class Messages : ClusterIndexAwarePage
         rows = null;
     }
 
-    private async Task HandleSearchAsync()
+    private Task HandleSearchAsync()
     {
-		var _ = await RunWithLoadingAsync(async () =>
-		{
-			rows = await messagesService
-				.SetClusterConfigOptions(ClusterConfig)
-				.ReadMessagesAsync(topicName);
-		});
+		loading = true;
+		rows = null;
 
-		//rows = SearchMessages().ToArray();
-        //return Task.CompletedTask;
-    }
+		var list = messagesService
+			.SetClusterConfigOptions(ClusterConfig)
+			.ReadMessages(topicName);
 
-    public IEnumerable<MessageViewModel<string, string>> SearchMessages()
-    {
-        yield return new MessageViewModel<string, string>()
-        {
-            Key = "1",
-            Value = "asdfasdf",
-            Offset = 1,
-            Partition = 0,
-            Timestamp = DateTime.Now
-        };
+		rows = list.ToArray();
+		loading = false;
+		return Task.CompletedTask;
+		//var _ = await RunWithLoadingAsync(() =>
+		//{
+		//	rows = null;
 
-        yield return new MessageViewModel<string, string>()
-        {
-            Key = "2",
-            Value = "asdfasdf afasdfasdfasd f",
-            Offset = 2,
-            Partition = 0,
-            Timestamp = DateTime.Now
-        };
-    }
+		//	var list = messagesService
+		//		.SetClusterConfigOptions(ClusterConfig)
+		//		.ReadMessages(topicName);
+
+		//	rows = list.ToArray();
+		//	return Task.CompletedTask;
+		//});
+	}
 }

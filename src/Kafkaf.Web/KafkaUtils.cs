@@ -9,7 +9,7 @@ public delegate Task WithClusterConfigAndTopicsAsyncDelegate(ClusterConfigOption
 
 public static class KafkaUtils
 {
-    public static Task<Metadata> GetMetadata(ClusterConfigOptions clusterConfig, int timeoutSeconds = 5)
+    public static Task<Metadata> GetMetadata(ClusterConfigOptions clusterConfig, int timeoutSeconds = 10)
     {
         var config = new AdminClientConfig
         {
@@ -27,40 +27,40 @@ public static class KafkaUtils
         });
     }
 
-    public static IEnumerable<Message<string, string>> ReadMessages(ClusterConfigOptions clusterConfig, Metadata meta, string topicName, int timeoutSeconds = 5)
-    {
-        var config = new ConsumerConfig
-        {
-            BootstrapServers = clusterConfig.Address,
-            EnableAutoCommit = false,
-            GroupId = Guid.NewGuid().ToString(), // Optional: use random ID to avoid reuse
-            AutoOffsetReset = AutoOffsetReset.Earliest
-        };
+    //public static IEnumerable<Message<string, string>> ReadMessages(ClusterConfigOptions clusterConfig, Metadata meta, string topicName, int timeoutSeconds = 5)
+    //{
+    //    var config = new ConsumerConfig
+    //    {
+    //        BootstrapServers = clusterConfig.Address,
+    //        EnableAutoCommit = false,
+    //        GroupId = Guid.NewGuid().ToString(), // Optional: use random ID to avoid reuse
+    //        AutoOffsetReset = AutoOffsetReset.Earliest
+    //    };
 
-        using var consumer = new ConsumerBuilder<string, string>(config).Build();
+    //    using var consumer = new ConsumerBuilder<string, string>(config).Build();
 
-        // Get metadata to discover partitions        
-        var partitions = meta.Topics.First().Partitions.Select(p =>
-            new TopicPartitionOffset(topicName, p.PartitionId, Offset.Beginning)).ToList();
+    //    // Get metadata to discover partitions        
+    //    var partitions = meta.Topics.First().Partitions.Select(p =>
+    //        new TopicPartitionOffset(topicName, p.PartitionId, Offset.Beginning)).ToList();
 
-        // Assign manually
-        consumer.Assign(partitions);
+    //    // Assign manually
+    //    consumer.Assign(partitions);
 
-        var results = new List<Message<string, string>>();
+    //    var results = new List<Message<string, string>>();
 
-        // Read messages
-        for (int i = 0; i < 10; i++)
-        {
-            var cr = consumer.Consume(TimeSpan.FromMilliseconds(100));
+    //    // Read messages
+    //    for (int i = 0; i < 10; i++)
+    //    {
+    //        var cr = consumer.Consume(TimeSpan.FromMilliseconds(100));
 
-            if (cr != null)
-            {
-                results.Add(cr.Message);
-            }
-        }
+    //        if (cr != null)
+    //        {
+    //            results.Add(cr.Message);
+    //        }
+    //    }
 
-        return results;
-    }
+    //    return results;
+    //}
 
     public static async Task PurgeMessages(ClusterConfigOptions clusterConfig, IEnumerable<string> topicNames, int timeoutSeconds = 5)
     {
