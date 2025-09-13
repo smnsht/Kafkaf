@@ -3,7 +3,7 @@
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li>
-          <a [routerLink]="pathParts">Brokers</a>
+          <a [routerLink]="['/clusters', cluster, 'brokers']">Brokers</a>
         </li>
         <li class="is-active">
           <a href="#" aria-current="page" class="has-text-black">Broker #1</a>
@@ -15,3 +15,21 @@
     <h1 class="title is-size-4 is-pulled-right">Broker #1</h1>
   </div>
 </div>
+
+<app-stats-card [cardItems]="cardItems" [placeholderCount]="3" />
+
+<div class="tabs">
+  <ul>
+    <li [class.is-active]="'BrokerLogDirectories' == currentTab">
+      <a [routerLink]="['/clusters', cluster, 'brokers', broker]">Log directories</a>
+    </li>
+    <li [class.is-active]="'BrokerConfigs' == currentTab">
+      <a [routerLink]="[{ outlets: { broker: ['configs'] } }]">Configs</a>
+    </li>
+    <li [class.is-active]="'BrokerMetrics' == currentTab">
+      <a [routerLink]="[{ outlets: { broker: ['metrics'] } }]">Metrics</a>
+    </li>
+  </ul>
+</div>
+
+<router-outlet name="broker" (activate)="onBrokerActivate($event)"></router-outlet>

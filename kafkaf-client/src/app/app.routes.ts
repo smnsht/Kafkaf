@@ -9,6 +9,9 @@ import { TopicConsumers } from './pages/topic-consumers/topic-consumers';
 import { TopicSettings } from './pages/topic-settings/topic-settings';
 import { TopicStatistics } from './pages/topic-statistics/topic-statistics';
 import { BrokerDetails } from './pages/broker-details/broker-details';
+import { BrokerConfigs } from './pages/broker-configs/broker-configs';
+import { BrokerMetrics } from './pages/broker-metrics/broker-metrics';
+import { BrokerLogDirectories } from './pages/broker-log-directories/broker-log-directories';
 
 export const routes: Routes = [
   { path: '', component: Dashboard },
@@ -21,6 +24,23 @@ export const routes: Routes = [
     path: 'clusters/:cluster/brokers/:broker',
     component: BrokerDetails,
     title: 'Cluster %cluster% > Broker %broker% ',
+    children: [
+      {
+        path: '',
+        outlet: 'broker',
+        component: BrokerLogDirectories
+      },
+      {
+        path: 'configs',
+        outlet: 'broker',
+        component: BrokerConfigs
+      },
+      {
+        path: 'metrics',
+        outlet: 'broker',
+        component: BrokerMetrics
+      }
+    ]
   },
 
   {
@@ -28,6 +48,7 @@ export const routes: Routes = [
     component: TopicsList,
     title: 'Cluster %cluster% > Topics list',
   },
+
   {
     path: 'clusters/:cluster/topics/:topic',
     component: TopicDetails,
