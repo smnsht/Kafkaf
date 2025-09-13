@@ -1,1 +1,20 @@
 <p>brokers-list works!</p>
+
+<app-stats-card [cardItems]="cardItems" [placeholderCount]="1" />
+
+<table class="table is-hoverable is-fullwidth">
+  <thead>
+    <tr>
+      <th>Broker ID</th>
+      <th>Host</th>
+      <th>Port</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#">@row.BrokerId</a></td>
+      <td>@row.Host</td>
+      <td>@row.Port</td>
+    </tr>
+  </tbody>
+</table>

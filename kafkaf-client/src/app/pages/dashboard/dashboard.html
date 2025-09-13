@@ -1,1 +1,35 @@
-<p>dashboard works!</p>
+<h3>dashboard works!</h3>
+
+<app-stats-card></app-stats-card>
+
+<label class="checkbox">
+  <input type="checkbox" />
+  Only offline clusters
+</label>
+
+<table class="table is-striped">
+  <thead>
+    <tr>
+      <th>Cluster name</th>
+      <th>Version</th>
+      <th>Brokers count</th>
+      <th>Partitions</th>
+      <th>Topics</th>
+      <th>Production</th>
+      <th>Consumption</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>@infoRow.ClusterName</td>
+      <td>@infoRow.Version TODO</td>
+      <td>@infoRow.BrokersCount</td>
+      <td>@infoRow.PartitionsCount TODO</td>
+      <td>@infoRow.TopicsCount</td>
+      <td>@infoRow.Production TODO</td>
+      <td>@infoRow.Consumption TODO</td>
+      <td>dd</td>
+    </tr>
+  </tbody>
+</table>

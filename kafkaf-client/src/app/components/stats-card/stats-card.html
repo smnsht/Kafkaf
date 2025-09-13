@@ -1,0 +1,37 @@
+<div class="box mt-3 mb-3">
+  <div class="columns">
+    @for (item of cardItems(); track $index) {
+    <div class="column not-empty">
+      <label class="icon-text has-text-grey-light is-size-7">
+        <span>{{ item.label }}</span>
+        @switch (item.icon) {
+          @case ('info') {
+            <span class="icon has-text-info">
+              <i class="fas fa-info-circle"></i>
+            </span>
+          }
+          @case ('success') {
+            <span class="icon has-text-success">
+              <i class="fas fa-check-square"></i>
+            </span>
+          }
+          @case ('warning') {
+            <span class="icon has-text-warning">
+              <i class="fas fa-exclamation-triangle"></i>
+            </span>
+          }
+          @case ('danger') {
+            <span class="icon has-text-danger">
+              <i class="fas fa-ban"></i>
+            </span>
+          }
+        }
+      </label>
+
+      <div>{{ item.value }}</div>
+    </div>
+    } @for (_ of [].constructor(placeholderCount); track $index) {
+    <div class="column">&nbsp;</div>
+    }
+  </div>
+</div>

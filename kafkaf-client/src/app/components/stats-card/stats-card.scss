@@ -1,0 +1,18 @@
+.box {
+  background-color: #cacaca;
+}
+
+.columns .column.not-empty {
+  background-color: white;
+  margin-left: 2px;
+  margin-right: 2px;
+  border-radius: 5px;
+}
+
+.columns .column:nth-child(1) {
+  margin-left: -2px;
+}
+
+.columns .column:nth-last-child(1) {
+  margin-right: -2px;
+}
