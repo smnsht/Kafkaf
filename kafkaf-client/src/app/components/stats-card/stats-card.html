@@ -30,7 +30,7 @@
 
       <div>{{ item.value }}</div>
     </div>
-    } @for (_ of [].constructor(placeholderCount); track $index) {
+    } @for (_ of [].constructor(placeholderCount()); track $index) {
     <div class="column">&nbsp;</div>
     }
   </div>

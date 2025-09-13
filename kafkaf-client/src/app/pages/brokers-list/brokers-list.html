@@ -1,4 +1,4 @@
-<p>brokers-list works!</p>
+<h1 class="title is-size-4">Brokers</h1>
 
 <app-stats-card [cardItems]="cardItems" [placeholderCount]="1" />
 
@@ -11,8 +11,8 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td><a href="#">@row.BrokerId</a></td>
+    <tr (click)="navigateToBrokerDetails(1)" title="Click to open broker">
+      <td>@row.BrokerId</td>
       <td>@row.Host</td>
       <td>@row.Port</td>
     </tr>

@@ -11,16 +11,52 @@ import { TopicStatistics } from './pages/topic-statistics/topic-statistics';
 import { BrokerDetails } from './pages/broker-details/broker-details';
 
 export const routes: Routes = [
- { path: '', component: Dashboard },
- { path: 'clusters/:cluster/brokers', component: BrokersList },
- { path: 'clusters/:cluster/brokers/:id', component: BrokerDetails },
+  { path: '', component: Dashboard },
+  {
+    path: 'clusters/:cluster/brokers',
+    component: BrokersList,
+    title: 'Cluster %cluster% > Brokers list',
+  },
+  {
+    path: 'clusters/:cluster/brokers/:broker',
+    component: BrokerDetails,
+    title: 'Cluster %cluster% > Broker %broker% ',
+  },
 
- { path: 'clusters/:cluster/topics', component: TopicsList },
- { path: 'clusters/:cluster/topics/:id/overview', component: TopicOverview },
- { path: 'clusters/:cluster/topics/:id/messages', component: TopicMessages },
- { path: 'clusters/:cluster/topics/:id/consumers', component: TopicConsumers },
- { path: 'clusters/:cluster/topics/:id/settings', component: TopicSettings },
- { path: 'clusters/:cluster/topics/:id/statistics', component: TopicStatistics },
+  {
+    path: 'clusters/:cluster/topics',
+    component: TopicsList,
+    title: 'Cluster %cluster% > Topics list',
+  },
+  {
+    path: 'clusters/:cluster/topics/:topic',
+    component: TopicOverview,
+    title: 'Cluster %cluster% > Topic %topic%',
+  },
+  {
+    path: 'clusters/:cluster/topics/:topic/messages',
+    component: TopicMessages,
+    title: 'Cluster %cluster% > Topic %topic% > Messages',
+  },
+  {
+    path: 'clusters/:cluster/topics/:topic/consumers',
+    component: TopicConsumers,
+    title: 'Cluster %cluster% > Topic %topic% > Consumers',
+  },
+  {
+    path: 'clusters/:cluster/topics/:topic/settings',
+    component: TopicSettings,
+    title: 'Cluster %cluster% > Topic %topic% > Settings',
+  },
+  {
+    path: 'clusters/:cluster/topics/:topic/statistics',
+    component: TopicStatistics,
+    title: 'Cluster %cluster% > Topic %topic% > Statistics',
+  },
 
- { path: 'clusters/:cluster/consumers', component: Consumers },
+  {
+    path: 'clusters/:cluster/consumers',
+    component: Consumers,
+    title: 'Cluster %cluster% > Consumers',
+  },
 ];

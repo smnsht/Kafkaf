@@ -1,9 +1,9 @@
-<h3>dashboard works!</h3>
+<h1 class="title is-size-4">Dashboard</h1>
 
-<app-stats-card></app-stats-card>
+<app-stats-card [cardItems]="cardItems" [placeholderCount]="7"></app-stats-card>
 
-<label class="checkbox">
-  <input type="checkbox" />
+<label class="checkbox pt-2 pb-2">
+  <input type="checkbox" [(ngModel)]="onlyOfflineClusters" />
   Only offline clusters
 </label>
 
