@@ -1,1 +1,39 @@
-<p>topic-consumers works!</p>
+<div class="columns is-vcentered">
+  <!-- Search input-->
+  <div class="column is-one-third">
+    <div class="control has-icons-left">
+      <input
+        class="input"
+        type="search"
+        [(ngModel)]="search"
+        placeholder="Search by Consumer Name"
+        (ngModelChange)="onSearchChange($event)"
+      />
+      <span class="icon is-small is-left">
+        <i class="fas fa-search"></i>
+      </span>
+    </div>
+  </div>
+  <div class="column">&nbsp;</div>
+</div>
+
+<table class="table is-hoverable is-fullwidth">
+	<thead>
+		<tr>
+			<th>Consumer Group ID</th>
+			<th>Active Consumers</th>
+			<th>Consumer Lag</th>
+			<th>Coordinator</th>
+			<th>State</th>
+		</tr>
+	</thead>
+	<tbody>
+    <tr>
+      <td>Consumer Group ID</td>
+			<td>Active Consumers</td>
+			<td>Consumer Lag</td>
+			<td>Coordinator</td>
+			<td>State</td>
+    </tr>
+	</tbody>
+</table>

@@ -1,1 +1,83 @@
-<p>topic-messages works!</p>
+<!-- Filter options -->
+<div class="columns">
+  <div class="column">
+    <ddl-seek-type />
+  </div>
+  <div class="column">
+    <app-ddl-partitions [partitions]="['foo', 'bar', 'baz']" />
+  </div>
+  <div class="column">
+    <app-ddl-serde label="Key Serde" />
+  </div>
+  <div class="column">
+    <app-ddl-serde label="Value Serde" />
+  </div>
+  <div class="column">
+    <app-ddl-sort-order />
+  </div>
+  <div class="column">
+    <div class="field">
+      <label class="label">&nbsp;</label>
+      <div class="buttons">
+        <button class="button is-light is-small">
+          <span class="icon">
+            <i class="fa-solid fa-broom"></i>
+          </span>
+          <span>Clear All</span>
+        </button>
+        <button class="button is-primary is-small">
+          <span class="icon">
+            <i class="fa-solid fa-search"></i>
+          </span>
+          <span>Submit</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Search input & filters -->
+<div class="columns">
+  <div class="column is-one-third">
+    <div class="field has-addons">
+      <div class="control has-icons-left is-expanded">
+        <input class="input" type="search" placeholder="Search by Topic Name" />
+        <span class="icon is-small is-left">
+          <i class="fas fa-search"></i>
+        </span>
+      </div>
+      <div class="control">
+        <button class="button is-primary">
+          <span class="icon">
+            <i class="fa-solid fa-plus"></i>
+          </span>
+          <span>Add Filtes</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="column">&nbsp;</div>
+</div>
+
+
+<table class="table is-hoverable is-fullwidth">
+	<thead>
+		<tr>
+			<th>Offset</th>
+			<th>Partition</th>
+			<th>Timestamp</th>
+			<th>Key</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+	<tbody>
+
+    <tr>
+				<td>@msg.Offset</td>
+				<td>@msg.Partition</td>
+				<td>@msg.Timestamp</td>
+				<td>@msg.Key</td>
+				<td>@msg.Value</td>
+			</tr>
+	</tbody>
+</table>
