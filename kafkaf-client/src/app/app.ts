@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Navbar } from "./navbar/navbar";
 
 
@@ -12,4 +12,10 @@ import { Navbar } from "./navbar/navbar";
 })
 export class App {
   protected readonly title = signal('kafkaf-client');
+
+  constructor(private router: Router) {}
+
+  isActive(path: string): boolean {
+    return this.router.url.includes(path);
+  }
 }

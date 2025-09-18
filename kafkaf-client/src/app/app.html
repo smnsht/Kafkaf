@@ -7,11 +7,11 @@
         <a href="/">Dashboard</a>
       </div>
       <div class="box">
-        <em>cluster #1</em>
+        <em>Cluster #1</em>
         <ul>
-          <a [routerLink]="['/clusters', 1, 'brokers']">Brokers</a>
-          <li><a [routerLink]="['/clusters', 1, 'topics']">Topics</a></li>
-          <li><a [routerLink]="['/clusters', 1, 'consumers']">Consumers</a></li>
+          <li><a [routerLink]="['/clusters', 1, 'brokers']" [class.active]="isActive('/brokers')" >Brokers</a></li>
+          <li><a [routerLink]="['/clusters', 1, 'topics']" [class.active]="isActive('/topics')">Topics</a></li>
+          <li><a [routerLink]="['/clusters', 1, 'consumers']" [class.active]="isActive('/consumers')">Consumers</a></li>
         </ul>
       </div>
     </div>
