@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { StatsCard, StatsCardItem } from "../../components/stats-card/stats-card";
 import { Router } from '@angular/router';
+import { KafkafTable } from "../../directives/kafkaf-table";
 
 @Component({
   selector: 'app-brokers-list',
   standalone: true,
-  imports: [StatsCard],
+  imports: [StatsCard, KafkafTable],
   templateUrl: './brokers-list.html',
   styleUrl: './brokers-list.scss'
 })

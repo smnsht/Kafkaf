@@ -26,10 +26,8 @@
 <!-- Tabs -->
 <div class="tabs">
   <ul>
-    <li [class.is-active]="currentTab == 'TopicDetails'">
-      <a [routerLink]="['/clusters', cluster, 'topics', topic]" (click)="onTopicOverviewClick()"
-        >Overview</a
-      >
+    <li [class.is-active]="currentTab == 'TopicOverview'">
+      <a [routerLink]="[{ outlets: { topic: [] } }]">Overview</a>
     </li>
     <li [class.is-active]="currentTab == 'TopicMessages'">
       <a [routerLink]="[{ outlets: { topic: ['messages'] } }]">Messages</a>
@@ -45,10 +43,6 @@
     </li>
   </ul>
 </div>
-
-@if (currentTab == 'TopicDetails') {
-  <app-topic-tab-overview></app-topic-tab-overview>
-}
 
 <router-outlet
   name="topic"

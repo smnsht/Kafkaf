@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { StatsCard, StatsCardItem } from "../stats-card/stats-card";
+import { StatsCard, StatsCardItem } from '../../components/stats-card/stats-card';
+import { KafkafTable } from '../../directives/kafkaf-table';
 
 @Component({
-  selector: 'app-topic-tab-overview',
-  imports: [StatsCard],
-  templateUrl: './topic-tab-overview.html',
-  // styleUrl: './topic-tab-overview.scss'
+  selector: 'app-topic-overview',
+  imports: [StatsCard,  KafkafTable],
+  templateUrl: './topic-overview.html',
+  // styleUrl: './topic-overview.scss'
 })
-export class TopicTabOverview implements OnInit {
+export class TopicOverview implements OnInit {
   public cardItems: StatsCardItem[] = [];
 
   ngOnInit(): void {

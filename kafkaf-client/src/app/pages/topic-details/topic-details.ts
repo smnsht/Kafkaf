@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
-import { TopicTabOverview } from '../../components/topic-tab-overview/topic-tab-overview';
 
 type TopicTabs =
-  | 'TopicDetails'
+  | 'TopicOverview'
   | 'TopicMessages'
   | 'TopicConsumers'
   | 'TopicSettings'
@@ -11,14 +10,14 @@ type TopicTabs =
 
 @Component({
   selector: 'app-topic-overview',
-  imports: [RouterLink, RouterOutlet, TopicTabOverview],
+  imports: [RouterLink, RouterOutlet],
   templateUrl: './topic-details.html',
   // styleUrl: './topic-details.scss',
 })
 export class TopicDetails {
   public cluster = '';
   public topic = '';
-  public currentTab: TopicTabs = 'TopicDetails';
+  public currentTab: TopicTabs = 'TopicOverview';
 
   constructor(route: ActivatedRoute) {
     this.cluster = route.snapshot.paramMap.get('cluster') ?? '';
@@ -34,9 +33,5 @@ export class TopicDetails {
 
   onTopicDeactivate(componentRef: any) {
     console.log('Messages outlet deactivated:', componentRef);
-  }
-
-  onTopicOverviewClick(): void {
-    this.currentTab = 'TopicDetails';
   }
 }

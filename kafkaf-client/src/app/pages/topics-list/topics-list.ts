@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { KafkafTable } from "../../directives/kafkaf-table";
 
 @Component({
   selector: 'app-topics-list',
-  imports: [FormsModule],
+  imports: [FormsModule, KafkafTable],
   templateUrl: './topics-list.html',
   styleUrl: './topics-list.scss',
 })

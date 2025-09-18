@@ -12,14 +12,17 @@ import { BrokerDetails } from './pages/broker-details/broker-details';
 import { BrokerConfigs } from './pages/broker-configs/broker-configs';
 import { BrokerMetrics } from './pages/broker-metrics/broker-metrics';
 import { BrokerLogDirectories } from './pages/broker-log-directories/broker-log-directories';
+import { TopicOverview } from './pages/topic-overview/topic-overview';
 
 export const routes: Routes = [
   { path: '', component: Dashboard },
+
   {
     path: 'clusters/:cluster/brokers',
     component: BrokersList,
     title: 'Cluster %cluster% > Brokers list',
   },
+
   {
     path: 'clusters/:cluster/brokers/:broker',
     component: BrokerDetails,
@@ -55,12 +58,17 @@ export const routes: Routes = [
     title: 'Cluster %cluster% > Topic %topic%',
     children: [
       {
+        path: '',
+        component: TopicOverview,
+        title: 'Cluster %cluster% > Topic %topic% > Overview',
+        outlet: 'topic'
+      },
+      {
         path: 'messages',
         component: TopicMessages,
         title: 'Cluster %cluster% > Topic %topic% > Messages',
         outlet: 'topic'
       },
-
       {
         path: 'consumers',
         component: TopicConsumers,
