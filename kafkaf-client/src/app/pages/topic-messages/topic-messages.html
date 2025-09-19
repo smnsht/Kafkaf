@@ -1,38 +1,33 @@
 <!-- Filter options -->
 <div class="columns">
   <div class="column">
-    <ddl-seek-type />
-  </div>
-  <div class="column">
-    <app-ddl-partitions [partitions]="['foo', 'bar', 'baz']" />
-  </div>
-  <div class="column">
-    <app-ddl-serde label="Key Serde" />
-  </div>
-  <div class="column">
-    <app-ddl-serde label="Value Serde" />
-  </div>
-  <div class="column">
-    <app-ddl-sort-order />
+    <ddl-seek-type [(seekType)]="seekType" />
   </div>
   <div class="column">
     <div class="field">
       <label class="label">&nbsp;</label>
-      <div class="buttons">
-        <button class="button is-light is-small">
-          <span class="icon">
-            <i class="fa-solid fa-broom"></i>
-          </span>
-          <span>Clear All</span>
-        </button>
-        <button class="button is-primary is-small">
-          <span class="icon">
-            <i class="fa-solid fa-search"></i>
-          </span>
-          <span>Submit</span>
-        </button>
+      <div class="control">
+        @switch (seekType) { @case ('Offset') {
+        <input class="input" type="number" placeholder="Offset" />
+        } @case ('Timestamp') {
+        <input class="input" type="datetime-local" />
+        } @default {
+        <i>?</i>
+        } }
       </div>
     </div>
+  </div>
+  <div class="column">
+    <ddl-partitions [partitions]="partitions" [(partition)]="partition" />
+  </div>
+  <div class="column">
+    <ddl-serde label="Key Serde" [(serde)]="keySerde" />
+  </div>
+  <div class="column">
+    <ddl-serde label="Value Serde" [(serde)]="valueSerde" />
+  </div>
+  <div class="column">
+    <ddl-sort-order [(sortOrder)]="sortOrder" />
   </div>
 </div>
 
@@ -56,27 +51,39 @@
       </div>
     </div>
   </div>
-  <div class="column">&nbsp;</div>
+  <div class="column has-text-right">
+    <button class="button is-light mr-2">
+      <span class="icon">
+        <i class="fa-solid fa-broom"></i>
+      </span>
+      <span>Clear All</span>
+    </button>
+    <button class="button is-primary">
+      <span class="icon">
+        <i class="fa-solid fa-search"></i>
+      </span>
+      <span>Submit</span>
+    </button>
+  </div>
 </div>
 
 <table appKafkafTable>
-	<thead>
-		<tr>
-			<th>Offset</th>
-			<th>Partition</th>
-			<th>Timestamp</th>
-			<th>Key</th>
-			<th>Value</th>
-		</tr>
-	</thead>
-	<tbody>
-
+  <thead>
     <tr>
-				<td>@msg.Offset</td>
-				<td>@msg.Partition</td>
-				<td>@msg.Timestamp</td>
-				<td>@msg.Key</td>
-				<td>@msg.Value</td>
-			</tr>
-	</tbody>
+      <th>Offset</th>
+      <th>Partition</th>
+      <th>Timestamp</th>
+      <th>Key</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>@msg.Offset</td>
+      <td>@msg.Partition</td>
+      <td>@msg.Timestamp</td>
+      <td>@msg.Key</td>
+      <td>@msg.Value</td>
+    </tr>
+  </tbody>
 </table>

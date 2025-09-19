@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
-import { Navbar } from "./navbar/navbar";
+import { Navbar } from "./components/navbar/navbar";
 
 
 @Component({

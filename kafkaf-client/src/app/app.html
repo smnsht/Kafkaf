@@ -1,6 +1,7 @@
 <div class="container is-fluid">
   <app-navbar />
 
+  <!-- left sidebar -->
   <div class="columns">
     <div class="column is-2 narrow-col">
       <div class="box">
@@ -14,7 +15,12 @@
           <li><a [routerLink]="['/clusters', 1, 'consumers']" [class.active]="isActive('/consumers')">Consumers</a></li>
         </ul>
       </div>
+      <div>
+        <b>DRAFT</b>
+      </div>
     </div>
+
+    <!-- main content -->
     <div class="column wide-col">
       <router-outlet />
     </div>
