@@ -1,6 +1,28 @@
 @Kafkaf.API_HostAddress = http://localhost:5175
 
+
+GET {{Kafkaf.API_HostAddress}}/debug/routes
+Accept: application/json
+
+###
+
 GET {{Kafkaf.API_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+GET {{Kafkaf.API_HostAddress}}/api/Clusters/1
+Accept: application/json
+
+### 
+
+
+GET {{Kafkaf.API_HostAddress}}/api/Clusters
+Accept: application/json
+
+### 
+
+GET {{Kafkaf.API_HostAddress}}/api/Clusters/Configs
+Accept: application/json
+
+### 
