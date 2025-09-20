@@ -22,22 +22,16 @@ public class ClustersController : ControllerBase
 		return await Task.WhenAll(tasks);
 	}
 
-	[HttpGet("{cluserIdx:int}")]
-	public async Task<ActionResult<ClusterInfoViewModel>> GetCluster(int cluserIdx, CancellationToken ct)
+	[HttpGet("{cluserIdx:clusterIndex}")]
+	public async Task<ClusterInfoViewModel> GetCluster(int cluserIdx, CancellationToken ct)
 	{
 		var alias = _clusterService.ClusterConfigOptions[cluserIdx].Alias;
 
-		if (string.IsNullOrEmpty(alias))
-		{
-			return NotFound();
-		}
-
-		var model = await _clusterService.FetchClusterInfoAsync(alias, ct);
-		return Ok(model);
+		return await _clusterService.FetchClusterInfoAsync(alias, ct);
 	}
 
 	[HttpGet("Configs")]
 	public IEnumerable<ClusterConfigViewModel> GetConfigs() =>
 		_clusterService.ClusterConfigOptions.Select(
-			opt => new ClusterConfigViewModel(opt));	
+			opt => new ClusterConfigViewModel(opt));
 }

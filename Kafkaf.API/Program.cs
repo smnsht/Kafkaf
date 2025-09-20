@@ -1,5 +1,6 @@
 using System.Text;
 using Kafkaf.API.Config;
+using Kafkaf.API.Routing;
 using Kafkaf.API.Services;
 
 namespace Kafkaf.API
@@ -17,6 +18,12 @@ namespace Kafkaf.API
 			// Add services to the container.
 			builder.Services.AddSingleton<AdminClientPool>();
 			builder.Services.AddTransient<ClusterService>();
+
+			// Register custom constraint
+			builder.Services.Configure<RouteOptions>(options =>
+			{
+				options.ConstraintMap.Add("clusterIndex", typeof(ClusterIndexConstraint));
+			});
 
 			builder.Services.AddControllers();
 

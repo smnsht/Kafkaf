@@ -6,10 +6,10 @@ namespace Kafkaf.API.Services;
 
 public class ClusterService
 {
-	private readonly List<ClusterConfigOptions> _clusterConfigOptions;
+	private readonly IReadOnlyList<ClusterConfigOptions> _clusterConfigOptions;
 	private readonly AdminClientPool _clientPool;
 
-	public ClusterService(List<ClusterConfigOptions> clusterConfigOptions, AdminClientPool clientPool)
+	public ClusterService(IReadOnlyList<ClusterConfigOptions> clusterConfigOptions, AdminClientPool clientPool)
 	{
 		_clusterConfigOptions = clusterConfigOptions;
 		_clientPool = clientPool;

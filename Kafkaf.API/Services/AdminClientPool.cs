@@ -5,10 +5,10 @@ namespace Kafkaf.API.Services;
 
 public class AdminClientPool : IDisposable
 {
-	private readonly List<ClusterConfigOptions> _clusterConfigs;
+	private readonly IReadOnlyList<ClusterConfigOptions> _clusterConfigs;
 	private readonly Dictionary<string, IAdminClient> _pool;
 
-	public AdminClientPool(List<ClusterConfigOptions> clusterConfigs)
+	public AdminClientPool(IReadOnlyList<ClusterConfigOptions> clusterConfigs)
 	{
 		_clusterConfigs = clusterConfigs;
 		_pool = new Dictionary<string, IAdminClient>();
