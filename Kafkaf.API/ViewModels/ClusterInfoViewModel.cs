@@ -1,4 +1,6 @@
-﻿namespace Kafkaf.API.ViewModels;
+﻿using Confluent.Kafka;
+
+namespace Kafkaf.API.ViewModels;
 
 public class ClusterInfoViewModel
 {
@@ -14,4 +16,18 @@ public class ClusterInfoViewModel
 	public bool ReadOnly { get; set; }
 	public required string Version { get; set; }
 	public ClusterFeature[] Features { get; set; } = [];
+
+	public static ClusterInfoViewModel FromMetadata(Metadata meta)
+	{
+		ArgumentNullException.ThrowIfNull(meta, nameof(meta));
+
+		return new ClusterInfoViewModel()
+		{
+			Name = meta.OriginatingBrokerName,
+			Version = "todo",
+			BrokerCount = meta.Brokers.Count,
+			OnlinePartitionCount = 0,// TODO
+			TopicCount = meta.Topics.Count,
+		};
+	}
 }

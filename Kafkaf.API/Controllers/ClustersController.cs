@@ -13,42 +13,20 @@ public class ClustersController : ControllerBase
 	public ClustersController(ClusterService clusterService) => _clusterService = clusterService;
 
 	public async Task<ClusterInfoViewModel[]> GetAsync()
-	{
+	{		
 		var list = new List<ClusterInfoViewModel>();
+
 		foreach(var cfg in _clusterService.ClusterConfigOptions)
 		{
 			var meta = await _clusterService.GetMetadataAsync(cfg.Alias);
-
-			var model = new ClusterInfoViewModel()
-			{
-				Name = meta.OriginatingBrokerName,
-				Version = "todo",
-				BrokerCount = meta.Brokers.Count,
-				OnlinePartitionCount = 0,// TODO
-				TopicCount = meta.Topics.Count,
-			};
+			var model = ClusterInfoViewModel.FromMetadata(meta);				
 
 			list.Add(model);
 		}
 
 		return list.ToArray();
 	}
-
-	//[HttpGet("{clusterNo:int}")]
-	//public async Task<ClusterInfoViewModel> GetAsync([FromRoute] int clusterNo)
-	//{
-	//	var meta = await _clusterService.GetMetadataAsync(clusterNo);
-
-	//	return new ClusterInfoViewModel()
-	//	{
-	//		Name = meta.OriginatingBrokerName,
-	//		Version = "todo",
-	//		BrokerCount = meta.Brokers.Count,
-	//		OnlinePartitionCount = 0,// TODO
-	//		TopicCount = meta.Topics.Count,
-	//	};		
-	//}
-
+	
 	[Route("Configs")]
 	public ClusterConfigViewModel[] GetConfigs()
 	{
@@ -61,3 +39,18 @@ public class ClustersController : ControllerBase
 				UserName: opt.UserName)).ToArray();
 	}
 }
+
+//[HttpGet("{clusterNo:int}")]
+//public async Task<ClusterInfoViewModel> GetAsync([FromRoute] int clusterNo)
+//{
+//	var meta = await _clusterService.GetMetadataAsync(clusterNo);
+
+//	return new ClusterInfoViewModel()
+//	{
+//		Name = meta.OriginatingBrokerName,
+//		Version = "todo",
+//		BrokerCount = meta.Brokers.Count,
+//		OnlinePartitionCount = 0,// TODO
+//		TopicCount = meta.Topics.Count,
+//	};		
+//}
