@@ -10,47 +10,34 @@ public class ClustersController : ControllerBase
 {
 	private readonly ClusterService _clusterService;
 
-	public ClustersController(ClusterService clusterService) => _clusterService = clusterService;
+	public ClustersController(ClusterService clusterService) =>
+		_clusterService = clusterService;
 
-	public async Task<ClusterInfoViewModel[]> GetAsync()
-	{		
-		var list = new List<ClusterInfoViewModel>();
+	[HttpGet]
+	public async Task<IEnumerable<ClusterInfoViewModel>> Get(CancellationToken ct)
+	{
+		var tasks = _clusterService.ClusterConfigOptions
+			.Select(cfg => _clusterService.FetchClusterInfoAsync(cfg.Alias, ct));
 
-		foreach(var cfg in _clusterService.ClusterConfigOptions)
+		return await Task.WhenAll(tasks);
+	}
+
+	[HttpGet("{cluserIdx:int}")]
+	public async Task<ActionResult<ClusterInfoViewModel>> GetCluster(int cluserIdx, CancellationToken ct)
+	{
+		var alias = _clusterService.ClusterConfigOptions[cluserIdx].Alias;
+
+		if (string.IsNullOrEmpty(alias))
 		{
-			var meta = await _clusterService.GetMetadataAsync(cfg.Alias);
-			var model = ClusterInfoViewModel.FromMetadata(meta);				
-
-			list.Add(model);
+			return NotFound();
 		}
 
-		return list.ToArray();
+		var model = await _clusterService.FetchClusterInfoAsync(alias, ct);
+		return Ok(model);
 	}
-	
-	[Route("Configs")]
-	public ClusterConfigViewModel[] GetConfigs()
-	{
-		var options = _clusterService.ClusterConfigOptions;
 
-		return options.Select(opt =>
-			new ClusterConfigViewModel(
-				Address: opt.Address,
-				Alias: opt.Alias,
-				UserName: opt.UserName)).ToArray();
-	}
+	[HttpGet("Configs")]
+	public IEnumerable<ClusterConfigViewModel> GetConfigs() =>
+		_clusterService.ClusterConfigOptions.Select(
+			opt => new ClusterConfigViewModel(opt));	
 }
-
-//[HttpGet("{clusterNo:int}")]
-//public async Task<ClusterInfoViewModel> GetAsync([FromRoute] int clusterNo)
-//{
-//	var meta = await _clusterService.GetMetadataAsync(clusterNo);
-
-//	return new ClusterInfoViewModel()
-//	{
-//		Name = meta.OriginatingBrokerName,
-//		Version = "todo",
-//		BrokerCount = meta.Brokers.Count,
-//		OnlinePartitionCount = 0,// TODO
-//		TopicCount = meta.Topics.Count,
-//	};		
-//}

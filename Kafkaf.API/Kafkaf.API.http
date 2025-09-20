@@ -11,13 +11,12 @@ Accept: application/json
 
 ###
 
-GET {{Kafkaf.API_HostAddress}}/api/Clusters/1
+GET {{Kafkaf.API_HostAddress}}/api/Clusters
 Accept: application/json
 
 ### 
 
-
-GET {{Kafkaf.API_HostAddress}}/api/Clusters
+GET {{Kafkaf.API_HostAddress}}/api/Clusters/0
 Accept: application/json
 
 ### 

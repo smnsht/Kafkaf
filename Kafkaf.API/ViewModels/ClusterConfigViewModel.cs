@@ -1,9 +1,12 @@
-﻿namespace Kafkaf.API.ViewModels;
+﻿using Kafkaf.API.Config;
 
-public record ClusterConfigViewModel(string Address, string Alias, string? UserName);
+namespace Kafkaf.API.ViewModels;
 
-//public required string Address { get; set; }
-//	public required string Alias { get; set; }
-//	public string? UserName { get; set; }
-//	public string? Password { get; set; }
-
+public record ClusterConfigViewModel(string Address, string Alias, string? UserName)
+{
+	public ClusterConfigViewModel(ClusterConfigOptions options) : this(
+		Address: options.Address,
+		Alias: options.Alias,
+		UserName: options.UserName)
+	{ }
+}

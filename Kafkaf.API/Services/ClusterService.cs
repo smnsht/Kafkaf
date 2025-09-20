@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using Kafkaf.API.Config;
+using Kafkaf.API.ViewModels;
 
 namespace Kafkaf.API.Services;
 
@@ -16,19 +17,33 @@ public class ClusterService
 
 	public ClusterConfigOptions[] ClusterConfigOptions => _clusterConfigOptions.ToArray();
 
-	public async Task<Metadata> GetMetadataAsync(int clusterNo)
+	public Metadata GetMetadata(int clusterNo)
 	{
 		var client = _clientPool.GetAdminClient(clusterNo);
 		var timeout = TimeSpan.FromSeconds(10);
-		
-		return await Task.Run(() => client.GetMetadata(timeout));		
+
+		return client.GetMetadata(timeout);
 	}
 
-	public async Task<Metadata> GetMetadataAsync(string alias)
+	public Metadata GetMetadata(string alias)
 	{
 		var client = _clientPool.GetAdminClient(alias);
 		var timeout = TimeSpan.FromSeconds(10);
 
-		return await Task.Run(() => client.GetMetadata(timeout));
+		return client.GetMetadata(timeout);
 	}
+
+	public Task<ClusterInfoViewModel> FetchClusterInfoAsync(string alias, CancellationToken ct) =>
+		Task.Run(() =>
+		{
+			try
+			{
+				var meta = GetMetadata(alias);
+				return ClusterInfoViewModel.FromMetadata(alias, meta);
+			}
+			catch (Exception e)
+			{
+				return ClusterInfoViewModel.Offline(alias, e.Message);
+			}
+		}, ct);
 }

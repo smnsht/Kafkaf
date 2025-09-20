@@ -24,7 +24,7 @@ public class AdminClientPool : IDisposable
 
 	public IAdminClient GetAdminClient(int clusterNo)
 	{
-		var clusterConfig = _clusterConfigs[clusterNo - 1]
+		var clusterConfig = _clusterConfigs[clusterNo]
 			?? throw new ArgumentOutOfRangeException(nameof(clusterNo));
 		
 		return GetAdminClient(clusterConfig);
