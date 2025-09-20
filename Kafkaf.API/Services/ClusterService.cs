@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Kafkaf.API.Config;
 using Kafkaf.API.ViewModels;
 
@@ -46,4 +47,11 @@ public class ClusterService
 				return ClusterInfoViewModel.Offline(alias, e.Message);
 			}
 		}, ct);
+
+	public async Task<DescribeClusterResult> DescribeClusterAsync(int clusterNo)
+	{
+		var client = _clientPool.GetAdminClient(clusterNo);		
+
+		return await client.DescribeClusterAsync();		
+	}	
 }

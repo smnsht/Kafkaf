@@ -18,6 +18,7 @@ namespace Kafkaf.API
 			// Add services to the container.
 			builder.Services.AddSingleton<AdminClientPool>();
 			builder.Services.AddTransient<ClusterService>();
+			builder.Services.AddTransient<BrokersService>();
 
 			// Register custom constraint
 			builder.Services.Configure<RouteOptions>(options =>

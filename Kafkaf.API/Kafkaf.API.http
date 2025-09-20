@@ -25,3 +25,17 @@ GET {{Kafkaf.API_HostAddress}}/api/Clusters/Configs
 Accept: application/json
 
 ### 
+
+#
+# Brokers
+#
+GET {{Kafkaf.API_HostAddress}}/api/Clusters/0/Brokers
+Accept: application/json
+
+### 
+
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/brokers/1
+Accept: application/json
+
+### 
