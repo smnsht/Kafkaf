@@ -1,5 +1,6 @@
 using System.Text;
 using Kafkaf.API.Config;
+using Kafkaf.API.Facades;
 using Kafkaf.API.Routing;
 using Kafkaf.API.Services;
 
@@ -19,6 +20,9 @@ namespace Kafkaf.API
 			builder.Services.AddSingleton<AdminClientPool>();
 			builder.Services.AddTransient<ClusterService>();
 			builder.Services.AddTransient<BrokersService>();
+			builder.Services.AddTransient<TopicsService>();
+			builder.Services.AddTransient<ConsumerService>();
+			builder.Services.AddTransient<TopicDetailsFacade>();
 
 			// Register custom constraint
 			builder.Services.Configure<RouteOptions>(options =>
