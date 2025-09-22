@@ -19,7 +19,7 @@ public class ClusterInfoViewModel
 	//public string? LastError { get; set; }
 	//public int? BytesInPerSec { get; set; }
 	//public int BytesOutPerSec { get; set; }
-	//public bool ReadOnly { get; set; }=	
+	//public bool ReadOnly { get; set; }=
 	//public ClusterFeature[] Features { get; set; } = [];
 
 	public static ClusterInfoViewModel FromMetadata(string alias, Metadata meta)
@@ -27,20 +27,20 @@ public class ClusterInfoViewModel
 		ArgumentNullException.ThrowIfNull(meta, nameof(meta));
 
 		// Sum partitions across all topics
-		var totalPartitions = meta.Topics
-			.Where(t => !t.Error.IsError) // skip internal/errored topics
+		var totalPartitions = meta
+			.Topics.Where(t => !t.Error.IsError) // skip internal/errored topics
 			.Sum(t => t.Partitions.Count);
-		
+
 		return new ClusterInfoViewModel()
 		{
-			Alias = alias,			
+			Alias = alias,
 			Version = "TODO",
 			BrokerCount = meta.Brokers.Count,
 			OnlinePartitionCount = totalPartitions,
 			TopicCount = meta.Topics.Count,
 			OriginatingBrokerName = meta.OriginatingBrokerName,
 			OriginatingBrokerId = meta.OriginatingBrokerId,
-			IsOffline = false
+			IsOffline = false,
 		};
 	}
 
@@ -54,6 +54,6 @@ public class ClusterInfoViewModel
 			TopicCount = -1,
 			OriginatingBrokerId = -1,
 			IsOffline = true,
-			Error = error
+			Error = error,
 		};
 }

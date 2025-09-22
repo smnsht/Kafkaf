@@ -10,14 +10,14 @@ public class ClustersController : ControllerBase
 {
 	private readonly ClusterService _clusterService;
 
-	public ClustersController(ClusterService clusterService) =>
-		_clusterService = clusterService;
+	public ClustersController(ClusterService clusterService) => _clusterService = clusterService;
 
 	[HttpGet]
 	public async Task<IEnumerable<ClusterInfoViewModel>> Get(CancellationToken ct)
 	{
-		var tasks = _clusterService.ClusterConfigOptions
-			.Select(cfg => _clusterService.FetchClusterInfoAsync(cfg.Alias, ct));
+		var tasks = _clusterService.ClusterConfigOptions.Select(cfg =>
+			_clusterService.FetchClusterInfoAsync(cfg.Alias, ct)
+		);
 
 		return await Task.WhenAll(tasks);
 	}
@@ -32,6 +32,5 @@ public class ClustersController : ControllerBase
 
 	[HttpGet("Configs")]
 	public IEnumerable<ClusterConfigViewModel> GetConfigs() =>
-		_clusterService.ClusterConfigOptions.Select(
-			opt => new ClusterConfigViewModel(opt));
+		_clusterService.ClusterConfigOptions.Select(opt => new ClusterConfigViewModel(opt));
 }

@@ -22,19 +22,17 @@ public class BrokersController : ControllerBase
 	public async Task<BrokersInfoViewModel> GetAsync(int cluserIdx)
 	{
 		var result = await _clusterService.DescribeClusterAsync(cluserIdx);
-		
-		return BrokersInfoViewModel.FromResult(result);
+
+		return new BrokersInfoViewModel(result);
 	}
 
 	[HttpGet("{brokerId:int}")]
 	public async Task<ActionResult<BrokerConfigRow[]>> Configs(int cluserIdx, int brokerId)
-	{		
-		var result = await _brokersService.DescribeBrokerAsync(
-			cluserIdx,
-			brokerId);
+	{
+		var result = await _brokersService.DescribeBrokerAsync(cluserIdx, brokerId);
 
 		if (result is DescribeConfigsResult configs)
-		{			
+		{
 			return Ok(BrokerConfigRow.FromResult(configs));
 		}
 

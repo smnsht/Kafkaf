@@ -10,7 +10,10 @@ public class ClusterService
 	private readonly IReadOnlyList<ClusterConfigOptions> _clusterConfigOptions;
 	private readonly AdminClientPool _clientPool;
 
-	public ClusterService(IReadOnlyList<ClusterConfigOptions> clusterConfigOptions, AdminClientPool clientPool)
+	public ClusterService(
+		IReadOnlyList<ClusterConfigOptions> clusterConfigOptions,
+		AdminClientPool clientPool
+	)
 	{
 		_clusterConfigOptions = clusterConfigOptions;
 		_clientPool = clientPool;
@@ -35,23 +38,26 @@ public class ClusterService
 	}
 
 	public Task<ClusterInfoViewModel> FetchClusterInfoAsync(string alias, CancellationToken ct) =>
-		Task.Run(() =>
-		{
-			try
+		Task.Run(
+			() =>
 			{
-				var meta = GetMetadata(alias);
-				return ClusterInfoViewModel.FromMetadata(alias, meta);
-			}
-			catch (Exception e)
-			{
-				return ClusterInfoViewModel.Offline(alias, e.Message);
-			}
-		}, ct);
+				try
+				{
+					var meta = GetMetadata(alias);
+					return ClusterInfoViewModel.FromMetadata(alias, meta);
+				}
+				catch (Exception e)
+				{
+					return ClusterInfoViewModel.Offline(alias, e.Message);
+				}
+			},
+			ct
+		);
 
 	public async Task<DescribeClusterResult> DescribeClusterAsync(int clusterNo)
 	{
-		var client = _clientPool.GetAdminClient(clusterNo);		
+		var client = _clientPool.GetAdminClient(clusterNo);
 
-		return await client.DescribeClusterAsync();		
-	}	
+		return await client.DescribeClusterAsync();
+	}
 }

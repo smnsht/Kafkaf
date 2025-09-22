@@ -12,40 +12,37 @@ public class AdminClientPool : IDisposable
 	{
 		_clusterConfigs = clusterConfigs;
 		_pool = new Dictionary<string, IAdminClient>();
-	}	
-	
+	}
+
 	public IAdminClient GetAdminClient(string alias)
 	{
-		var clusterConfig = _clusterConfigs.FirstOrDefault(c => c.Alias == alias)
+		var clusterConfig =
+			_clusterConfigs.FirstOrDefault(c => c.Alias == alias)
 			?? throw new ArgumentOutOfRangeException(nameof(alias));
 
-		return GetAdminClient(clusterConfig);		
+		return GetAdminClient(clusterConfig);
 	}
 
 	public IAdminClient GetAdminClient(int clusterNo)
 	{
-		var clusterConfig = _clusterConfigs[clusterNo]
-			?? throw new ArgumentOutOfRangeException(nameof(clusterNo));
-		
+		var clusterConfig =
+			_clusterConfigs[clusterNo] ?? throw new ArgumentOutOfRangeException(nameof(clusterNo));
+
 		return GetAdminClient(clusterConfig);
 	}
 
 	public IAdminClient GetAdminClient(ClusterConfigOptions clusterConfig)
 	{
 		var alias = clusterConfig.Alias;
-		
+
 		if (_pool.TryGetValue(alias, out var adminClient))
 		{
 			return adminClient;
 		}
 
-		var config = new AdminClientConfig
-		{
-			BootstrapServers = clusterConfig.Address,
-		};
+		var config = new AdminClientConfig { BootstrapServers = clusterConfig.Address };
 
-		adminClient = new AdminClientBuilder(config)
-			.Build();
+		adminClient = new AdminClientBuilder(config).Build();
 
 		_pool[alias] = adminClient;
 
@@ -60,6 +57,6 @@ public class AdminClientPool : IDisposable
 			client.Dispose();
 		}
 
-		_pool.Clear();		
+		_pool.Clear();
 	}
 }
