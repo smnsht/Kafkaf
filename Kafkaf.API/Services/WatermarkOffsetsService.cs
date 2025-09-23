@@ -8,10 +8,10 @@ namespace Kafkaf.API.Services;
 public class WatermarkOffsetsService
 {
 	private readonly WatermarkOffsetsClientPool _pool;
-	private readonly WatermarkOffsetsClientOptions _options;
+	private readonly MessageConsumerOptions _options;
 
 	public WatermarkOffsetsService(
-		IOptions<WatermarkOffsetsClientOptions> options,
+		IOptions<MessageConsumerOptions> options,
 		WatermarkOffsetsClientPool pool
 	)
 	{

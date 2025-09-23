@@ -16,7 +16,8 @@ namespace Kafkaf.API
 			builder
 				.ConfigureClusterConfigOptions()
 				.AddAdminClientConfigOptions()
-				.AddWatermarkOffsetsClient();
+				.AddWatermarkOffsetsMessageConsumerOptions()
+				.AddMessagesReaderServiceOptions();
 
 			// Add services to the container.
 			builder.Services.AddSingleton<AdminClientPool>();
@@ -26,6 +27,7 @@ namespace Kafkaf.API
 			builder.Services.AddSingleton<BrokersService>();
 			builder.Services.AddSingleton<TopicsService>();
 			builder.Services.AddSingleton<WatermarkOffsetsService>();
+			builder.Services.AddSingleton<MessagesReaderService>();
 
 			builder.Services.AddTransient<TopicDetailsFacade>();
 

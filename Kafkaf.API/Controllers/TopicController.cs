@@ -12,6 +12,12 @@ public class TopicController : ControllerBase
 
 	public TopicController(TopicDetailsFacade servicesFacade) => _servicesFacade = servicesFacade;
 
+	/// <summary>
+	/// GET api/clusters/{clusterIdx}/topics/{topicName}
+	/// </summary>
+	/// <param name="clusterIdx"></param>
+	/// <param name="topicName"></param>
+	/// <returns></returns>
 	[HttpGet]
 	public async Task<ActionResult<string>> GetAsync(int clusterIdx, string topicName)
 	{

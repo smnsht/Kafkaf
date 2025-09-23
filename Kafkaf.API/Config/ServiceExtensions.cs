@@ -36,18 +36,32 @@ public static class ServiceExtensions
 		return builder;
 	}
 
-	public static WebApplicationBuilder AddWatermarkOffsetsClient(this WebApplicationBuilder builder)
+	public static WebApplicationBuilder AddWatermarkOffsetsMessageConsumerOptions(this WebApplicationBuilder builder)
 	{
 		var sectionName = $"Kafkaf:WatermarkOffsets";
 
 		builder.Services
-			.AddOptions<WatermarkOffsetsClientOptions>()
+			.AddOptions<MessageConsumerOptions>()
 			.Bind(builder.Configuration.GetSection(sectionName))
 			.ValidateDataAnnotations()
 			.ValidateOnStart();
 
 		return builder;
 	}
+
+	public static WebApplicationBuilder AddMessagesReaderServiceOptions(this WebApplicationBuilder builder)
+	{
+		var sectionName = $"Kafkaf:MessagesReaderService";
+
+		builder.Services
+			.AddOptions<MessagesReaderServiceOptions>()
+			.Bind(builder.Configuration.GetSection(sectionName))
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
+
+		return builder;
+	}
+	
 
 	//public static WebApplicationBuilder AddClusterPingServiceOptions(this WebApplicationBuilder builder)
 	//{

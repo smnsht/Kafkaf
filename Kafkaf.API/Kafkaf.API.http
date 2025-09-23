@@ -43,3 +43,11 @@ Accept: application/json
 
 GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.1
 Accept: application/json
+
+###
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.1/messages?partitions=0,1,2
+Accept: application/json
+
+###
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/__consumer_offsets/messages?partitions=5
+Accept: application/json

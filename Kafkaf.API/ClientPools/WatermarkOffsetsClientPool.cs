@@ -6,11 +6,11 @@ namespace Kafkaf.API.ClientPools;
 
 public class WatermarkOffsetsClientPool : AbstractClientPool<IConsumer<Ignore, Ignore>>
 {
-	private readonly WatermarkOffsetsClientOptions _options;
+	private readonly MessageConsumerOptions _options;
 
 	public WatermarkOffsetsClientPool(
 		IReadOnlyList<ClusterConfigOptions> clusterConfigs,
-		IOptions<WatermarkOffsetsClientOptions> options
+		IOptions<MessageConsumerOptions> options
 	)
 		: base(clusterConfigs) => _options = options.Value;
 

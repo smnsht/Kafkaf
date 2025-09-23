@@ -2,7 +2,7 @@
 
 namespace Kafkaf.API.Config;
 
-public class WatermarkOffsetsClientOptions
+public class MessageConsumerOptions
 {
 	[Required]
 	[RegularExpression(
