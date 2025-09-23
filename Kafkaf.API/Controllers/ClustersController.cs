@@ -30,7 +30,7 @@ public class ClustersController : ControllerBase
 		return await _clusterService.FetchClusterInfoAsync(alias, ct);
 	}
 
-	[HttpGet("Configs")]
+	[HttpGet("configs")]
 	public IEnumerable<ClusterConfigViewModel> GetConfigs() =>
 		_clusterService.ClusterConfigOptions.Select(opt => new ClusterConfigViewModel(opt));
 }

@@ -6,22 +6,17 @@ Accept: application/json
 
 ###
 
-GET {{Kafkaf.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
-
-GET {{Kafkaf.API_HostAddress}}/api/Clusters
+GET {{Kafkaf.API_HostAddress}}/api/clusters
 Accept: application/json
 
 ### 
 
-GET {{Kafkaf.API_HostAddress}}/api/Clusters/0
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0
 Accept: application/json
 
 ### 
 
-GET {{Kafkaf.API_HostAddress}}/api/Clusters/Configs
+GET {{Kafkaf.API_HostAddress}}/api/clusters/configs
 Accept: application/json
 
 ### 
@@ -29,7 +24,8 @@ Accept: application/json
 #
 # Brokers
 #
-GET {{Kafkaf.API_HostAddress}}/api/Clusters/0/Brokers
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/brokers
 Accept: application/json
 
 ### 

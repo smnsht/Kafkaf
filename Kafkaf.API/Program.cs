@@ -1,4 +1,5 @@
 using System.Text;
+using Kafkaf.API.ClientPools;
 using Kafkaf.API.Config;
 using Kafkaf.API.Facades;
 using Kafkaf.API.Routing;
@@ -14,14 +15,18 @@ namespace Kafkaf.API
 
 			builder
 				.ConfigureClusterConfigOptions()
-				.AddAdminClientConfigOptions();
+				.AddAdminClientConfigOptions()
+				.AddWatermarkOffsetsClient();
 
 			// Add services to the container.
 			builder.Services.AddSingleton<AdminClientPool>();
+			builder.Services.AddSingleton<WatermarkOffsetsClientPool>();
+
 			builder.Services.AddTransient<ClusterService>();
 			builder.Services.AddTransient<BrokersService>();
 			builder.Services.AddTransient<TopicsService>();
-			builder.Services.AddTransient<ConsumerService>();
+			builder.Services.AddTransient<WatermarkOffsetsService>();
+
 			builder.Services.AddTransient<TopicDetailsFacade>();
 
 			// Register custom constraint

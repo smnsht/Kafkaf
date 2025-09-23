@@ -6,9 +6,9 @@ namespace Kafkaf.API.Facades;
 public class TopicDetailsFacade
 {
 	private readonly TopicsService _topicsService;
-	private readonly ConsumerService _consumerService;
+	private readonly WatermarkOffsetsService _consumerService;
 
-	public TopicDetailsFacade(TopicsService topicsService, ConsumerService consumerService)
+	public TopicDetailsFacade(TopicsService topicsService, WatermarkOffsetsService consumerService)
 	{
 		_topicsService = topicsService;
 		_consumerService = consumerService;
@@ -24,7 +24,11 @@ public class TopicDetailsFacade
 			);
 
 		var partitions = desc.Partitions.Select(p => p.Partition).ToArray();
-		var partitionOffsets = _consumerService.GetWatermarkOffsets(topicName, partitions ?? []);
+		var partitionOffsets = _consumerService.GetWatermarkOffsets(
+			clusterNo,
+			topicName,
+			partitions ?? []
+		);
 
 		return new TopicDetailsViewModel(desc, partitionOffsets);
 	}

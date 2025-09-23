@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using Confluent.Kafka.Admin;
+using Kafkaf.API.ClientPools;
 using Kafkaf.API.Config;
 using Kafkaf.API.ViewModels;
 
@@ -23,7 +24,7 @@ public class ClusterService
 
 	public Metadata GetMetadata(int clusterNo)
 	{
-		var client = _clientPool.GetAdminClient(clusterNo);
+		var client = _clientPool.GetClient(clusterNo);
 		var timeout = TimeSpan.FromSeconds(10);
 
 		return client.GetMetadata(timeout);
@@ -31,7 +32,7 @@ public class ClusterService
 
 	public Metadata GetMetadata(string alias)
 	{
-		var client = _clientPool.GetAdminClient(alias);
+		var client = _clientPool.GetClient(alias);
 		var timeout = TimeSpan.FromSeconds(10);
 
 		return client.GetMetadata(timeout);
@@ -56,7 +57,7 @@ public class ClusterService
 
 	public async Task<DescribeClusterResult> DescribeClusterAsync(int clusterNo)
 	{
-		var client = _clientPool.GetAdminClient(clusterNo);
+		var client = _clientPool.GetClient(clusterNo);
 
 		return await client.DescribeClusterAsync();
 	}

@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka.Admin;
+using Kafkaf.API.ClientPools;
 
 namespace Kafkaf.API.Services;
 
@@ -10,7 +11,7 @@ public class BrokersService
 
 	public async Task<DescribeConfigsResult?> DescribeBrokerAsync(int clusterNo, int brokerId)
 	{
-		var client = _clientPool.GetAdminClient(clusterNo);
+		var client = _clientPool.GetClient(clusterNo);
 
 		// Describe configs for broker with ID 0
 		var resources = new List<ConfigResource>

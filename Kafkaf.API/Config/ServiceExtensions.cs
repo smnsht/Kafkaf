@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using Kafkaf.API.ClientPools;
 using Kafkaf.API.Services;
 
 namespace Kafkaf.API.Config;
@@ -28,6 +29,19 @@ public static class ServiceExtensions
 
 		builder.Services
 			.AddOptions<AdminClientConfigOptions>()
+			.Bind(builder.Configuration.GetSection(sectionName))
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
+
+		return builder;
+	}
+
+	public static WebApplicationBuilder AddWatermarkOffsetsClient(this WebApplicationBuilder builder)
+	{
+		var sectionName = $"Kafkaf:WatermarkOffsets";
+
+		builder.Services
+			.AddOptions<WatermarkOffsetsClientOptions>()
 			.Bind(builder.Configuration.GetSection(sectionName))
 			.ValidateDataAnnotations()
 			.ValidateOnStart();
