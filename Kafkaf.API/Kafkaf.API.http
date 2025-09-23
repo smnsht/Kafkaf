@@ -35,3 +35,11 @@ GET {{Kafkaf.API_HostAddress}}/api/clusters/0/brokers/1
 Accept: application/json
 
 ### 
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics
+Accept: application/json
+
+###
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.1
+Accept: application/json

@@ -16,6 +16,7 @@ public class TopicDetailsFacade
 
 	public async Task<TopicDetailsViewModel> GetTopicDetails(int clusterNo, string topicName)
 	{
+		// Will throw DescribeTopicsException when topic not found
 		var topicResult = await _topicsService.DescribeTopicsAsync(clusterNo, topicName);
 		var desc =
 			topicResult.TopicDescriptions.FirstOrDefault()

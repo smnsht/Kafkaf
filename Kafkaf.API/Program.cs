@@ -22,10 +22,10 @@ namespace Kafkaf.API
 			builder.Services.AddSingleton<AdminClientPool>();
 			builder.Services.AddSingleton<WatermarkOffsetsClientPool>();
 
-			builder.Services.AddTransient<ClusterService>();
-			builder.Services.AddTransient<BrokersService>();
-			builder.Services.AddTransient<TopicsService>();
-			builder.Services.AddTransient<WatermarkOffsetsService>();
+			builder.Services.AddSingleton<ClusterService>();
+			builder.Services.AddSingleton<BrokersService>();
+			builder.Services.AddSingleton<TopicsService>();
+			builder.Services.AddSingleton<WatermarkOffsetsService>();
 
 			builder.Services.AddTransient<TopicDetailsFacade>();
 
@@ -33,6 +33,7 @@ namespace Kafkaf.API
 			builder.Services.Configure<RouteOptions>(options =>
 			{
 				options.ConstraintMap.Add("clusterIndex", typeof(ClusterIndexConstraint));
+				options.ConstraintMap.Add("topicName", typeof(KafkaTopicConstraint));
 			});
 
 			builder.Services.AddControllers();

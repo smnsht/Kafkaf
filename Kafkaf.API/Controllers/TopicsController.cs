@@ -1,34 +1,24 @@
-﻿using Kafkaf.API.Facades;
-using Kafkaf.API.Services;
+﻿using Kafkaf.API.Services;
 using Kafkaf.API.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kafkaf.API.Controllers;
 
-[Route("api/clusters/{cluserIdx:clusterIndex}/[controller]")]
+
+[Route("api/clusters/{cluserIdx:clusterIndex}/topics")]
 [ApiController]
 public class TopicsController : ControllerBase
 {
+	private readonly ClusterService _clusterService;
+
+	public TopicsController(ClusterService clusterService) => _clusterService = clusterService;
+
 	[HttpGet]
-	public IEnumerable<TopicsListViewModel> GetTopics(int clusterNo, [FromServices] ClusterService clusterService)
+	public IEnumerable<TopicsListViewModel> GetTopics(int clusterNo)
 	{
 		// Request metadata for all topics in the cluster
-		var metadata = clusterService.GetMetadata(clusterNo);
+		var metadata = _clusterService.GetMetadata(clusterNo);
 
 		return metadata.Topics.Select(topicMeta => new TopicsListViewModel(topicMeta));
-	}
-
-	[HttpGet("{topicName:alpha}")]
-	public async Task<ActionResult<TopicDetailsViewModel>> GetTopicDetails(int clusterNo, string topicName, [FromServices] TopicDetailsFacade detailsService)
-	{
-		try
-		{
-			var details = await detailsService.GetTopicDetails(clusterNo, topicName); 
-			return Ok(details);
-		}
-		catch (Exception)
-		{			
-			return NotFound();
-		}
-	}
+	}	
 }

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Kafkaf.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/clusters")]
 [ApiController]
 public class ClustersController : ControllerBase
 {
