@@ -1,9 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Kafkaf.API.Models;
-//int cluserIdx,
-//string Topic,
 public record ReadMessagesRequest(
 	string Partitions,
 	SeekType seekType=SeekType.OFFSET,
@@ -20,16 +17,3 @@ public record ReadMessagesRequest(
 		yield break;
 	}
 }
-
-
-public record ReadMessagesRequest2(int clusterIdx, string topicName);
-public record ReadMessagesRequest3(
-	SeekType? seekType,
-	SeekDirection? seekDirection,
-	int[]? Partitions,
-	string? keySerde,
-	string? valueSerde,
-	int? Offset,
-	DateTime? Timestamp
-);
-

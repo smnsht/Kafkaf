@@ -2,8 +2,6 @@
 using Kafkaf.API.Config;
 using Kafkaf.API.Models;
 using Microsoft.Extensions.Options;
-using TConsumer = Confluent.Kafka.IConsumer<byte[]?, byte[]?>;
-using TCR = Confluent.Kafka.ConsumeResult<byte[]?, byte[]?>;
 
 namespace Kafkaf.API.Services;
 
@@ -17,7 +15,7 @@ public class MessagesReaderService
 		int clusterIdx,
 		string topicName,
 		ReadMessagesRequest request,
-		TConsumer consumer,
+		IConsumer<byte[]?, byte[]?> consumer,
 		CancellationToken token
 	) : IDisposable
 	{
@@ -35,7 +33,7 @@ public class MessagesReaderService
 		_clusterConfigs = clusterConfigs;
 	}
 
-	public IEnumerable<TCR> ReadMessages(
+	public List<ConsumeResult<byte[]?, byte[]?>> ReadMessages(
 		int clusterIdx,
 		string topicName,
 		ReadMessagesRequest request,
@@ -57,7 +55,7 @@ public class MessagesReaderService
 		}
 	}
 
-	internal TConsumer BuildConsumer(int clusterIdx)
+	internal IConsumer<byte[]?, byte[]?> BuildConsumer(int clusterIdx)
 	{
 		var clusterConfig =
 			_clusterConfigs[clusterIdx]
@@ -89,11 +87,11 @@ public class MessagesReaderService
 		ctx.consumer.Assign(topicPartitions);
 	}
 
-	internal List<TCR> Consume(ReadingContext ctx)
+	internal List<ConsumeResult<byte[]?, byte[]?>> Consume(ReadingContext ctx)
 	{
 		var consumer = ctx.consumer;
 		var timeout = TimeSpan.FromSeconds(_options.ConsumeTimeoutInSeconds);
-		var messages = new List<TCR>();
+		var messages = new List<ConsumeResult<byte[]?, byte[]?>>();
 
 		for (var i = 0; i <= _options.MaxMessages && !ctx.token.IsCancellationRequested; i++)
 		{

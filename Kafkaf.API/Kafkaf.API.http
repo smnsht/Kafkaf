@@ -49,5 +49,5 @@ GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.1/messages?partitions=
 Accept: application/json
 
 ###
-GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/__consumer_offsets/messages?partitions=5
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.3/messages?partitions=0
 Accept: application/json
