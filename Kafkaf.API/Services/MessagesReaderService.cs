@@ -33,6 +33,56 @@ public class MessagesReaderService
 		_clusterConfigs = clusterConfigs;
 	}
 
+	// TODO: create Stream
+	public List<ConsumeResult<byte[]?, byte[]?>> ReadMessagesBackwards(
+		int clusterIdx,
+		string topicName,
+		ReadMessagesRequest request,
+		CancellationToken ct
+	)
+	{
+		var messages = new List<ConsumeResult<byte[]?, byte[]?>>();
+
+		using (var consumer = _buildConsumer(clusterIdx))
+		{
+			// Get metadata to discover partitions
+			var partitions = request
+				.PartitionsAsInt.Select(p => new TopicPartition(topicName, new Partition(p)))
+				.ToList();
+
+			foreach (var tp in partitions)
+			{
+				// Query watermarks for this partition
+				var watermark = consumer.QueryWatermarkOffsets(tp, TimeSpan.FromSeconds(5));
+				var lastOffset = watermark.High - 1;
+
+				// Walk backwards through this partition
+				for (var offset = lastOffset; offset >= watermark.Low; offset--)
+				{
+					if (ct.IsCancellationRequested || messages.Count > _options.MaxMessages)
+					{
+						break;
+					}
+
+					var tpo = new TopicPartitionOffset(tp, new Offset(offset));
+					consumer.Assign(tpo);
+
+					var cr = consumer.Consume(TimeSpan.FromSeconds(2));
+
+					if (cr is null || cr.IsPartitionEOF)
+					{
+						// No more messages right now — we've reached the "end"
+						break;
+					}
+
+					messages.Add(cr);
+				}
+			}
+		}
+
+		return messages;
+	}
+
 	public List<ConsumeResult<byte[]?, byte[]?>> ReadMessages(
 		int clusterIdx,
 		string topicName,
@@ -45,17 +95,17 @@ public class MessagesReaderService
 				clusterIdx: clusterIdx,
 				topicName: topicName,
 				request: request,
-				consumer: BuildConsumer(clusterIdx),
+				consumer: _buildConsumer(clusterIdx),
 				token: ct
 			)
 		)
 		{
-			AssignTopicPartitions(ctx);
-			return Consume(ctx);
+			_assignTopicPartitions(ctx);
+			return _consume(ctx);
 		}
 	}
 
-	internal IConsumer<byte[]?, byte[]?> BuildConsumer(int clusterIdx)
+	internal IConsumer<byte[]?, byte[]?> _buildConsumer(int clusterIdx)
 	{
 		var clusterConfig =
 			_clusterConfigs[clusterIdx]
@@ -72,10 +122,10 @@ public class MessagesReaderService
 		return new ConsumerBuilder<byte[]?, byte[]?>(config).Build();
 	}
 
-	internal void AssignTopicPartitions(ReadingContext ctx)
+	internal void _assignTopicPartitions(ReadingContext ctx)
 	{
 		var topicPartitions = ctx
-			.request.Partitions.Split(',')			
+			.request.Partitions.Split(',')
 			.Select(sPartition => new TopicPartitionOffset(
 				topic: ctx.topicName,
 				partition: int.Parse(sPartition),
@@ -87,7 +137,7 @@ public class MessagesReaderService
 		ctx.consumer.Assign(topicPartitions);
 	}
 
-	internal List<ConsumeResult<byte[]?, byte[]?>> Consume(ReadingContext ctx)
+	internal List<ConsumeResult<byte[]?, byte[]?>> _consume(ReadingContext ctx)
 	{
 		var consumer = ctx.consumer;
 		var timeout = TimeSpan.FromSeconds(_options.ConsumeTimeoutInSeconds);

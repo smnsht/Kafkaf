@@ -22,7 +22,7 @@ public class MessagesController : ControllerBase
 		CancellationToken ct
 	)
 	{
-		var results = _readerService.ReadMessages(clusterIdx, topicName, req, ct);
+		var results = _readerService.ReadMessagesBackwards(clusterIdx, topicName, req, ct);
 
 		return results.Select(result => new ReadMessagesViewModel(result));
 	}
