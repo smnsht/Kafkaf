@@ -50,8 +50,8 @@ Accept: application/json
 
 ###
 
-DELETE {{Kafkaf.API_HostAddress}}/api/clusters/0/topics?names=topic&names=topic.666
-Accept: application/json
+#DELETE {{Kafkaf.API_HostAddress}}/api/clusters/0/topics?names=topic&names=topic.666
+#Accept: application/json
 
 ### 
 
@@ -64,9 +64,26 @@ GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.1
 Accept: application/json
 
 ###
+
 GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/__consumer_offsets/messages?partitions=5,13
 Accept: application/json
 
 ###
+
 GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.3/messages?partitions=0
+Accept: application/json
+
+###
+
+DELETE {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.3/messages
+Accept: application/json
+
+###
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.3/settings
+Accept: application/json
+
+###
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.3/consumers
 Accept: application/json

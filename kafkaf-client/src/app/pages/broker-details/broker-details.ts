@@ -1,34 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Signal } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { StatsCard, StatsCardItem } from '../../components/stats-card/stats-card';
+import { BrokerDetailsStore } from '../../services/broker-details-store';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { PageState } from '../../services/base-store';
 
 type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
 
 @Component({
   selector: 'app-broker-details',
-  imports: [RouterLink, StatsCard, RouterOutlet],
+  imports: [RouterLink, StatsCard, RouterOutlet, PageWrapper],
   templateUrl: './broker-details.html',
   styleUrl: './broker-details.scss',
 })
 export class BrokerDetails implements OnInit {
-  public cardItems: StatsCardItem[] = [];
-  public cluster = '';
-  public broker = '';
-  public currentTab?: BrokerTabs;
+  cardItems: StatsCardItem[] = [];
+  cluster = NaN;
+  broker = NaN;
+  currentTab?: BrokerTabs;
 
-  constructor(route: ActivatedRoute) {
-    ((paramMap) => {
-      this.cluster = paramMap.get('cluster') ?? '';
-      this.broker = paramMap.get('broker') ?? '';
-    })(route.snapshot.paramMap);
+  pageState : Signal<PageState>;
+
+  constructor(route: ActivatedRoute, store: BrokerDetailsStore) {
+    this.pageState = store.pageState;
+
+    route.paramMap.subscribe(paramMap => {
+      this.cluster = parseInt(paramMap.get('cluster')!);
+      this.broker = parseInt(paramMap.get('broker')!);
+
+      store.loadConfigs({
+        clusterIdx: this.cluster,
+        brokerId: this.broker,
+      });
+    });
   }
 
   ngOnInit(): void {
     this.cardItems = [
-      { label: 'Segment Size', value: '3.97 KB' },
-      { label: 'Segment Count', value: 19 },
-      { label: 'Port', value: 9094 },
-      { label: 'Host', value: 'localhost' },
+      { label: 'Segment Size', value: 'TODO KB' },
+      { label: 'Segment Count', value: 'TODO' },
+      { label: 'Port', value: 'TODO' },
+      { label: 'Host', value: 'TODO' },
     ];
   }
 

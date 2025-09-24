@@ -1,0 +1,28 @@
+:host ::ng-deep {
+  /* Invalid state */
+  select.ng-touched.ng-invalid,
+  input.ng-touched.ng-invalid {
+    border-color: var(--bulma-danger);
+    box-shadow: none;
+  }
+
+  select.ng-touched.ng-invalid:focus,
+  input.ng-touched.ng-invalid:focus {
+    border-color: var(--bulma-danger);
+    box-shadow: 0 0 0 0.125em
+      hsla(var(--bulma-danger-h), var(--bulma-danger-s), var(--bulma-danger-l), 0.25);
+  }
+
+  /* Valid state */
+  input.ng-touched.ng-valid,
+  select.ng-touched.ng-valid {
+    border-color: var(--bulma-success);
+  }
+
+  input.ng-touched.ng-valid:focus,
+  select.ng-touched.ng-valid:focus {
+    border-color: var(--bulma-success);
+    box-shadow: 0 0 0 0.125em
+      hsla(var(--bulma-success-h), var(--bulma-success-s), var(--bulma-success-l), 0.25);
+  }
+}

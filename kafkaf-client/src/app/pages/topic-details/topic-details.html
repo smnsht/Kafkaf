@@ -4,17 +4,17 @@
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li>
-          <a [routerLink]="['/clusters', cluster, 'topics']">Topics</a>
+          <a [routerLink]="['/clusters', store.clusterIdx(), 'topics']">Topics</a>
         </li>
         <li class="is-active">
-          <a href="#" aria-current="page" class="has-text-black">Topic #{{ topic }}</a>
+          <a href="#" aria-current="page" class="has-text-black">Topic #{{ store.topic() }}</a>
         </li>
       </ul>
     </nav>
   </div>
   <!-- Button -->
   <div class="column">
-    <button class="button is-primary is-pulled-right">
+    <button class="button is-primary is-pulled-right" (click)="store.setShowMessageForm(true)">
       <span class="icon is-small">
         <i class="fas fa-envelope"></i>
       </span>
@@ -49,3 +49,5 @@
   (activate)="onTopicActivate($event)"
   (deactivate)="onTopicDeactivate($event)"
 ></router-outlet>
+
+<message-form />

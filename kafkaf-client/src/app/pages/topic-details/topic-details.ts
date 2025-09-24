@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
+import { TopicDetailsStore } from '../../services/topic-details-store';
+import { MessageForm } from "../../components/message-form/message-form";
 
 type TopicTabs =
   | 'TopicOverview'
@@ -10,18 +12,26 @@ type TopicTabs =
 
 @Component({
   selector: 'app-topic-overview',
-  imports: [RouterLink, RouterOutlet],
+  imports: [RouterLink, RouterOutlet, MessageForm],
   templateUrl: './topic-details.html',
+  providers: [{
+    provide: TopicDetailsStore,
+    deps:[ActivatedRoute],
+    useFactory: (route: ActivatedRoute) => {
+      const { paramMap } = route.snapshot;
+      const cluster = parseInt(paramMap.get('cluster')!);
+      const topic = paramMap.get('topic')!;
+
+      return new TopicDetailsStore(cluster, topic)
+    }
+  }]
   // styleUrl: './topic-details.scss',
 })
 export class TopicDetails {
-  public cluster = '';
-  public topic = '';
-  public currentTab: TopicTabs = 'TopicOverview';
+  currentTab: TopicTabs = 'TopicOverview';
 
-  constructor(route: ActivatedRoute) {
-    this.cluster = route.snapshot.paramMap.get('cluster') ?? '';
-    this.topic = route.snapshot.paramMap.get('topic') ?? '';
+  constructor(readonly store: TopicDetailsStore) {
+    store.loadTopicDetails();
   }
 
   onTopicActivate(componentRef: any) {

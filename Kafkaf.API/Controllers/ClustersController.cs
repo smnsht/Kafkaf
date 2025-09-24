@@ -15,9 +15,9 @@ public class ClustersController : ControllerBase
 	[HttpGet]
 	public async Task<IEnumerable<ClusterInfoViewModel>> Get(CancellationToken ct)
 	{
-		var tasks = _clusterService.ClusterConfigOptions.Select(cfg =>
-			_clusterService.FetchClusterInfoAsync(cfg.Alias, ct)
-		);
+		var tasks = _clusterService
+			.ClusterConfigOptions()
+			.Select(cfg => _clusterService.FetchClusterInfoAsync(cfg.Alias, ct));
 
 		return await Task.WhenAll(tasks);
 	}
@@ -25,12 +25,12 @@ public class ClustersController : ControllerBase
 	[HttpGet("{cluserIdx:clusterIndex}")]
 	public async Task<ClusterInfoViewModel> GetCluster(int cluserIdx, CancellationToken ct)
 	{
-		var alias = _clusterService.ClusterConfigOptions[cluserIdx].Alias;
+		var alias = _clusterService.ClusterConfigOptions()[cluserIdx].Alias;
 
 		return await _clusterService.FetchClusterInfoAsync(alias, ct);
 	}
 
 	[HttpGet("configs")]
 	public IEnumerable<ClusterConfigViewModel> GetConfigs() =>
-		_clusterService.ClusterConfigOptions.Select(opt => new ClusterConfigViewModel(opt));
+		_clusterService.ClusterConfigOptions().Select(opt => new ClusterConfigViewModel(opt));
 }

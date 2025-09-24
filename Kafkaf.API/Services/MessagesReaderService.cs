@@ -7,7 +7,6 @@ namespace Kafkaf.API.Services;
 
 public class MessagesReaderService
 {
-	private readonly ILogger<MessagesReaderService> _logger;
 	private readonly MessagesReaderServiceOptions _options;
 	private readonly IReadOnlyList<ClusterConfigOptions> _clusterConfigs;
 
@@ -23,12 +22,10 @@ public class MessagesReaderService
 	}
 
 	public MessagesReaderService(
-		ILogger<MessagesReaderService> logger,
 		IOptions<MessagesReaderServiceOptions> options,
 		IReadOnlyList<ClusterConfigOptions> clusterConfigs
 	)
 	{
-		_logger = logger;
 		_options = options.Value;
 		_clusterConfigs = clusterConfigs;
 	}
@@ -47,7 +44,8 @@ public class MessagesReaderService
 		{
 			// Get metadata to discover partitions
 			var partitions = request
-				.PartitionsAsInt.Select(p => new TopicPartition(topicName, new Partition(p)))
+				.PartitionsAsInt()
+				.Select(p => new TopicPartition(topicName, new Partition(p)))
 				.ToList();
 
 			foreach (var tp in partitions)

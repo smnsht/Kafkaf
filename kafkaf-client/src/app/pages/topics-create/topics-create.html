@@ -1,0 +1,39 @@
+<div class="columns">
+  <!-- Breadcrumbs-->
+  <div class="column">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li>
+          <a [routerLink]="['/clusters', 0, 'topics']">Topics</a>
+        </li>
+        <li class="is-active">
+          <a href="#" aria-current="page" class="has-text-black">Create</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <!-- Button -->
+  <div class="column">
+    <h1 class="title is-size-4 is-pulled-right">Create New Topic</h1>
+  </div>
+</div>
+
+<topic-form [topicForm]="topicForm" />
+
+<topic-custsom-parameters [topicForm]="topicForm" [customParameters]="customParameters" />
+
+<div class="buttons">
+  <a class="button is-danger" routerLink="../">
+    <span class="icon">
+      <i class="fas fa-xmark-circle"></i>
+    </span>
+    <span>Cancel</span>
+  </a>
+
+  <button class="button is-success" [disabled]="topicForm.invalid" (click)="onCreateTopicClick()">
+    <span class="icon">
+      <i class="fas fa-save"></i>
+    </span>
+    <span>Create Topic</span>
+  </button>
+</div>

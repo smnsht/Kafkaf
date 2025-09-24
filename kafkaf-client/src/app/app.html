@@ -5,15 +5,36 @@
   <div class="columns">
     <div class="column is-2 narrow-col">
       <div class="box">
-        <a href="/">Dashboard</a>
+        <a routerLink="/">Dashboard</a>
       </div>
+      @if ( cluster() >= 0 ) {
       <div class="box">
-        <em>Cluster #1</em>
-        <ul>
-          <li><a [routerLink]="['/clusters', 1, 'brokers']" [class.active]="isActive('/brokers')" >Brokers</a></li>
-          <li><a [routerLink]="['/clusters', 1, 'topics']" [class.active]="isActive('/topics')">Topics</a></li>
-          <li><a [routerLink]="['/clusters', 1, 'consumers']" [class.active]="isActive('/consumers')">Consumers</a></li>
-        </ul>
+        <em>Cluster #{{ cluster() }}</em>
+        <app-cluster-side-menu [cluster]="cluster()" [kafkaSection]="kafkaSection()" />
+      </div>
+      }
+      <div class="box cluster-details">
+        @for (cfg of clusters(); track $index) {
+        <details class="mb-3">
+          @if (cfg.isOffline) {
+          <summary title="Cluster offline">
+            <span class="has-text-warning">
+              <i class="fas fa-exclamation-triangle"></i>
+            </span>
+            #{{ $index }} {{ cfg.alias }}
+          </summary>
+          } @else {
+          <summary title="Cluster online">
+            <span class="has-text-success">
+              <i class="fas fa-check-square"></i>
+            </span>
+            #{{ $index }} {{ cfg.alias }}
+          </summary>
+
+          <app-cluster-side-menu [cluster]="$index" />
+          }
+        </details>
+        }
       </div>
       <div>
         <b>DRAFT</b>
@@ -23,6 +44,7 @@
     <!-- main content -->
     <div class="column wide-col">
       <router-outlet />
+      <app-confirmation-modal />
     </div>
   </div>
 </div>

@@ -20,6 +20,10 @@ public class WatermarkOffsetsClientPool : AbstractClientPool<IConsumer<Ignore, I
 			new ConsumerConfig
 			{
 				BootstrapServers = clusterConfig.Address,
+				SaslUsername = clusterConfig.SaslUsername,
+				SaslPassword = clusterConfig.SaslPassword,
+				SaslMechanism = clusterConfig.SaslMechanism,
+				SecurityProtocol = clusterConfig.SecurityProtocol,
 				GroupId = _options.GroupId,
 				EnableAutoCommit = false,
 			}

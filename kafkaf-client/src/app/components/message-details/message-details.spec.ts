@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Dropdowns } from './dropdowns';
+import { MessageDetails } from './message-details';
 
-describe('Dropdowns', () => {
-  let component: Dropdowns;
-  let fixture: ComponentFixture<Dropdowns>;
+describe('MessageDetails', () => {
+  let component: MessageDetails;
+  let fixture: ComponentFixture<MessageDetails>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Dropdowns]
+      imports: [MessageDetails]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Dropdowns);
+    fixture = TestBed.createComponent(MessageDetails);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

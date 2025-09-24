@@ -1,20 +1,31 @@
-<h1 class="title is-size-4">Brokers</h1>
+<app-page-wrapper [state]="pageState()">
+  <h1 class="title is-size-4">Brokers</h1>
 
-<app-stats-card [cardItems]="cardItems" [placeholderCount]="1" />
+  <app-stats-card [cardItems]="cardItems()" [placeholderCount]="1" />
 
-<table appKafkafTable>
-  <thead>
-    <tr>
-      <th>Broker ID</th>
-      <th>Host</th>
-      <th>Port</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr (click)="navigateToBrokerDetails(1)" title="Click to open broker">
-      <td>@row.BrokerId</td>
-      <td>@row.Host</td>
-      <td>@row.Port</td>
-    </tr>
-  </tbody>
-</table>
+  <table appKafkafTable>
+    <thead>
+      <tr>
+        <th>Broker ID</th>
+        <th>Host</th>
+        <th>Port</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of brokers(); track $index) {
+      <tr (click)="navigateToBrokerDetails(row.brokerID)" title="Click to open broker">
+        <td>
+          {{ row.brokerID }}
+          @if( row.brokerID == brokersInfo()?.controller ){
+          <span class="icon has-text-success" title="Active controller">
+            <i class="fas fa-check-square"></i>
+          </span>
+          }
+        </td>
+        <td>{{ row.host }}</td>
+        <td>{{ row.port }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</app-page-wrapper>
