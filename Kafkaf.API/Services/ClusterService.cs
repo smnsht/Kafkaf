@@ -20,7 +20,7 @@ public class ClusterService
 		_clientPool = clientPool;
 	}
 
-	public ClusterConfigOptions[] ClusterConfigOptions => _clusterConfigOptions.ToArray();
+	public ClusterConfigOptions[] ClusterConfigOptions() => _clusterConfigOptions.ToArray();
 
 	public Metadata GetMetadata(int clusterNo)
 	{

@@ -18,5 +18,5 @@ public record ReadMessagesRequest(
 		yield break;
 	}
 
-	public int[] PartitionsAsInt => Partitions.Split(',').Select(int.Parse).ToArray();
+	public int[] PartitionsAsInt() => Partitions.Split(',').Select(int.Parse).ToArray();
 }
