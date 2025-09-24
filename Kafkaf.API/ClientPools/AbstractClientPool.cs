@@ -7,8 +7,9 @@ public abstract class AbstractClientPool<T> : IDisposable
 {
 	protected readonly IReadOnlyList<ClusterConfigOptions> _clusterConfigs;
 	protected readonly Dictionary<string, T> _pool;
+	protected bool _disposed;
 
-	public AbstractClientPool(IReadOnlyList<ClusterConfigOptions> clusterConfigs)
+	protected AbstractClientPool(IReadOnlyList<ClusterConfigOptions> clusterConfigs)
 	{
 		_clusterConfigs = clusterConfigs;
 		_pool = new Dictionary<string, T>();
@@ -47,13 +48,23 @@ public abstract class AbstractClientPool<T> : IDisposable
 
 	public void Dispose()
 	{
-		foreach (var pair in _pool)
+		Dispose(true);
+		GC.SuppressFinalize(this);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (_disposed)
+			return;
+
+		if (disposing)
 		{
-			var client = pair.Value;
-			client.Dispose();
+			// Dispose managed resources
+			_pool.ToList().ForEach(pair => pair.Value.Dispose());
+			_pool.Clear();
 		}
 
-		_pool.Clear();
+		_disposed = true;
 	}
 
 	protected abstract T BuildClient(ClusterConfigOptions clusterConfig);

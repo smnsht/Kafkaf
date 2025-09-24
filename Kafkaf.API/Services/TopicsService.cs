@@ -68,6 +68,8 @@ public class TopicsService
 			}
 			catch (Exception e)
 			{
+				_logger.LogDebug(e, "DeleteTopicsAsync(...) failed for topic {0}", topic);
+
 				retval.Add(new BatchItemResult(topic, false, e.Message));
 			}
 		}
