@@ -1,0 +1,26 @@
+<app-stats-card [cardItems]="cardItems" />
+
+<table appKafkafTable>
+	<thead>
+		<tr>
+			<th>Partition ID</th>
+			<th>Replicas</th>
+			<th>First Offset</th>
+			<th>Next Offset</th>
+			<th>Message Count</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+
+    <tr>
+				<td>@row.Partition</td>
+				<td>@row.Replicas.Count</td>
+				<td>@row.OffsetMin</td>
+				<td>@row.OffsetMax</td>
+				<td>@row.MessagesCount</td>
+				<td>&nbsp;</td>
+			</tr>
+	</tbody>
+</table>
+

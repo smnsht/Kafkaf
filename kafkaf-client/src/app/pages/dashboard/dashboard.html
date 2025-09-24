@@ -1,0 +1,35 @@
+<h1 class="title is-size-4">Dashboard</h1>
+
+<app-stats-card [cardItems]="cardItems" [placeholderCount]="7"></app-stats-card>
+
+<label class="checkbox pt-2 pb-2">
+  <input type="checkbox" [(ngModel)]="onlyOfflineClusters" />
+  Only offline clusters
+</label>
+
+<table appKafkafTable>
+  <thead>
+    <tr>
+      <th>Cluster name</th>
+      <th>Version</th>
+      <th>Brokers count</th>
+      <th>Partitions</th>
+      <th>Topics</th>
+      <th>Production</th>
+      <th>Consumption</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>@infoRow.ClusterName</td>
+      <td>@infoRow.Version TODO</td>
+      <td>@infoRow.BrokersCount</td>
+      <td>@infoRow.PartitionsCount TODO</td>
+      <td>@infoRow.TopicsCount</td>
+      <td>@infoRow.Production TODO</td>
+      <td>@infoRow.Consumption TODO</td>
+      <td>dd</td>
+    </tr>
+  </tbody>
+</table>

@@ -1,0 +1,72 @@
+@Kafkaf.API_HostAddress = http://localhost:5175
+
+
+GET {{Kafkaf.API_HostAddress}}/debug/routes
+Accept: application/json
+
+###
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters
+Accept: application/json
+
+### 
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0
+Accept: application/json
+
+### 
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/configs
+Accept: application/json
+
+### 
+
+#
+# Brokers
+#
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/brokers
+Accept: application/json
+
+### 
+
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/brokers/1
+Accept: application/json
+
+### 
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics
+Accept: application/json
+
+###
+
+POST {{Kafkaf.API_HostAddress}}/api/clusters/0/topics
+Content-Type: application/json
+Accept: application/json
+{
+	"name": "topic.666"
+}
+
+###
+
+DELETE {{Kafkaf.API_HostAddress}}/api/clusters/0/topics?names=topic&names=topic.666
+Accept: application/json
+
+### 
+
+DELETE {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/topic.666
+Accept: application/json
+
+###
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.1
+Accept: application/json
+
+###
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/__consumer_offsets/messages?partitions=5,13
+Accept: application/json
+
+###
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.3/messages?partitions=0
+Accept: application/json

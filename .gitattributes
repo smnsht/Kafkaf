@@ -1,0 +1,28 @@
+# Ensure all text files use LF in the repository
+* text=auto eol=lf
+
+# Windows-specific scripts (force CRLF)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Unix shell scripts (force LF)
+*.sh text eol=lf
+
+# Source code files (force LF)
+*.cs  text eol=lf
+*.js  text eol=lf
+*.ts  text eol=lf
+*.java text eol=lf
+*.py  text eol=lf
+*.go  text eol=lf
+
+# Mark binary files so Git won’t try to mess with them
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.exe binary
+*.dll binary

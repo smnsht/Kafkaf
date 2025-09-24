@@ -1,0 +1,12 @@
+<div class="field">
+  <label class="label">Seek Type</label>
+  <div class="control">
+    <div class="select is-fullwidth">
+      <select [ngModel]="seekType()" (ngModelChange)="onModelChange($event)">
+        @for (option of options; track $index) {
+          <option [value]="option">{{ option }}</option>
+        }
+      </select>
+    </div>
+  </div>
+</div>

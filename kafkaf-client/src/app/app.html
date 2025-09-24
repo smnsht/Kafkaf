@@ -1,0 +1,28 @@
+<div class="container is-fluid">
+  <app-navbar />
+
+  <!-- left sidebar -->
+  <div class="columns">
+    <div class="column is-2 narrow-col">
+      <div class="box">
+        <a href="/">Dashboard</a>
+      </div>
+      <div class="box">
+        <em>Cluster #1</em>
+        <ul>
+          <li><a [routerLink]="['/clusters', 1, 'brokers']" [class.active]="isActive('/brokers')" >Brokers</a></li>
+          <li><a [routerLink]="['/clusters', 1, 'topics']" [class.active]="isActive('/topics')">Topics</a></li>
+          <li><a [routerLink]="['/clusters', 1, 'consumers']" [class.active]="isActive('/consumers')">Consumers</a></li>
+        </ul>
+      </div>
+      <div>
+        <b>DRAFT</b>
+      </div>
+    </div>
+
+    <!-- main content -->
+    <div class="column wide-col">
+      <router-outlet />
+    </div>
+  </div>
+</div>

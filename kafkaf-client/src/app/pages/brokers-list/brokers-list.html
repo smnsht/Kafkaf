@@ -1,0 +1,20 @@
+<h1 class="title is-size-4">Brokers</h1>
+
+<app-stats-card [cardItems]="cardItems" [placeholderCount]="1" />
+
+<table appKafkafTable>
+  <thead>
+    <tr>
+      <th>Broker ID</th>
+      <th>Host</th>
+      <th>Port</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr (click)="navigateToBrokerDetails(1)" title="Click to open broker">
+      <td>@row.BrokerId</td>
+      <td>@row.Host</td>
+      <td>@row.Port</td>
+    </tr>
+  </tbody>
+</table>
