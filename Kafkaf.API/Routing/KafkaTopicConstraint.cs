@@ -1,14 +1,9 @@
-﻿using System.Text.RegularExpressions;
+﻿using Kafkaf.API.Validators;
 
 namespace Kafkaf.API.Routing;
 
 public class KafkaTopicConstraint : IRouteConstraint
 {
-	private static readonly Regex TopicNameRegex = new Regex(
-		@"^[a-zA-Z0-9._-]+$",
-		RegexOptions.Compiled
-	);
-
 	private readonly ILogger<KafkaTopicConstraint> _logger;
 
 	public KafkaTopicConstraint(ILogger<KafkaTopicConstraint> logger) => _logger = logger;
@@ -30,26 +25,12 @@ public class KafkaTopicConstraint : IRouteConstraint
 		var topicName = value.ToString();
 
 		// Length check
-		if (string.IsNullOrEmpty(topicName) || topicName.Length < 1 || topicName.Length > 249)
+		if (!KafkaTopicValidator.IsValidTopicName(topicName, out var error))
 		{
-			_logger.LogDebug(
-				"Invalid Kafka topic name length: {TopicName} (length {Length}). Must be between 1 and 249 characters.",
-				topicName,
-				topicName?.Length ?? 0
-			);
+			_logger.LogDebug(error);
 			return false;
 		}
-
-		// Allowed characters
-		if (!TopicNameRegex.IsMatch(topicName))
-		{
-			_logger.LogDebug(
-				"Invalid Kafka topic name characters: {TopicName}. Allowed characters are a–z, A–Z, 0–9, '.', '_', '-'.",
-				topicName
-			);
-			return false;
-		}
-
+		
 		return true;
 	}
 }

@@ -1,7 +1,6 @@
 using System.Text;
 using Kafkaf.API.ClientPools;
 using Kafkaf.API.Config;
-using Kafkaf.API.Facades;
 using Kafkaf.API.Routing;
 using Kafkaf.API.Services;
 
@@ -27,9 +26,7 @@ namespace Kafkaf.API
 			builder.Services.AddSingleton<BrokersService>();
 			builder.Services.AddSingleton<TopicsService>();
 			builder.Services.AddSingleton<WatermarkOffsetsService>();
-			builder.Services.AddSingleton<MessagesReaderService>();
-
-			builder.Services.AddTransient<TopicDetailsFacade>();
+			builder.Services.AddSingleton<MessagesReaderService>();			
 
 			// Register custom constraint
 			builder.Services.Configure<RouteOptions>(options =>

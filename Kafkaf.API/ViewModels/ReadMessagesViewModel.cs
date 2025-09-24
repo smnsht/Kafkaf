@@ -38,6 +38,9 @@ public record ReadMessagesViewModel(
 		}
 	}
 
+	public static IEnumerable<ReadMessagesViewModel> FromResults(List<ConsumeResult<byte[]?, byte[]?>> results) =>
+		results.Select(result => new ReadMessagesViewModel(result));
+
 	internal static string _str(byte[]? bytes) =>
 		bytes is null ? string.Empty : Encoding.UTF8.GetString(bytes);
 }

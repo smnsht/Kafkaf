@@ -24,6 +24,6 @@ public class MessagesController : ControllerBase
 	{
 		var results = _readerService.ReadMessagesBackwards(clusterIdx, topicName, req, ct);
 
-		return results.Select(result => new ReadMessagesViewModel(result));
-	}
+		return ReadMessagesViewModel.FromResults(results);
+	}	
 }

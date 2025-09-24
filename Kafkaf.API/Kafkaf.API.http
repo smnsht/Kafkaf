@@ -41,11 +41,30 @@ Accept: application/json
 
 ###
 
+POST {{Kafkaf.API_HostAddress}}/api/clusters/0/topics
+Content-Type: application/json
+Accept: application/json
+{
+	"name": "topic.666"
+}
+
+###
+
+DELETE {{Kafkaf.API_HostAddress}}/api/clusters/0/topics?names=topic&names=topic.666
+Accept: application/json
+
+### 
+
+DELETE {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/topic.666
+Accept: application/json
+
+###
+
 GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.1
 Accept: application/json
 
 ###
-GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.1/messages?partitions=0,1,2
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/__consumer_offsets/messages?partitions=5,13
 Accept: application/json
 
 ###

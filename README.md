@@ -5,7 +5,7 @@
 
 # Kafkaf: A C\# Web UI for Apache Kafka
 
-Kafkaf is an open-source, web-based UI for Apache Kafka, built from the ground up using **C\#** and the **Blazor** framework. It's designed to be a secure, native .NET alternative to existing Kafka UIs.
+Kafkaf is an open-source, web-based UI for Apache Kafka, built from the ground up using **C\#** and the **Angular** framework. It's designed to be a secure, native .NET alternative to existing Kafka UIs.
 
 ## About the Project
 
