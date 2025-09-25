@@ -8,8 +8,6 @@ div.columns {
   border-right: 1px solid gray;
 }
 
-a.active {
-  font-weight: bold;
-  color: #1976d2;
-  text-decoration: underline;
+.cluster-details {
+  overflow-x: auto;
 }

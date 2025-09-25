@@ -36,7 +36,7 @@ export class Dashboard implements OnInit {
       {
         label: 'Online',
         value: stats.online == 1 ? '1 cluster' : `${stats.online} clusters`,
-        icon: 'success',
+        icon: stats.online == 0 ? 'warning' : 'success'
       },
       {
         label: 'Offline',
@@ -56,7 +56,7 @@ export class Dashboard implements OnInit {
 
   constructor(private readonly clustersStore: ClustersStore) {
     this.clusters = clustersStore.clusters.asReadonly();
-    this.loading = clustersStore.loadingClusters.asReadonly();
+    this.loading = clustersStore.loading.asReadonly();
     this.error = clustersStore.error.asReadonly();
   }
 
