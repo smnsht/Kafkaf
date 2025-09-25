@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { effect, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 
@@ -78,9 +78,9 @@ export class ClustersStore {
         this.clusters.set(data);
         this.loadingClusters.set(false);
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.loadingClusters.set(false);
-        this.error.set(err);
+        this.error.set(err.message);
       },
     });
   }

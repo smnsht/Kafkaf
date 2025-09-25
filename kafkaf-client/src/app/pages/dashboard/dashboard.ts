@@ -3,19 +3,21 @@ import { StatsCard, StatsCardItem } from '../../components/stats-card/stats-card
 import { FormsModule } from '@angular/forms';
 import { KafkafTable } from '../../directives/kafkaf-table';
 import { ClusterInfo, ClustersStore } from '../../services/clusters-store';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [StatsCard, FormsModule, KafkafTable],
+  imports: [StatsCard, FormsModule, KafkafTable, PageWrapper],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss',
+  // styleUrl: './dashboard.scss',
 })
 export class Dashboard implements OnInit {
   private clusters: Signal<ClusterInfo[]>;
 
   public onlyOfflineClusters = model(false);
   public loading: Signal<boolean>;
+  public error: Signal<string | null>;
 
   public cardItems = computed(() => {
     var stats = this.clusters().reduce(
@@ -55,6 +57,7 @@ export class Dashboard implements OnInit {
   constructor(private readonly clustersStore: ClustersStore) {
     this.clusters = clustersStore.clusters.asReadonly();
     this.loading = clustersStore.loadingClusters.asReadonly();
+    this.error = clustersStore.error.asReadonly();
   }
 
   ngOnInit(): void {
