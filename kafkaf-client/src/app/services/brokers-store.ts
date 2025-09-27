@@ -14,15 +14,6 @@ export interface BrokersInfoView {
   brokers: BrokerInfoRow[];
 }
 
-export interface BrokerConfigRow {
-  isDefault: boolean;
-  isReadOnly: boolean;
-  isSensitive: boolean;
-  name: string;
-  value: string;
-  source: string;
-}
-
 interface BrokersState {
   brokersInfo: Map<number, BrokersInfoView>;
   loading?: boolean;

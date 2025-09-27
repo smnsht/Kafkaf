@@ -24,5 +24,9 @@ export class App {
     this.loading = clustersStore.loading.asReadonly();
     this.cluster = clustersStore.clusterIndex.asReadonly();
     this.kafkaSection = clustersStore.kafkaSection.asReadonly();
+
+    if (this.clusters().length == 0) {
+      clustersStore.loadClustersInfo();
+    }
   }
 }

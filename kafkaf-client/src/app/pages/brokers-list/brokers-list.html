@@ -13,7 +13,7 @@
     </thead>
     <tbody>
       @for (row of brokers(); track $index) {
-      <tr (click)="navigateToBrokerDetails(1)" title="Click to open broker">
+      <tr (click)="navigateToBrokerDetails(row.brokerID)" title="Click to open broker">
         <td>
           {{ row.brokerID }}
           @if( row.brokerID == brokersInfo()?.controller ){
