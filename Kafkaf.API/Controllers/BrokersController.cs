@@ -19,7 +19,7 @@ public class BrokersController : ControllerBase
 	}
 
 	[HttpGet]
-	public async Task<BrokersInfoViewModel> GetAsync(int cluserIdx)
+	public async Task<BrokersInfoViewModel> GetListAsync(int cluserIdx)
 	{
 		var result = await _clusterService.DescribeClusterAsync(cluserIdx);
 
@@ -27,7 +27,7 @@ public class BrokersController : ControllerBase
 	}
 
 	[HttpGet("{brokerId:int}")]
-	public async Task<ActionResult<BrokerConfigRow[]>> Configs(int cluserIdx, int brokerId)
+	public async Task<ActionResult<BrokerConfigRow[]>> BetConfigsAsync(int cluserIdx, int brokerId)
 	{
 		var result = await _brokersService.DescribeBrokerAsync(cluserIdx, brokerId);
 

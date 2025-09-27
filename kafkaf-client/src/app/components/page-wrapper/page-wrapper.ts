@@ -1,7 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 
 type SpinnerFontSize = 1 | 2 | 3 | 4;
+
+export interface PageState {
+  loading?: boolean;
+  error?: string | null;
+  notice?: string | null;
+}
 
 @Component({
   selector: 'app-page-wrapper',
@@ -10,8 +16,17 @@ type SpinnerFontSize = 1 | 2 | 3 | 4;
   // styleUrl: './page-wrapper.scss'
 })
 export class PageWrapper {
-  @Input() loading = false;
   @Input() spinnerFontSize: SpinnerFontSize = 1;
-  @Input() error: string | null = null;
-  @Input() notice: string | null = null;
+
+  @Input() loading: boolean | null | undefined;
+  @Input() error: string | null | undefined;
+  @Input() notice: string | null | undefined;
+
+  @Input()
+  set state(value: PageState) {
+    // Sync other properties
+    this.loading = value.loading;
+    this.error = value.error;
+    this.notice = value.notice;
+  }
 }
