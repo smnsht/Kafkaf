@@ -10,7 +10,15 @@ public class AdminClientPool : AbstractClientPool<IAdminClient>
 
 	protected override IAdminClient BuildClient(ClusterConfigOptions clusterConfig)
 	{
-		var config = new AdminClientConfig { BootstrapServers = clusterConfig.Address };
+		var config = new AdminClientConfig
+		{
+			BootstrapServers = clusterConfig.Address,
+			SaslUsername = clusterConfig.SaslUsername,
+			SaslPassword = clusterConfig.SaslPassword,
+			SaslMechanism = clusterConfig.SaslMechanism,
+			SecurityProtocol = clusterConfig.SecurityProtocol,
+		};
+		
 		return new AdminClientBuilder(config).Build();
 	}
 }
