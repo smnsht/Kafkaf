@@ -13,6 +13,7 @@ import { BrokerConfigs } from './pages/broker-configs/broker-configs';
 import { BrokerMetrics } from './pages/broker-metrics/broker-metrics';
 import { BrokerLogDirectories } from './pages/broker-log-directories/broker-log-directories';
 import { TopicOverview } from './pages/topic-overview/topic-overview';
+import { clusterBrokerGuardFn, clusterGuardFn } from './app.guards';
 
 export const routes: Routes = [
   { path: '', component: Dashboard },
@@ -20,12 +21,14 @@ export const routes: Routes = [
   {
     path: 'clusters/:cluster/brokers',
     component: BrokersList,
+    canMatch: [clusterGuardFn],
     title: 'Cluster %cluster% > Brokers list',
   },
 
   {
     path: 'clusters/:cluster/brokers/:broker',
     component: BrokerDetails,
+    canMatch: [clusterBrokerGuardFn],
     title: 'Cluster %cluster% > Broker %broker% ',
     children: [
       {
@@ -49,12 +52,14 @@ export const routes: Routes = [
   {
     path: 'clusters/:cluster/topics',
     component: TopicsList,
+    canMatch: [clusterGuardFn],
     title: 'Cluster %cluster% > Topics list',
   },
 
   {
     path: 'clusters/:cluster/topics/:topic',
     component: TopicDetails,
+    canMatch: [clusterGuardFn],
     title: 'Cluster %cluster% > Topic %topic%',
     children: [
       {
@@ -93,6 +98,7 @@ export const routes: Routes = [
   {
     path: 'clusters/:cluster/consumers',
     component: Consumers,
+    canMatch: [clusterGuardFn],
     title: 'Cluster %cluster% > Consumers',
   },
 ];

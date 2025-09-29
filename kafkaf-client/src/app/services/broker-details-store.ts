@@ -12,17 +12,17 @@ export interface BrokerConfigRow {
   source: string;
 }
 
+export interface ClusterBroker {
+  clusterIdx: number;
+  brokerId: number;
+}
+
 interface BrokerDetailsState {
   configs: Map<string, BrokerConfigRow[]>;
   currentClusterId: number;
   currentBrokerId: number;
   loading?: boolean;
   error?: string;
-}
-
-export interface ClusterBroker {
-  clusterIdx: number;
-  brokerId: number;
 }
 
 const defaultState: BrokerDetailsState = {
@@ -49,6 +49,9 @@ function parseConfigRowKey(str: string): ClusterBroker {
 export class BrokerDetailsStore {
   private readonly http = inject(HttpClient);
   private readonly state = signal<BrokerDetailsState>({ ...defaultState });
+
+  readonly loading = computed(() => this.state().loading);
+  readonly error = computed(() => this.state().error);
 
   readonly configs = computed(() => {
     const { configs, currentClusterId, currentBrokerId } = this.state();
@@ -107,8 +110,8 @@ export class BrokerDetailsStore {
 
     this.http.get<BrokerConfigRow[]>(url).subscribe({
       next: (data) => {
-        this.state.update((s) => {
-          const { configs } = s;
+        this.state.update((state) => {
+          const { configs } = state;
           const key = makeKey({
             clusterIdx: currentClusterId,
             brokerId: currentBrokerId,
@@ -116,7 +119,7 @@ export class BrokerDetailsStore {
           configs.set(key, data);
 
           return {
-            ...s,
+            ...state,
             configs: configs,
             loading: false,
           };

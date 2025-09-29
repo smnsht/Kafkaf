@@ -23,18 +23,15 @@ export class BrokerDetails implements OnInit {
   constructor(route: ActivatedRoute, store: BrokerDetailsStore) {
     this.pageState = store.pageState;
 
-    ((paramMap) => {
-      const cluster = paramMap.get('cluster') ?? '';
-      const broker = paramMap.get('broker') ?? '';
-
-      this.cluster = parseInt(cluster);
-      this.broker = parseInt(broker);
+    route.paramMap.subscribe(paramMap => {
+      this.cluster = parseInt(paramMap.get('cluster')!);
+      this.broker = parseInt(paramMap.get('broker')!);
 
       store.loadConfigs({
         clusterIdx: this.cluster,
         brokerId: this.broker,
       });
-    })(route.snapshot.paramMap);
+    });
   }
 
   ngOnInit(): void {

@@ -1,6 +1,6 @@
-import { Component, Signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { KafkafTable } from '../../directives/kafkaf-table';
-import { BrokerConfigRow, BrokerDetailsStore } from '../../services/broker-details-store';
+import { BrokerDetailsStore } from '../../services/broker-details-store';
 
 @Component({
   selector: 'app-broker-configs',
@@ -9,10 +9,5 @@ import { BrokerConfigRow, BrokerDetailsStore } from '../../services/broker-detai
   // styleUrl: './broker-configs.scss'
 })
 export class BrokerConfigs {
-
-  configs: Signal<BrokerConfigRow[] | undefined>;
-
-  constructor(store: BrokerDetailsStore){
-    this.configs = store.configs;
-  }
+  constructor(public store: BrokerDetailsStore) {}
 }
