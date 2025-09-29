@@ -1,30 +1,70 @@
-import { Component } from '@angular/core';
+import { Component, computed, effect, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { KafkafTable } from "../../directives/kafkaf-table";
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { KafkafTable } from '../../directives/kafkaf-table';
+import { TopicsStore } from '../../services/topics-store';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 
 @Component({
   selector: 'app-topics-list',
-  imports: [FormsModule, KafkafTable],
+  imports: [FormsModule, KafkafTable, PageWrapper, RouterLink],
   templateUrl: './topics-list.html',
   styleUrl: './topics-list.scss',
 })
 export class TopicsList {
-  public search = '';
-  public showInternalTopics = false;
+  search = signal('');
+  showInternalTopics = signal(false);
+  selectedTopics: string[] = [];
 
-  constructor(private router: Router){}
+  topics = computed(() => {
+    const searchStr = this.search().toLowerCase();
+    const showInternal = this.showInternalTopics();
+    const topics = this.store.topics();
 
-  onSearchChange(search: string): void {
-    console.log(search)
+    return topics?.filter((topic) => {
+      if (!showInternal && topic.isInternal) {
+        return false;
+      }
+
+      if (searchStr && !topic.topicName.toLowerCase().includes(searchStr)) {
+        return false;
+      }
+
+      return true;
+    });
+  });
+
+  constructor(public store: TopicsStore, route: ActivatedRoute) {
+    route.paramMap.subscribe((params) => {
+      const clusterIdx = parseInt(params.get('cluster')!);
+      store.loadTopis(clusterIdx);
+    });
+
+    effect(() => {
+      const notice = store.notice();
+      if (notice) {
+        this.selectedTopics = [];
+      }
+    })
   }
 
-  onShowInternalTopicsChange(newValue: boolean): void {
-    console.log('Checkbox changed to:', newValue);
+  onCheckboxChange(value: string, isChecked: boolean) {
+    if (isChecked) {
+      this.selectedTopics.push(value);
+    } else {
+      this.selectedTopics = this.selectedTopics.filter((item) => item !== value);
+    }
   }
 
-  navigateToTopicDetails(topic: number): void {
-    console.log(topic)
-    this.router.navigate([this.router.url, topic]);
+  onDeleteTopicsClick(): void {
+    this.store.deleteTopics(this.selectedTopics);
+  }
+
+  onCopyTopicClick(): void {
+    console.log('onCopyTopicClick', this.selectedTopics)
+  }
+
+  onPurgeMessagesClick(): void {
+    this.store.purgeMessages(this.selectedTopics);
   }
 }

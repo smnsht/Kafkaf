@@ -25,5 +25,22 @@ public class MessagesController : ControllerBase
 		var results = _readerService.ReadMessagesBackwards(clusterIdx, topicName, req, ct);
 
 		return ReadMessagesViewModel.FromResults(results);
-	}	
+	}
+
+	[HttpDelete]
+	public async Task<ActionResult<int>> PurgeMessagesAsync(
+		int clusterIdx,
+		string topicName,
+		CancellationToken ct
+	)
+	{
+		if (topicName == "topic")
+		{
+			return NotFound();
+		}
+
+		await Task.Delay(10);
+
+		return Ok(0);
+	}
 }

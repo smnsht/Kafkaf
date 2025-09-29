@@ -40,8 +40,11 @@ public class TopicsController : ControllerBase
 		[FromQuery] DeleteTopicsRequest req
 	)
 	{
-		var deleteResult = await _topicsService.DeleteTopicsAsync(clusterIdx, req.names);
+		//var deleteResult = await _topicsService.DeleteTopicsAsync(clusterIdx, req.names);
 
-		return new BatchActionResult(deleteResult, null);
+		//return new BatchActionResult(deleteResult, null);
+		await Task.Delay(10);
+		var foo = req.names.Select(name => new BatchItemResult(name, true));
+		return new BatchActionResult(foo, "asdfasd");
 	}
 }

@@ -18,13 +18,7 @@
   <!-- Search input-->
   <div class="column is-one-third">
     <div class="control has-icons-left">
-      <input
-        class="input"
-        type="search"
-        [(ngModel)]="search"
-        placeholder="Search by Topic Name"
-        (ngModelChange)="onSearchChange($event)"
-      />
+      <input class="input" type="search" [(ngModel)]="search" placeholder="Search by Topic Name" />
       <span class="icon is-small is-left">
         <i class="fas fa-search"></i>
       </span>
@@ -33,11 +27,7 @@
   <!-- Checkbox -->
   <div class="column is-one-quarter">
     <label class="checkbox">
-      <input
-        type="checkbox"
-        [(ngModel)]="showInternalTopics"
-        (ngModelChange)="onShowInternalTopicsChange($event)"
-      />
+      <input type="checkbox" [(ngModel)]="showInternalTopics" />
       Show Internal Topics
     </label>
   </div>
@@ -46,40 +36,64 @@
 
 <!-- buttons -->
 <div class="buttons">
-  <button class="button is-light" disabled>Delete selected topics</button>
-  <button class="button is-light" disabled>Copy selected topic</button>
-  <button class="button is-light" disabled>Purge messages of selected topics</button>
+  <button
+    class="button is-light"
+    [disabled]="selectedTopics.length === 0 || store.loading()"
+    (click)="onDeleteTopicsClick()"
+  >
+    Delete selected topics
+  </button>
+  <button
+    class="button is-light"
+    [disabled]="selectedTopics.length !== 1 || store.loading()"
+    (click)="onCopyTopicClick()"
+  >
+    Copy selected topic
+  </button>
+  <button
+    class="button is-light"
+    [disabled]="selectedTopics.length === 0 || store.loading()"
+    (click)="onPurgeMessagesClick()"
+  >
+    Purge messages of selected topics
+  </button>
 </div>
 
-<!-- Topics table -->
-<table appKafkafTable>
-	<thead>
-		<tr>
-			<th>&nbsp;</th>
-			<th>Topic Name</th>
-			<th>Partitions</th>
-			<th>Out of sync replicas</th>
-			<th>Replication Factor</th>
-			<th>Number of messages</th>
-			<th>Size</th>
-		</tr>
-	</thead>
-	<tbody>
-    <tr (click)="navigateToTopicDetails(1)" title="Click to open topic details">
-				<td>
-					<input type="checkbox"
-						   checked="@isChecked"
-						   disabled=@topic.IsInternal
-						    />
-				</td>
-				<td>
-					nav
-				</td>
-				<td>@topic.Partitions</td>
-				<td>@topic.OutOfSyncReplicas</td>
-				<td>@topic.ReplicationFactor</td>
-				<td>@topic.NumberOfMessages</td>
-				<td>TODO</td>
-			</tr>
-	</tbody>
-</table>
+<app-page-wrapper [state]="store.pageState()">
+  <!-- Topics table -->
+  <table appKafkafTable>
+    <thead>
+      <tr>
+        <th>&nbsp;</th>
+        <th>Topic Name</th>
+        <th>Partitions</th>
+        <th>Out of sync replicas</th>
+        <th>Replication Factor</th>
+        <th>Number of messages</th>
+        <th>Size</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (topic of topics(); track $index) {
+      <tr>
+        <td>
+          <input
+            type="checkbox"
+            [ngModel]="selectedTopics.includes(topic.topicName)"
+            (ngModelChange)="onCheckboxChange(topic.topicName, $event)"
+            [disabled]="topic.isInternal"
+          />
+        </td>
+        <td>
+          <a [routerLink]="[topic.topicName]">{{ topic.topicName }}</a>
+        </td>
+        <td>{{ topic.partitionsCount }}</td>
+        <td>{{ topic.outOfSyncReplicas }}</td>
+        <td>{{ topic.replicationFactor }}</td>
+        <td>TODO</td>
+        <td>TODO</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</app-page-wrapper>
