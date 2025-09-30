@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { computed, inject, signal, WritableSignal } from '@angular/core';
+import { forkJoin, Observable, tap } from 'rxjs';
 
 export interface BaseState<T> {
   itemsMap: Map<number, T[]>;
@@ -18,13 +18,20 @@ export interface PageState {
 
 export type ItemIdPK = string | number;
 
-@Injectable()
 export abstract class BaseStore<T> {
   protected readonly http = inject(HttpClient);
-  protected readonly state = signal<BaseState<T>>({
-    itemsMap: new Map<number, T[]>(),
-    clusterIdx: NaN,
-  });
+  protected readonly state: WritableSignal<BaseState<T>>;
+
+  constructor(initialState?: Partial<BaseState<T>>) {
+    this.state = signal<BaseState<T>>({
+      itemsMap: new Map<number, T[]>(),
+      clusterIdx: NaN,
+      loading: false,
+      error: undefined,
+      notice: undefined,
+      ...initialState,
+    });
+  }
 
   // Abstract
   protected abstract resourceUrl(clusterIdx: number): string;
@@ -90,6 +97,19 @@ export abstract class BaseStore<T> {
     }
   }
 
+  public clearCurrentCluster(): void {
+    const clusterIdx = this.clusterIdx();
+
+    if (clusterIdx >= 0) {
+      this.state.update((state) => {
+        const { itemsMap } = state;
+        itemsMap.delete(clusterIdx);
+
+        return { ...state, itemsMap };
+      });
+    }
+  }
+
   loadCollection(): boolean {
     const keys = this.keys();
     const clusterIdx = this.clusterIdx();
@@ -99,7 +119,6 @@ export abstract class BaseStore<T> {
         ...state,
         loading: true,
         error: undefined,
-        notice: undefined,
       }));
       this.fetchItems(clusterIdx);
       return true;
@@ -108,14 +127,14 @@ export abstract class BaseStore<T> {
     return false;
   }
 
-  removeItem(itemId: ItemIdPK, reload = false, successNotice?: string): void {
+  removeItem(itemId: ItemIdPK, reload = false, successNotice?: string): Observable<void> {
     this.setPageState({ loading: true });
-    this.deleteItem(this.clusterIdx(), itemId, reload, successNotice);
+    return this.deleteItem(this.clusterIdx(), itemId, reload, successNotice);
   }
 
-  removeItems(ids: ItemIdPK[], reload = false): void {
+  removeItems(ids: ItemIdPK[], reload = false): Observable<void[]> {
     this.setPageState({ loading: true });
-    this.deleteMany(this.clusterIdx(), ids, reload);
+    return this.deleteMany(this.clusterIdx(), ids, reload);
   }
 
   protected fetchItems(clusterIdx: number): void {
@@ -145,11 +164,11 @@ export abstract class BaseStore<T> {
     itemId: string | number,
     reload = false,
     successNotice: string = 'Item deleted successfully'
-  ): void {
+  ): Observable<void> {
     const url = this.resourceItemUrl(clusterIdx, itemId);
 
-    this.http.delete<void>(url).subscribe({
-      next: () => {
+    return this.http.delete<void>(url).pipe(
+      tap(() => {
         if (reload) {
           // Option 1: reload the whole collection
           this.fetchItems(clusterIdx);
@@ -169,25 +188,23 @@ export abstract class BaseStore<T> {
             };
           });
         }
-      },
-      error: (err: HttpErrorResponse) => {
-        this.setPageState({
-          error: err.message,
-          loading: false,
-        });
-      },
-    });
+      })
+    );
   }
 
-  protected deleteMany(clusterIdx: number, itemIds: ItemIdPK[], reload = false): void {
+  protected deleteMany(
+    clusterIdx: number,
+    itemIds: ItemIdPK[],
+    reload = false
+  ): Observable<void[]> {
     const requests = itemIds.map((id) =>
       this.http.delete<void>(this.resourceItemUrl(clusterIdx, id))
     );
 
-    const notice = `${itemIds.length} items deleted successfully`;
+    return forkJoin(requests).pipe(
+      tap(() => {
+        const notice = `${itemIds.length} items deleted successfully`;
 
-    forkJoin(requests).subscribe({
-      next: () => {
         if (reload) {
           this.fetchItems(clusterIdx);
           this.state.update((state) => {
@@ -207,10 +224,7 @@ export abstract class BaseStore<T> {
             };
           });
         }
-      },
-      error: (err: HttpErrorResponse) => {
-        this.setPageState({ error: err.message });
-      },
-    });
+      })
+    );
   }
 }

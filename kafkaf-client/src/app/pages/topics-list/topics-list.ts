@@ -51,16 +51,18 @@ export class TopicsList {
   }
 
   onDeleteTopicsClick(): void {
-    this.store.deleteTopics(this.selectedTopics);
-    this.selectedTopics = [];
+    this.store.deleteTopics(this.selectedTopics).then(() => {
+      this.selectedTopics = [];
+    });
   }
 
   onCopyTopicClick(): void {
-    console.log('onCopyTopicClick', this.selectedTopics)
+    console.log('onCopyTopicClick', this.selectedTopics);
   }
 
   onPurgeMessagesClick(): void {
-    //this.store.purgeMessages(this.selectedTopics);
-    console.log(this.selectedTopics)
+    this.store.purgeMessages(this.selectedTopics).then(() => {
+      this.selectedTopics = [];
+    });
   }
 }
