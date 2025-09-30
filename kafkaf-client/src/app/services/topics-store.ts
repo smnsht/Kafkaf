@@ -1,9 +1,9 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { PageState } from '../components/page-wrapper/page-wrapper';
 import { environment } from '../../environments/environment';
 import { forkJoin, map, switchMap } from 'rxjs';
 import { BatchResult, TopicsListViewModel } from '../response.models';
+import { PageState } from './base-store';
 
 interface TopicsState {
   topicsMap: Map<number, TopicsListViewModel[]>;
@@ -24,6 +24,8 @@ const defaultState: TopicsState = {
 export class TopicsStore {
   private readonly http = inject(HttpClient);
   private readonly state = signal<TopicsState>({ ...defaultState });
+
+  // getters
 
   readonly topicsMap = computed(() => this.state().topicsMap);
   readonly clusterIdx = computed(() => this.state().clusterIdx);

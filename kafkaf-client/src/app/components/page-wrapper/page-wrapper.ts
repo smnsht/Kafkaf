@@ -1,13 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { PageState } from '../../services/base-store';
 
 type SpinnerFontSize = 1 | 2 | 3 | 4;
-
-export interface PageState {
-  loading?: boolean;
-  error?: string | null;
-  notice?: string | null;
-}
 
 @Component({
   selector: 'app-page-wrapper',
