@@ -3,7 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { forkJoin, map, switchMap } from 'rxjs';
 import { BatchResult, TopicsListViewModel } from '../response.models';
-import { PageState } from './base-store';
+import { BaseStore, ItemIdPK, PageState } from './base-store';
 
 interface TopicsState {
   topicsMap: Map<number, TopicsListViewModel[]>;
@@ -21,7 +21,45 @@ const defaultState: TopicsState = {
 @Injectable({
   providedIn: 'root',
 })
-export class TopicsStore {
+export class TopicsStore extends BaseStore<TopicsListViewModel> {
+  protected override resourceUrl(clusterIdx: number): string {
+    return `${environment.apiUrl}/clusters/${clusterIdx}/topics`;
+  }
+
+  protected override resourceItemUrl(clusterIdx: number, topicName: string): string {
+    return `${environment.apiUrl}/clusters/${clusterIdx}/topics/${topicName}`;
+  }
+
+  protected override getItemKey(item: TopicsListViewModel): string | number {
+    return item.topicName;
+  }
+
+  loadTopics(): boolean {
+    return this.loadCollection();
+  }
+
+  removeTopic(topicName: string, reload = false): void {
+    this.removeItem(topicName, reload, `Topic "${topicName}" deleted`);
+  }
+
+  deleteTopics(topicName: string[]): void {
+    this.removeItems(topicName, true)
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+class TopicsStore_old {
   private readonly http = inject(HttpClient);
   private readonly state = signal<TopicsState>({ ...defaultState });
 

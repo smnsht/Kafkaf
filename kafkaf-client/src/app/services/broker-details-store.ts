@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { PageState } from '../components/page-wrapper/page-wrapper';
 import { environment } from '../../environments/environment';
+import { PageState } from './base-store';
 
 export interface BrokerConfigRow {
   isDefault: boolean;

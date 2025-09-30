@@ -1,4 +1,4 @@
-import { Component, computed, effect, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { KafkafTable } from '../../directives/kafkaf-table';
@@ -19,7 +19,7 @@ export class TopicsList {
   topics = computed(() => {
     const searchStr = this.search().toLowerCase();
     const showInternal = this.showInternalTopics();
-    const topics = this.store.topics();
+    const topics = this.store.currentItems();
 
     return topics?.filter((topic) => {
       if (!showInternal && topic.isInternal) {
@@ -37,15 +37,9 @@ export class TopicsList {
   constructor(public store: TopicsStore, route: ActivatedRoute) {
     route.paramMap.subscribe((params) => {
       const clusterIdx = parseInt(params.get('cluster')!);
-      store.loadTopis(clusterIdx);
+      store.selectCluster(clusterIdx);
+      store.loadTopics();
     });
-
-    effect(() => {
-      const notice = store.notice();
-      if (notice) {
-        this.selectedTopics = [];
-      }
-    })
   }
 
   onCheckboxChange(value: string, isChecked: boolean) {
@@ -58,6 +52,7 @@ export class TopicsList {
 
   onDeleteTopicsClick(): void {
     this.store.deleteTopics(this.selectedTopics);
+    this.selectedTopics = [];
   }
 
   onCopyTopicClick(): void {
@@ -65,6 +60,7 @@ export class TopicsList {
   }
 
   onPurgeMessagesClick(): void {
-    this.store.purgeMessages(this.selectedTopics);
+    //this.store.purgeMessages(this.selectedTopics);
+    console.log(this.selectedTopics)
   }
 }

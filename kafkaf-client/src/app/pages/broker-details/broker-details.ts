@@ -2,7 +2,8 @@ import { Component, OnInit, Signal } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { StatsCard, StatsCardItem } from '../../components/stats-card/stats-card';
 import { BrokerDetailsStore } from '../../services/broker-details-store';
-import { PageState, PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { PageState } from '../../services/base-store';
 
 type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
 

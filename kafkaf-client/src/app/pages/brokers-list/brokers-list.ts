@@ -2,8 +2,9 @@ import { Component, computed, signal, Signal } from '@angular/core';
 import { StatsCard, StatsCardItem } from '../../components/stats-card/stats-card';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KafkafTable } from '../../directives/kafkaf-table';
-import { PageState, PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import { BrokersInfoView, BrokersStore } from '../../services/brokers-store';
+import { PageState } from '../../services/base-store';
 
 const defaultCardItems: ReadonlyArray<StatsCardItem> = [
   { label: 'Broker Count', value: 0, icon: 'danger' },

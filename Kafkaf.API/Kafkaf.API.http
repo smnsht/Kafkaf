@@ -50,8 +50,8 @@ Accept: application/json
 
 ###
 
-DELETE {{Kafkaf.API_HostAddress}}/api/clusters/0/topics?names=topic&names=topic.666
-Accept: application/json
+#DELETE {{Kafkaf.API_HostAddress}}/api/clusters/0/topics?names=topic&names=topic.666
+#Accept: application/json
 
 ### 
 
