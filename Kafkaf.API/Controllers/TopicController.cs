@@ -28,7 +28,7 @@ public class TopicController : ControllerBase
 	/// <param name="topicName"></param>
 	/// <returns></returns>
 	[HttpGet]
-	public async Task<ActionResult<string>> GetAsync(int clusterIdx, string topicName)
+	public async Task<ActionResult<TopicDetailsViewModel>> GetAsync(int clusterIdx, string topicName)
 	{
 		DescribeTopicsResult topicResult = default!;
 		try
@@ -53,9 +53,9 @@ public class TopicController : ControllerBase
 			desc.Partitions.Select(p => p.Partition).ToArray()
 		);
 
-		var topicConfigs = new TopicDetailsViewModel(desc, partitionOffsets);
+		var topicDetails = new TopicDetailsViewModel(desc, partitionOffsets);
 
-		return Ok(topicConfigs);
+		return Ok(topicDetails);
 	}
 
 	/// <summary>
