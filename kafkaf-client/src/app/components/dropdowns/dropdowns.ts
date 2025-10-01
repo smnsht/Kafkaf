@@ -1,7 +1,6 @@
 import { Component, input, model } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
-
-
+import { SerdeType, SerdeTypes, SortOrderType } from './models';
 
 // @Component({
 //   selector: 'ddl-seek-type',
@@ -14,56 +13,50 @@ import { FormsModule, NgModel } from '@angular/forms';
 
 // }
 
-export type SortOrderType = 'FORWARD' | 'BACKWARD' | 'TAILING';
-
 @Component({
   selector: 'ddl-sort-order',
   imports: [FormsModule],
   template: `
-  <div class="field">
+    <div class="field">
       <label class="label">Sort</label>
       <div class="control">
         <div class="select is-fullwidth">
           <select [ngModel]="sortOrder()" (ngModelChange)="sortOrder.set($event)">
             @for (item of options; track $index) {
-              <option [value]="item[0]">{{ item[1] }}</option>
+            <option [value]="item[0]">{{ item[1] }}</option>
             }
           </select>
         </div>
       </div>
     </div>
-  `
-  // templateUrl: './dropdowns.html',
+  `,
 })
 export class DDLSortOrder {
   options = new Map<SortOrderType, string>([
-    [ 'FORWARD', 'Oldest First' ],
-    [ 'BACKWARD', 'Newest First' ],
-    [ 'TAILING', 'Live Mode' ]
+    ['FORWARD', 'Oldest First'],
+    ['BACKWARD', 'Newest First'],
+    ['TAILING', 'Live Mode'],
   ]);
   sortOrder = model<SortOrderType>('FORWARD');
 }
-
-export const SerdeTypes = Object.freeze(['String', 'Int32', 'Int64', 'UInt32', 'UInt64']);
-export type SerdeType = typeof SerdeTypes[number];
 
 @Component({
   selector: 'ddl-serde',
   imports: [FormsModule],
   template: `
-  <div class="field">
+    <div class="field">
       <label class="label">{{ label() }}</label>
       <div class="control">
         <div class="select is-fullwidth">
           <select [ngModel]="serde()" (ngModelChange)="serde.set($event)">
             @for (serde of options; track $index) {
-              <option [value]="serde">{{ serde }}</option>
+            <option [value]="serde">{{ serde }}</option>
             }
           </select>
         </div>
       </div>
     </div>
-  `
+  `,
 })
 export class DDLSerde {
   label = input<string>('Serde');
@@ -71,25 +64,23 @@ export class DDLSerde {
   serde = model<SerdeType>('String');
 }
 
-
-
 @Component({
   selector: 'ddl-partitions',
   imports: [FormsModule],
   template: `
-  <div class="field">
+    <div class="field">
       <label class="label">Partitions</label>
       <div class="control">
         <div class="select is-fullwidth">
           <select [ngModel]="partition()" (ngModelChange)="partition.set($event)">
             @for (part of partitions(); track $index) {
-              <option [value]="part">{{ part }}</option>
+            <option [value]="part">{{ part }}</option>
             }
           </select>
         </div>
       </div>
     </div>
-  `
+  `,
 })
 export class DDLPartitions {
   partitions = input<number[]>([]);

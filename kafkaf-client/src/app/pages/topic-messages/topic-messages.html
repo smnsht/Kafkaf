@@ -34,9 +34,9 @@
 <!-- Search input & filters -->
 <div class="columns">
   <div class="column is-one-third">
-    <div class="field has-addons">
+    <div class="field is-grouped">
       <div class="control has-icons-left is-expanded">
-        <input class="input" type="search" placeholder="Search by Topic Name" />
+        <input class="input" type="search" placeholder="Search" [(ngModel)]="search" />
         <span class="icon is-small is-left">
           <i class="fas fa-search"></i>
         </span>
@@ -52,7 +52,7 @@
     </div>
   </div>
   <div class="column has-text-right">
-    <button class="button is-light mr-2">
+    <button class="button is-light mr-2" (click)="onClearAllClick()">
       <span class="icon">
         <i class="fa-solid fa-broom"></i>
       </span>
@@ -75,6 +75,7 @@
   <table appKafkafTable>
     <thead>
       <tr>
+        <th>&nbsp;</th>
         <th>Offset</th>
         <th>Partition</th>
         <th>Timestamp</th>
@@ -83,13 +84,28 @@
       </tr>
     </thead>
     <tbody>
-      @for (msg of store.messages(); track $index) {
-      <tr>
+      @for (msg of messages(); track $index) { @let expanded = isRowExpanded($index);
+      <tr class="main-row">
+        <td>
+          <span class="icon has-text-info" (click)="onToggleRowClick($index)">
+            <i
+              class="fas fa-plus-square"
+              [ngClass]="{
+                fas: true,
+                'fa-plus-square': !expanded,
+                'fa-minus-square': expanded
+              }"
+            ></i>
+          </span>
+        </td>
         <td>{{ msg.offset }}</td>
         <td>{{ msg.partition }}</td>
         <td>{{ msg.timestamp.utcDateTime | date : 'yyyy-MM-dd HH:mm:ss' }}</td>
         <td>{{ msg.key }}</td>
         <td>{{ msg.value }}</td>
+      </tr>
+      <tr class="details-row" [class.is-hidden]="!expanded">
+        <td colspan="6">index: {{ $index }} TODO: show message details</td>
       </tr>
       }
     </tbody>

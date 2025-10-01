@@ -1,4 +1,5 @@
 import { computed, inject, signal, WritableSignal } from '@angular/core';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import {
   ConsumerGroupRow,
   MessageRow,
@@ -6,10 +7,8 @@ import {
   TopicSettingRow,
 } from '../response.models';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { SeekType } from '../components/ddl-seek-type/ddl-seek-type';
-import { SerdeType, SortOrderType } from '../components/dropdowns/dropdowns';
+import { SerdeType, SortOrderType } from '../components/dropdowns/models';
 
 export interface SearchMessagesOptions {
   seekType: SeekType;
@@ -30,20 +29,19 @@ export const defaultSearchMessagesOptions: SearchMessagesOptions = {
 interface TopicDetailsState {
   topic: string;
   clusterIdx: number;
-  topicDetails?: TopicDetailsViewModel;
+  details?: TopicDetailsViewModel;
   settings?: TopicSettingRow[];
   consumers?: ConsumerGroupRow[];
   messages?: MessageRow[];
-  loading?: boolean;
-  error?: string;
-
+  // loading...
+  loadingDetails?: boolean;
   loadingSettings?: boolean;
-  errorSettings?: string;
-
   loadingConsumers?: boolean;
-  errorConsumers?: string;
-
   loadingMessages?: boolean;
+  // error...
+  errorDetails?: string;
+  errorSettings?: string;
+  errorConsumers?: string;
   errorMessages?: string;
 }
 
@@ -59,28 +57,35 @@ export class TopicDetailsStore {
     this.state = signal(initialState);
   }
 
+  // required
   readonly topic = computed(() => this.state().topic);
   readonly clusterIdx = computed(() => this.state().clusterIdx);
-  readonly loading = computed(() => this.state().loading);
-  readonly error = computed(() => this.state().error);
-  readonly topicDetails = computed(() => this.state().topicDetails);
-  readonly partitions = computed(() => this.state().topicDetails?.partitions );
+
+  // data
+  readonly details = computed(() => this.state().details);
   readonly settings = computed(() => this.state().settings);
   readonly consumers = computed(() => this.state().consumers);
   readonly messages = computed(() => this.state().messages);
+  readonly partitions = computed(() => this.state().details?.partitions);
+
+  // loading...
+  readonly loadingDetails = computed(() => this.state().loadingDetails);
   readonly loadingSettings = computed(() => this.state().loadingSettings);
-  readonly errorSettings = computed(() => this.state().errorSettings);
   readonly loadingConsumers = computed(() => this.state().loadingConsumers);
-  readonly errorConsumers = computed(() => this.state().errorConsumers);
   readonly loadingMessages = computed(() => this.state().loadingMessages);
+
+  // error...
+  readonly errorDetails = computed(() => this.state().errorDetails);
+  readonly errorSettings = computed(() => this.state().errorSettings);
+  readonly errorConsumers = computed(() => this.state().errorConsumers);
   readonly errorMessages = computed(() => this.state().errorMessages);
 
   loadTopicDetails(): void {
-    if (!this.topicDetails() && !this.loading()) {
+    if (!this.details() && !this.loadingDetails()) {
       this.state.update((state) => ({
         ...state,
-        loading: true,
-        error: undefined,
+        loadingDetails: true,
+        errorDetails: undefined,
       }));
 
       this.fetchTopicDetails();
@@ -111,7 +116,6 @@ export class TopicDetailsStore {
     }
   }
 
-  // Observable<MessageRow[]>
   loadMessages(options: SearchMessagesOptions): void {
     this.state.update((state) => ({
       ...state,
@@ -135,14 +139,14 @@ export class TopicDetailsStore {
       next: (topicDetails) =>
         this.state.update((state) => ({
           ...state,
-          topicDetails,
-          loading: false,
+          details: topicDetails,
+          loadingDetails: false,
         })),
       error: (err) => {
         this.state.update((state) => ({
           ...state,
-          loading: false,
-          error: err.message,
+          loadingDetails: false,
+          errorDetails: err.message,
         }));
       },
     });
@@ -190,7 +194,7 @@ export class TopicDetailsStore {
         this.state.update((state) => ({
           ...state,
           loadingMessages: false,
-          error: err.message,
+          errorDetails: err.message,
         })),
     });
   }

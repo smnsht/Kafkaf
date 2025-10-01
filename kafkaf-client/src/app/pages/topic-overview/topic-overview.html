@@ -1,4 +1,4 @@
-<app-page-wrapper [error]="store.error()" [loading]="store.loading()">
+<app-page-wrapper [error]="store.errorDetails()" [loading]="store.loadingDetails()">
   <app-stats-card [cardItems]="cardItems" />
 
   <table appKafkafTable>

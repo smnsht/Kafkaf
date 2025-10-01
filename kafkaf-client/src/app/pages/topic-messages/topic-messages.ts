@@ -1,29 +1,80 @@
 import { Component, computed, signal } from '@angular/core';
-import { DDLSortOrder, DDLSerde, DDLPartitions, SortOrderType, SerdeType } from '../../components/dropdowns/dropdowns';
-import { DdlSeekType, SeekType } from '../../components/ddl-seek-type/ddl-seek-type';
+import { DDLSortOrder, DDLSerde, DDLPartitions } from '../../components/dropdowns/dropdowns';
+import { DdlSeekType } from '../../components/ddl-seek-type/ddl-seek-type';
 import { KafkafTable } from '../../directives/kafkaf-table';
-import { defaultSearchMessagesOptions, TopicDetailsStore } from '../../services/topic-details-store';
-import { DatePipe } from '@angular/common';
-import { PageWrapper } from "../../components/page-wrapper/page-wrapper";
+import {
+  defaultSearchMessagesOptions,
+  TopicDetailsStore,
+} from '../../services/topic-details-store';
+import { CommonModule, DatePipe } from '@angular/common';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-topic-messages',
   standalone: true,
-  imports: [DDLSortOrder, DDLSerde, DDLPartitions, DdlSeekType, KafkafTable, DatePipe, PageWrapper],
+  imports: [
+    DDLSortOrder,
+    DDLSerde,
+    DDLPartitions,
+    DdlSeekType,
+    KafkafTable,
+    DatePipe,
+    PageWrapper,
+    FormsModule,
+    CommonModule
+],
   templateUrl: './topic-messages.html',
   styleUrl: './topic-messages.scss',
 })
 export class TopicMessages {
   searchMessagesOptions = { ...defaultSearchMessagesOptions };
+  search = signal('');
+  expandedRows = signal<Map<number, boolean>>(new Map());
+
   partitions = computed<number[]>(() => {
     const partitions = this.store.partitions() ?? [];
-    return partitions.map(p => p.partition);
+    return partitions.map((p) => p.partition);
   });
 
-  constructor(readonly store: TopicDetailsStore){   }
+  messages = computed(() => {
+    const search = this.search().toLowerCase();
+
+    return this.store.messages()?.filter((msg) => {
+      if (search) {
+        const key = msg.key?.toLowerCase() || '';
+        const value = msg.value?.toLowerCase() || '';
+        return key.includes(search) || value.includes(search);
+      }
+
+      return true;
+    });
+  });
+
+  constructor(readonly store: TopicDetailsStore) {}
+
+  isRowExpanded(rowIndex: number): boolean {
+    return this.expandedRows().has(rowIndex);
+  }
 
   onSubmitClick(): void {
-    //console.log(this.searchMessagesOptions)
-    this.store.loadMessages(this.searchMessagesOptions)
+    this.store.loadMessages(this.searchMessagesOptions);
+  }
+
+  onClearAllClick(): void {
+    this.searchMessagesOptions = { ...defaultSearchMessagesOptions };
+  }
+
+  onToggleRowClick(rowIndex: number): void {
+    const expanded = this.expandedRows();
+
+    if (expanded.has(rowIndex)) {
+      expanded.delete(rowIndex);
+    } else {
+      expanded.set(rowIndex, true);
+    }
+
+    this.expandedRows.set(expanded);
   }
 }

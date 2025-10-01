@@ -17,7 +17,7 @@ export class TopicOverview {
 
   constructor(readonly store: TopicDetailsStore) {
     effect(() => {
-      const topicDetails = this.store.topicDetails();
+      const topicDetails = this.store.details();
 
       if (topicDetails) {
         this.cardItems = [
