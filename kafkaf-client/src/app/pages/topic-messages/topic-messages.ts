@@ -1,21 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { DDLSortOrder, DDLSerde, DDLPartitions, SortOrderType, SerdeType } from '../../components/dropdowns/dropdowns';
 import { DdlSeekType, SeekType } from '../../components/ddl-seek-type/ddl-seek-type';
 import { KafkafTable } from '../../directives/kafkaf-table';
+import { defaultSearchMessagesOptions, TopicDetailsStore } from '../../services/topic-details-store';
+import { DatePipe } from '@angular/common';
+import { PageWrapper } from "../../components/page-wrapper/page-wrapper";
 
 @Component({
   selector: 'app-topic-messages',
   standalone: true,
-  imports: [DDLSortOrder, DDLSerde, DDLPartitions, DdlSeekType, KafkafTable],
+  imports: [DDLSortOrder, DDLSerde, DDLPartitions, DdlSeekType, KafkafTable, DatePipe, PageWrapper],
   templateUrl: './topic-messages.html',
   styleUrl: './topic-messages.scss',
 })
 export class TopicMessages {
-  partitions = [0, 1, 2];
+  searchMessagesOptions = { ...defaultSearchMessagesOptions };
+  partitions = computed<number[]>(() => {
+    const partitions = this.store.partitions() ?? [];
+    return partitions.map(p => p.partition);
+  });
 
-  seekType: SeekType = 'Offset';
-  partition = 0;
-  keySerde: SerdeType = 'String';
-  valueSerde: SerdeType = 'String';
-  sortOrder: SortOrderType = 'FORWARD';
+  constructor(readonly store: TopicDetailsStore){   }
+
+  onSubmitClick(): void {
+    //console.log(this.searchMessagesOptions)
+    this.store.loadMessages(this.searchMessagesOptions)
+  }
 }

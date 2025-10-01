@@ -15,16 +15,22 @@ public class MessagesController : ControllerBase
 		_readerService = readerService;
 
 	[HttpGet]
-	public IEnumerable<ReadMessagesViewModel> GetMessages(
+	public IEnumerable<MessageRow> GetMessages(
 		int clusterIdx,
 		string topicName,
 		[FromQuery] ReadMessagesRequest req,
 		CancellationToken ct
 	)
 	{
-		var results = _readerService.ReadMessagesBackwards(clusterIdx, topicName, req, ct);
+		var results = req.seekDirection switch
+		{
+			SeekDirection.FORWARD => _readerService.ReadMessages(clusterIdx, topicName, req, ct),
+			SeekDirection.BACKWARD => _readerService.ReadMessagesBackwards(clusterIdx, topicName, req, ct),
+			SeekDirection.TAILING => throw new NotImplementedException(),
+			_ => throw new ArgumentOutOfRangeException(nameof(req))
+		};	
 
-		return ReadMessagesViewModel.FromResults(results);
+		return results.Select(MessageRow.FromResult);
 	}
 
 	[HttpDelete]
@@ -34,11 +40,7 @@ public class MessagesController : ControllerBase
 		CancellationToken ct
 	)
 	{
-		if (topicName == "topic")
-		{
-			return NotFound();
-		}
-
+		// TODO
 		await Task.Delay(10);
 
 		return Ok(0);

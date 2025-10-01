@@ -58,3 +58,16 @@ export interface ConsumerGroupRow {
   coordinator: number;
   state: string;
 }
+
+export interface MessageRow {
+  offset: number;
+  partition: number;
+  timestamp: {
+    type: number;
+    unixTimestampMs: number;
+    utcDateTime: Date;
+  };
+  key?: string | null;
+  value?: string | null;
+  headers?: string | null;
+}
