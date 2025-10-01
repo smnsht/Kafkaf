@@ -1,14 +1,18 @@
 import { computed, inject, signal, WritableSignal } from '@angular/core';
-import { TopicDetailsViewModel } from '../response.models';
+import { TopicDetailsViewModel, TopicSettingRow } from '../response.models';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 interface TopicDetailsState {
   topic: string;
   clusterIdx: number;
   topicDetails?: TopicDetailsViewModel;
+  settings?: TopicSettingRow[];
   loading?: boolean;
   error?: string;
+
+  loadingSettings?: boolean;
+  errorSettings?: string;
 }
 
 export class TopicDetailsStore {
@@ -26,8 +30,11 @@ export class TopicDetailsStore {
   readonly topic = computed(() => this.state().topic);
   readonly clusterIdx = computed(() => this.state().clusterIdx);
   readonly loading = computed(() => this.state().loading);
-  readonly topicDetails = computed(() => this.state().topicDetails );
   readonly error = computed(() => this.state().error);
+  readonly topicDetails = computed(() => this.state().topicDetails);
+  readonly settings = computed(() => this.state().settings);
+  readonly loadingSettings = computed(() => this.state().loadingSettings );
+  readonly errorSettings = computed(() => this.state().errorSettings );
 
   loadTopicDetails(): void {
     this.state.update((state) => ({ ...state, loading: true }));
@@ -35,8 +42,20 @@ export class TopicDetailsStore {
     this.fetchTopicDetails();
   }
 
+  loadSettings(): void {
+    if (!this.settings()) {
+      this.state.update((state) => ({
+        ...state,
+        loadingSettings: true,
+        errorSettings: undefined,
+      }));
+
+      this.fetchSettings();
+    }
+  }
+
   private fetchTopicDetails() {
-    return this.http.get<TopicDetailsViewModel>(this.url).subscribe({
+    this.http.get<TopicDetailsViewModel>(this.url).subscribe({
       next: (topicDetails) =>
         this.state.update((state) => ({
           ...state,
@@ -50,6 +69,19 @@ export class TopicDetailsStore {
           error: err.message,
         }));
       },
+    });
+  }
+
+  private fetchSettings(): void {
+    this.http.get<TopicSettingRow[]>(`${this.url}/settings`).subscribe({
+      next: (settings) =>
+        this.state.update((state) => ({ ...state, settings, loadingSettings: false })),
+      error: (err: HttpErrorResponse) =>
+        this.state.update((state) => ({
+          ...state,
+          loadingSettings: false,
+          errorSettings: err.message,
+        })),
     });
   }
 }

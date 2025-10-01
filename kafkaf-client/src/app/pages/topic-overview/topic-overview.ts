@@ -1,8 +1,9 @@
-import { Component, computed, effect, OnInit, signal } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { StatsCard, StatsCardItem } from '../../components/stats-card/stats-card';
 import { KafkafTable } from '../../directives/kafkaf-table';
 import { TopicDetailsStore } from '../../services/topic-details-store';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { PartitionInfo } from '../../response.models';
 
 @Component({
   selector: 'app-topic-overview',
@@ -10,16 +11,16 @@ import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
   templateUrl: './topic-overview.html',
   // styleUrl: './topic-overview.scss'
 })
-export class TopicOverview implements OnInit {
-  cardItems = signal<StatsCardItem[]>([]);
-  partitions = computed(() => this.store.topicDetails()?.partitions);
+export class TopicOverview {
+  cardItems: StatsCardItem[] = [];
+  partitions: PartitionInfo[] = [];
 
   constructor(readonly store: TopicDetailsStore) {
     effect(() => {
       const topicDetails = this.store.topicDetails();
 
       if (topicDetails) {
-        const cardItems: StatsCardItem[] = [
+        this.cardItems = [
           { label: 'Partitions', value: topicDetails.partitionCount },
           { label: 'Replication Factor', value: topicDetails.replicationFactor },
           { label: 'URP', value: topicDetails.underReplicatedPartitions },
@@ -28,25 +29,11 @@ export class TopicOverview implements OnInit {
           { label: 'Segment Size', value: 'TODO' },
           { label: 'Segment Count', value: 'TODO' },
           { label: 'Clean Up Policy', value: 'TODO' },
-          { label: 'Message Count', value: 'TODO'},
+          { label: 'Message Count', value: 'TODO' },
         ];
 
-        this.cardItems.set(cardItems)
+        this.partitions = topicDetails.partitions;
       }
     });
-  }
-
-  ngOnInit(): void {
-    // this.cardItems = [
-    //   { label: 'Partitions', value: 2 },
-    //   { label: 'Replication Factor', value: 1 },
-    //   { label: 'URP', value: 0 },
-    //   { label: 'In Sync Replicas', value: '2 of 2' },
-    //   { label: 'Type', value: '???' },
-    //   { label: 'Segment Size', value: '198 Bytes' },
-    //   { label: 'Segment Count', value: 1 },
-    //   { label: 'Clean Up Policy', value: 'DELETE' },
-    //   { label: 'Message Count', value: 2 },
-    // ];
   }
 }

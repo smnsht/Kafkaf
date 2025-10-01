@@ -44,3 +44,9 @@ export interface TopicDetailsViewModel {
   messageCount?: number;
   partitions: PartitionInfo[];
 }
+
+export interface TopicSettingRow {
+  name: string;
+  value: string;
+  defaultValue?: string | null;
+}

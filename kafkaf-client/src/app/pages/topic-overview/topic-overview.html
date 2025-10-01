@@ -1,5 +1,5 @@
 <app-page-wrapper [error]="store.error()" [loading]="store.loading()">
-  <app-stats-card [cardItems]="cardItems()" />
+  <app-stats-card [cardItems]="cardItems" />
 
   <table appKafkafTable>
     <thead>
@@ -13,7 +13,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (row of partitions(); track $index) {
+      @for (row of partitions; track $index) {
       <tr>
         <td>{{ row.partition }}</td>
         <td>{{ row.replicas.length }}</td>

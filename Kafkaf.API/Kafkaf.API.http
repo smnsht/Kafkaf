@@ -78,3 +78,7 @@ Accept: application/json
 DELETE {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.3/messages
 Accept: application/json
 
+###
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.3/settings
+Accept: application/json
