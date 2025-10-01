@@ -1,5 +1,5 @@
 import { computed, inject, signal, WritableSignal } from '@angular/core';
-import { TopicDetailsViewModel, TopicSettingRow } from '../response.models';
+import { ConsumerGroupRow, TopicDetailsViewModel, TopicSettingRow } from '../response.models';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
@@ -8,11 +8,15 @@ interface TopicDetailsState {
   clusterIdx: number;
   topicDetails?: TopicDetailsViewModel;
   settings?: TopicSettingRow[];
+  consumers?: ConsumerGroupRow[];
   loading?: boolean;
   error?: string;
 
   loadingSettings?: boolean;
   errorSettings?: string;
+
+  loadingConsumers?: boolean;
+  errorConsumers?: string;
 }
 
 export class TopicDetailsStore {
@@ -33,17 +37,26 @@ export class TopicDetailsStore {
   readonly error = computed(() => this.state().error);
   readonly topicDetails = computed(() => this.state().topicDetails);
   readonly settings = computed(() => this.state().settings);
-  readonly loadingSettings = computed(() => this.state().loadingSettings );
-  readonly errorSettings = computed(() => this.state().errorSettings );
+  readonly consumers = computed(() => this.state().consumers);
+  readonly loadingSettings = computed(() => this.state().loadingSettings);
+  readonly errorSettings = computed(() => this.state().errorSettings);
+  readonly loadingConsumers = computed(() => this.state().loadingConsumers);
+  readonly ererrorConsumers = computed(() => this.state().errorConsumers);
 
   loadTopicDetails(): void {
-    this.state.update((state) => ({ ...state, loading: true }));
+    if (!this.topicDetails() && !this.loading()) {
+      this.state.update((state) => ({
+        ...state,
+        loading: true,
+        error: undefined,
+      }));
 
-    this.fetchTopicDetails();
+      this.fetchTopicDetails();
+    }
   }
 
   loadSettings(): void {
-    if (!this.settings()) {
+    if (!this.settings() && !this.loadingSettings()) {
       this.state.update((state) => ({
         ...state,
         loadingSettings: true,
@@ -51,6 +64,18 @@ export class TopicDetailsStore {
       }));
 
       this.fetchSettings();
+    }
+  }
+
+  loadConsumers(): void {
+    if (!this.consumers() && !this.loadingConsumers()) {
+      this.state.update((state) => ({
+        ...state,
+        loadingConsumers: true,
+        errorConsumers: undefined,
+      }));
+
+      this.fetchConsumers();
     }
   }
 
@@ -81,6 +106,19 @@ export class TopicDetailsStore {
           ...state,
           loadingSettings: false,
           errorSettings: err.message,
+        })),
+    });
+  }
+
+  private fetchConsumers(): void {
+    this.http.get<ConsumerGroupRow[]>(`${this.url}/consumers`).subscribe({
+      next: (consumers) =>
+        this.state.update((state) => ({ ...state, consumers, loadingConsumers: false })),
+      error: (err: HttpErrorResponse) =>
+        this.state.update((state) => ({
+          ...state,
+          loadingConsumers: false,
+          errorConsumers: err.message,
         })),
     });
   }

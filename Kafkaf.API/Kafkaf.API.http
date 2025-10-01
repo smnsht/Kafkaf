@@ -82,3 +82,8 @@ Accept: application/json
 
 GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.3/settings
 Accept: application/json
+
+###
+
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.3/consumers
+Accept: application/json
