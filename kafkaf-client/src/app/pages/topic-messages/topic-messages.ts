@@ -6,13 +6,12 @@ import {
   defaultSearchMessagesOptions,
   TopicDetailsStore,
 } from '../../services/topic-details-store';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import { FormsModule } from '@angular/forms';
-import { MessageDetails } from "../../components/message-details/message-details";
+import { MessageDetails } from '../../components/message-details/message-details';
 import { TimestampPipe } from '../../pipes/timestamp-pipe';
 import { TruncatePipe } from '../../pipes/truncate-pipe';
-
 
 @Component({
   selector: 'app-topic-messages',
@@ -28,15 +27,16 @@ import { TruncatePipe } from '../../pipes/truncate-pipe';
     CommonModule,
     MessageDetails,
     TimestampPipe,
-    TruncatePipe
-],
+    TruncatePipe,
+  ],
   templateUrl: './topic-messages.html',
   styleUrl: './topic-messages.scss',
 })
 export class TopicMessages {
   searchMessagesOptions = { ...defaultSearchMessagesOptions };
+  expandedRows = new Map<number, boolean>();
+
   search = signal('');
-  expandedRows = signal<Map<number, boolean>>(new Map());
 
   partitions = computed<number[]>(() => {
     const partitions = this.store.partitions() ?? [];
@@ -59,12 +59,9 @@ export class TopicMessages {
 
   constructor(readonly store: TopicDetailsStore) {}
 
-  // isRowExpanded(rowIndex: number): boolean {
-  //   return this.expandedRows().has(rowIndex);
-  // }
-
   onSubmitClick(): void {
     this.store.loadMessages(this.searchMessagesOptions);
+    this.expandedRows.clear();
   }
 
   onClearAllClick(): void {
@@ -72,21 +69,11 @@ export class TopicMessages {
   }
 
   onToggleRowClick(rowIndex: number): void {
-    const expanded = this.expandedRows();
-
-    if (expanded.has(rowIndex)) {
-      expanded.delete(rowIndex);
-    } else {
-      expanded.set(rowIndex, true);
-    }
-
-    this.expandedRows.set(expanded);
-    /////////////////////////////////////////////////////////
     const messages = this.messages();
+
     if (messages && messages.length > 0) {
-      const msg  = messages[rowIndex] as any;
-      const expanded = !!msg['_expanded'];
-      msg['_expanded'] = !expanded;
+      const expanded = !!this.expandedRows.get(rowIndex);
+      this.expandedRows.set(rowIndex, !expanded);
     }
   }
 }

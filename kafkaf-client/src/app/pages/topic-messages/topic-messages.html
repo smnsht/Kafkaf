@@ -84,7 +84,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (msg of messages(); track $index) {
+      @for (msg of messages(); track $index) { @let expanded = expandedRows.get($index);
       <tr class="main-row">
         <td>
           <span class="icon has-text-info" (click)="onToggleRowClick($index)">
@@ -92,8 +92,8 @@
               class="fas fa-plus-square"
               [ngClass]="{
                 fas: true,
-                'fa-plus-square': !$any(msg)._expanded,
-                'fa-minus-square': $any(msg)._expanded
+                'fa-plus-square': !expanded,
+                'fa-minus-square': expanded
               }"
             ></i>
           </span>
@@ -104,8 +104,8 @@
         <td>{{ msg.key | truncate : 30 }}</td>
         <td>{{ msg.value | truncate : 30 }}</td>
       </tr>
-      <tr class="details-row" [class.is-hidden]="!$any(msg)._expanded">
-        <td colspan="6">
+      <tr class="details-row" [class.is-hidden]="!expanded">
+        <td colspan="6" style="border: 1px solid black">
           <message-details [message]="msg" />
         </td>
       </tr>

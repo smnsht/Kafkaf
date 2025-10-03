@@ -2,7 +2,7 @@
 <div class="columns">
   <!-- message content tabs -->
   <div class="column">
-    <div class="tabs is-small">
+    <div class="tabs">
       <ul>
         <li [class.is-active]="selectedTab() == 'Key'">
           <a (click)="onTabClick($event, 'Key')">Key</a>
@@ -15,7 +15,40 @@
         </li>
       </ul>
     </div>
+
+    <!-- message contents -->
     <pre>{{ contents() }}</pre>
+
+    <!-- buttons -->
+    <div class="buttons pb-2 pt-3">
+      <button class="button" (click)="onCopy2ClipboardClick()">
+        <span class="icon">
+          <i class="fas fa-copy"></i>
+        </span>
+        <span>Copy to clipboard</span>
+      </button>
+      <button class="button" (click)="onSaveAsFileClick()">
+        <span class="icon">
+          <i class="fas fa-save"></i>
+        </span>
+        <span>Save as file</span>
+      </button>
+    </div>
+
+    <!-- success notification -->
+    @if (showCopiedSuccessfully) {
+    <article class="message is-success">
+      <div class="message-header">
+        <p>Success</p>
+        <button
+          class="delete"
+          aria-label="delete"
+          (click)="showCopiedSuccessfully = false"
+        ></button>
+      </div>
+      <div class="message-body">Copied successfully!</div>
+    </article>
+    }
   </div>
   <!-- message metatadata -->
   <div class="column is-one-third">
