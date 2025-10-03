@@ -9,6 +9,9 @@ import {
 import { CommonModule, DatePipe } from '@angular/common';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import { FormsModule } from '@angular/forms';
+import { MessageDetails } from "../../components/message-details/message-details";
+import { TimestampPipe } from '../../pipes/timestamp-pipe';
+import { TruncatePipe } from '../../pipes/truncate-pipe';
 
 
 @Component({
@@ -20,10 +23,12 @@ import { FormsModule } from '@angular/forms';
     DDLPartitions,
     DdlSeekType,
     KafkafTable,
-    DatePipe,
     PageWrapper,
     FormsModule,
-    CommonModule
+    CommonModule,
+    MessageDetails,
+    TimestampPipe,
+    TruncatePipe
 ],
   templateUrl: './topic-messages.html',
   styleUrl: './topic-messages.scss',
@@ -54,9 +59,9 @@ export class TopicMessages {
 
   constructor(readonly store: TopicDetailsStore) {}
 
-  isRowExpanded(rowIndex: number): boolean {
-    return this.expandedRows().has(rowIndex);
-  }
+  // isRowExpanded(rowIndex: number): boolean {
+  //   return this.expandedRows().has(rowIndex);
+  // }
 
   onSubmitClick(): void {
     this.store.loadMessages(this.searchMessagesOptions);
@@ -76,5 +81,12 @@ export class TopicMessages {
     }
 
     this.expandedRows.set(expanded);
+    /////////////////////////////////////////////////////////
+    const messages = this.messages();
+    if (messages && messages.length > 0) {
+      const msg  = messages[rowIndex] as any;
+      const expanded = !!msg['_expanded'];
+      msg['_expanded'] = !expanded;
+    }
   }
 }

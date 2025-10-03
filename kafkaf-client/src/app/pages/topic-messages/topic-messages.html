@@ -84,7 +84,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (msg of messages(); track $index) { @let expanded = isRowExpanded($index);
+      @for (msg of messages(); track $index) {
       <tr class="main-row">
         <td>
           <span class="icon has-text-info" (click)="onToggleRowClick($index)">
@@ -92,20 +92,22 @@
               class="fas fa-plus-square"
               [ngClass]="{
                 fas: true,
-                'fa-plus-square': !expanded,
-                'fa-minus-square': expanded
+                'fa-plus-square': !$any(msg)._expanded,
+                'fa-minus-square': $any(msg)._expanded
               }"
             ></i>
           </span>
         </td>
         <td>{{ msg.offset }}</td>
         <td>{{ msg.partition }}</td>
-        <td>{{ msg.timestamp.utcDateTime | date : 'yyyy-MM-dd HH:mm:ss' }}</td>
-        <td>{{ msg.key }}</td>
-        <td>{{ msg.value }}</td>
+        <td>{{ msg.timestamp | timestamp : 'datetime' }}</td>
+        <td>{{ msg.key | truncate : 30 }}</td>
+        <td>{{ msg.value | truncate : 30 }}</td>
       </tr>
-      <tr class="details-row" [class.is-hidden]="!expanded">
-        <td colspan="6">index: {{ $index }} TODO: show message details</td>
+      <tr class="details-row" [class.is-hidden]="!$any(msg)._expanded">
+        <td colspan="6">
+          <message-details [message]="msg" />
+        </td>
       </tr>
       }
     </tbody>

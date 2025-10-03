@@ -59,15 +59,23 @@ export interface ConsumerGroupRow {
   state: string;
 }
 
+export interface KafkaTimestamp {
+  type: TimestampType;
+  unixTimestampMs: number;
+  utcDateTime: Date;
+}
+
 export interface MessageRow {
   offset: number;
   partition: number;
-  timestamp: {
-    type: number;
-    unixTimestampMs: number;
-    utcDateTime: Date;
-  };
+  timestamp: KafkaTimestamp;
   key?: string | null;
   value?: string | null;
   headers?: string | null;
+}
+
+export enum TimestampType {
+    NotAvailable,
+    CreateTime,
+    LogAppendTime
 }

@@ -1,0 +1,48 @@
+@let msg = message(); @if (msg) {
+<div class="columns">
+  <!-- message content tabs -->
+  <div class="column">
+    <div class="tabs is-small">
+      <ul>
+        <li [class.is-active]="selectedTab() == 'Key'">
+          <a (click)="onTabClick($event, 'Key')">Key</a>
+        </li>
+        <li [class.is-active]="selectedTab() == 'Value'">
+          <a (click)="onTabClick($event, 'Value')">Value</a>
+        </li>
+        <li [class.is-active]="selectedTab() == 'Headers'">
+          <a (click)="onTabClick($event, 'Headers')">Headers</a>
+        </li>
+      </ul>
+    </div>
+    <pre>{{ contents() }}</pre>
+  </div>
+  <!-- message metatadata -->
+  <div class="column is-one-third">
+    <table>
+      <tbody>
+        <tr>
+          <th>Timestamp</th>
+          <td>
+            {{ msg.timestamp | timestamp : 'datetime' }}
+            <i class="is-block is-size-7"
+              >Timestamp type: {{ msg.timestamp | timestamp : 'type' }}</i
+            >
+            <i class="is-block is-size-7"
+              >Unix timestamp ms: {{ msg.timestamp | timestamp : 'unix' }}</i
+            >
+          </td>
+        </tr>
+        <tr>
+          <th>Key Serde</th>
+          <td>TODO</td>
+        </tr>
+        <tr>
+          <th>Value Serde</th>
+          <td>TODO</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+}
