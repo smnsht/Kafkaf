@@ -18,7 +18,7 @@
     </div>
   </div>
   <div class="column">
-    <ddl-partitions [src]="store.partitions()" (partitionsChange)="searchMessagesOptions.partitions = $event" />
+    <ddl-partitions [src]="store.partitions()" [(selected)]="searchMessagesOptions.partitions" />
   </div>
   <div class="column">
     <ddl-serde label="Key Serde" [(serde)]="searchMessagesOptions.keySerde" />
@@ -30,7 +30,7 @@
     <ddl-sort-order [(sortOrder)]="searchMessagesOptions.sortOrder" />
   </div>
 </div>
-
+<pre>partitions {{ searchMessagesOptions.partitions.length}}</pre>
 <!-- Search input & filters -->
 <div class="columns">
   <div class="column is-one-third">

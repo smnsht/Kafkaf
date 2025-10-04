@@ -1,5 +1,5 @@
-import { Component, computed, effect, input, output, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, effect, input, model, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { PartitionInfo } from '../../response.models';
 import { ClickOutsideDirective } from '../../directives/click-outside';
 
@@ -10,15 +10,26 @@ import { ClickOutsideDirective } from '../../directives/click-outside';
   styleUrl: './ddl-partitions.scss',
 })
 export class DDLPartitions {
+  // signals
   isActive = signal(false);
   search = signal('');
   selectAll = signal(false);
 
+  // inputs
   src = input<PartitionInfo[] | undefined>();
-  // array index -> partintion id
-  selected = signal(new Map<number, number>([]));
 
-  partitionsChange = output<number[]>();
+  // model
+  selected = model<number[]>();
+
+  selectedNotEmpty = computed(() => {
+    const arr = this.selected();
+    return arr && arr.length > 0;
+  });
+
+  selectedSet = computed(() => {
+    const arr = this.selected();
+    return new Set(arr);
+  });
 
   partitionsFiltered = computed(() => {
     const all = this.src();
@@ -34,8 +45,8 @@ export class DDLPartitions {
   });
 
   partitionsCommaSeparted = computed(() => {
-    const selected = this.selected();
-    return Array.from(selected.values()).join(',');
+    const selected = this.selected() || [];
+    return selected.join(',');
   });
 
   partitionsWithMessages = computed(() => {
@@ -46,21 +57,11 @@ export class DDLPartitions {
   constructor() {
     effect(() => {
       if (this.selectAll()) {
-        this.selected.update((map) => {
-          map.clear();
-
-          this.partitionsWithMessages().forEach((p, index) => map.set(index, p.partition));
-
-          return map;
-        });
+        const arr = this.partitionsWithMessages().map((p) => p.partition);
+        this.selected.set(arr);
       } else {
-        this.selected.update((map) => {
-          map.clear();
-          return map;
-        });
+        this.selected.set([]);
       }
-
-      this.raisePartitionsChange();
     });
   }
 
@@ -69,35 +70,24 @@ export class DDLPartitions {
     this.isActive.set(!isActive);
   }
 
-  onCheckboxChange(index: number, p: PartitionInfo): void {
-    const isChecked = this.selected().has(index);
+  onCheckboxChange(p: PartitionInfo): void {
+    const selectedSet = this.selectedSet();
+    const isChecked = selectedSet.has(p.partition);
 
     // toggle checkbox
 
     if (isChecked) {
-      this.selected.update((map) => {
-        map.delete(index);
-        return map;
-      });
+      selectedSet.delete(p.partition);
     } else {
-      this.selected.update((map) => {
-        map.set(index, p.partition);
-        return map;
-      });
+      selectedSet.add(p.partition);
     }
 
-    this.raisePartitionsChange();
+    this.selected.set(Array.from(selectedSet.values()));
   }
 
   onClickedOutside(): void {
-    if(this.isActive()) {
+    if (this.isActive()) {
       this.isActive.set(false);
     }
-  }
-
-  private raisePartitionsChange(): void {
-    const selectedPartitions = this.selected().values();
-    const arr = Array.from(selectedPartitions);
-    this.partitionsChange.emit(arr);
   }
 }
