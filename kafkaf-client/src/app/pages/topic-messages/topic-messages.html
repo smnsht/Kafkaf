@@ -61,7 +61,7 @@
     <button
       class="button is-primary"
       (click)="onSubmitClick()"
-      [disabled]="store.loadingMessages()"
+      [disabled]="store.loadingMessages() || searchMessagesOptions.partitions.length === 0"
     >
       <span class="icon">
         <i class="fa-solid fa-search"></i>

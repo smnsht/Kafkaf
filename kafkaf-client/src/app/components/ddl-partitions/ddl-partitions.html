@@ -16,7 +16,7 @@
   </label>
 
   <!-- dropdown -->
-  <div class="control">
+  <div class="control" (clickOutside)="onClickedOutside()">
     <div class="dropdown" [class.is-active]="isActive()">
       <div class="dropdown-trigger">
         <button

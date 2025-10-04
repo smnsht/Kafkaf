@@ -1,10 +1,11 @@
 import { Component, computed, effect, input, output, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PartitionInfo } from '../../response.models';
+import { ClickOutsideDirective } from '../../directives/click-outside';
 
 @Component({
   selector: 'ddl-partitions',
-  imports: [FormsModule, ReactiveFormsModule],
+  imports: [FormsModule, ClickOutsideDirective],
   templateUrl: './ddl-partitions.html',
   styleUrl: './ddl-partitions.scss',
 })
@@ -86,6 +87,12 @@ export class DDLPartitions {
     }
 
     this.raisePartitionsChange();
+  }
+
+  onClickedOutside(): void {
+    if(this.isActive()) {
+      this.isActive.set(false);
+    }
   }
 
   private raisePartitionsChange(): void {
