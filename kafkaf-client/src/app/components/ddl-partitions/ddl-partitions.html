@@ -1,0 +1,12 @@
+<div class="field">
+  <label class="label">Partitions</label>
+  <div class="control">
+    <div class="select is-fullwidth">
+      <select [ngModel]="partition()" (ngModelChange)="partition.set($event)">
+        @for (part of partitions(); track $index) {
+        <option [value]="part">{{ part }}</option>
+        }
+      </select>
+    </div>
+  </div>
+</div>

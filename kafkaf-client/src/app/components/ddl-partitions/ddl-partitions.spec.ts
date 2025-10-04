@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Dropdowns } from './dropdowns';
+import { DdlPartitions } from './ddl-partitions';
 
-describe('Dropdowns', () => {
-  let component: Dropdowns;
-  let fixture: ComponentFixture<Dropdowns>;
+describe('DdlPartitions', () => {
+  let component: DdlPartitions;
+  let fixture: ComponentFixture<DdlPartitions>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Dropdowns]
+      imports: [DdlPartitions]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Dropdowns);
+    fixture = TestBed.createComponent(DdlPartitions);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

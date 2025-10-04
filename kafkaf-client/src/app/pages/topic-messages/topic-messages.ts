@@ -1,5 +1,4 @@
 import { Component, computed, signal } from '@angular/core';
-import { DDLSortOrder, DDLSerde, DDLPartitions } from '../../components/dropdowns/dropdowns';
 import { DdlSeekType } from '../../components/ddl-seek-type/ddl-seek-type';
 import { KafkafTable } from '../../directives/kafkaf-table';
 import {
@@ -12,6 +11,9 @@ import { FormsModule } from '@angular/forms';
 import { MessageDetails } from '../../components/message-details/message-details';
 import { TimestampPipe } from '../../pipes/timestamp-pipe';
 import { TruncatePipe } from '../../pipes/truncate-pipe';
+import { DDLPartitions } from '../../components/ddl-partitions/ddl-partitions';
+import { DDLSerde } from '../../components/ddl-serde/ddl-serde';
+import { DDLSortOrder } from '../../components/ddl-sort-order/ddl-sort-order';
 
 @Component({
   selector: 'app-topic-messages',

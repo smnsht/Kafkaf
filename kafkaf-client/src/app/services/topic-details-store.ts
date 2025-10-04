@@ -8,7 +8,8 @@ import {
 } from '../response.models';
 import { environment } from '../../environments/environment';
 import { SeekType } from '../components/ddl-seek-type/ddl-seek-type';
-import { SerdeType, SortOrderType } from '../components/dropdowns/models';
+import { SerdeType } from '../components/ddl-serde/ddl-serde';
+import { SortOrderType } from '../components/ddl-sort-order/ddl-sort-order';
 
 export interface SearchMessagesOptions {
   seekType: SeekType;
