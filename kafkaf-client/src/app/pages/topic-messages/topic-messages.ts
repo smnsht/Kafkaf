@@ -40,11 +40,6 @@ export class TopicMessages {
 
   search = signal('');
 
-  partitions = computed<number[]>(() => {
-    const partitions = this.store.partitions() ?? [];
-    return partitions.map((p) => p.partition);
-  });
-
   messages = computed(() => {
     const search = this.search().toLowerCase();
 

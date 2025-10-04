@@ -13,7 +13,7 @@ import { SortOrderType } from '../components/ddl-sort-order/ddl-sort-order';
 
 export interface SearchMessagesOptions {
   seekType: SeekType;
-  partition: number;
+  partitions: number[];
   keySerde: SerdeType;
   valueSerde: SerdeType;
   sortOrder: SortOrderType;
@@ -21,7 +21,7 @@ export interface SearchMessagesOptions {
 
 export const defaultSearchMessagesOptions: SearchMessagesOptions = {
   seekType: 'Offset',
-  partition: 0,
+  partitions: [],
   keySerde: 'String',
   valueSerde: 'String',
   sortOrder: 'FORWARD',
@@ -126,7 +126,7 @@ export class TopicDetailsStore {
 
     this.fetchMessages(
       new HttpParams().appendAll({
-        partitions: [options.partition],
+        partitions: options.partitions,
         seekType: options.seekType,
         seekDirection: options.sortOrder,
         keySerde: options.keySerde,

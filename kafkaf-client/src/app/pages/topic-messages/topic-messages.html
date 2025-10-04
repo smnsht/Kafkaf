@@ -18,7 +18,7 @@
     </div>
   </div>
   <div class="column">
-    <ddl-partitions [partitions]="partitions()" [(partition)]="searchMessagesOptions.partition" />
+    <ddl-partitions [src]="store.partitions()" (partitionsChange)="searchMessagesOptions.partitions = $event" />
   </div>
   <div class="column">
     <ddl-serde label="Key Serde" [(serde)]="searchMessagesOptions.keySerde" />
