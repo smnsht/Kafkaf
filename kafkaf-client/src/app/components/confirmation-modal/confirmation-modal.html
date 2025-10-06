@@ -1,0 +1,20 @@
+<div class="modal" [class.is-active]="isActive()">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">{{ title() }}</p>
+      <button class="delete" aria-label="close" (click)="confirmations.next(false)"></button>
+    </header>
+    <section class="modal-card-body">
+      {{ body() }}
+    </section>
+    <footer class="modal-card-foot">
+      <div class="buttons">
+        <button class="button is-success" (click)="confirmations.next(true)">
+          {{ confirm() }}
+        </button>
+        <button class="button" (click)="confirmations.next(false)">{{ cancel() }}</button>
+      </div>
+    </footer>
+  </div>
+</div>

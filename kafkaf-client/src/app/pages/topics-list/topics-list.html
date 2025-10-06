@@ -71,6 +71,7 @@
         <th>Replication Factor</th>
         <th>Number of messages</th>
         <th>Size</th>
+        <th>&nbsp;</th>
       </tr>
     </thead>
     <tbody>
@@ -92,6 +93,12 @@
         <td>{{ topic.replicationFactor }}</td>
         <td>TODO</td>
         <td>TODO</td>
+        <td>
+          <topics-dropdown-menu
+            [topicName]="topic.topicName"
+            (commandSelected)="onCommandSelected($event, topic)"
+          />
+        </td>
       </tr>
       }
     </tbody>

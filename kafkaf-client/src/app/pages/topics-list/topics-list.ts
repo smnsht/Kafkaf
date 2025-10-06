@@ -4,10 +4,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { KafkafTable } from '../../directives/kafkaf-table';
 import { TopicsStore } from '../../services/topics-store';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import {  DropdownMenuCommand, TopicsDropdownMenu } from "../../components/dropdown-menu/dropdown-menu";
+import { TopicsListViewModel } from '../../response.models';
 
 @Component({
   selector: 'app-topics-list',
-  imports: [FormsModule, KafkafTable, PageWrapper, RouterLink],
+  imports: [FormsModule, KafkafTable, PageWrapper, RouterLink, TopicsDropdownMenu],
   templateUrl: './topics-list.html',
   styleUrl: './topics-list.scss',
 })
@@ -64,5 +66,10 @@ export class TopicsList {
     this.store.purgeMessages(this.selectedTopics).then(() => {
       this.selectedTopics = [];
     });
+  }
+
+  onCommandSelected(event: DropdownMenuCommand, topic: TopicsListViewModel): void {
+    console.log(event);
+    console.log(topic);
   }
 }
