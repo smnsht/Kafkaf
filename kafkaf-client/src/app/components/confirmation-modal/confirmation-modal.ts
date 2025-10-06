@@ -1,19 +1,28 @@
-import { Component, computed, input } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { ConfirmationRequest, ConfirmationService } from '../../services/confirmation-service';
 
 @Component({
   selector: 'app-confirmation-modal',
   imports: [],
   templateUrl: './confirmation-modal.html',
-  styleUrl: './confirmation-modal.scss'
+  styleUrl: './confirmation-modal.scss',
 })
-export class ConfirmationModal {
-  confirmations = new Subject<boolean>();
+export class ConfirmationModal implements OnInit {
+  active = false;
+  request?: ConfirmationRequest;
 
-  title = input<string>('Title');
-  body = input<string | null>(null);
-  confirm = input<string>('Confirm');
-  cancel = input<string>('Cancel');
+  constructor(private readonly confirmationService: ConfirmationService) {}
 
-  isActive = computed(() => !!this.body());
+  ngOnInit(): void {
+    this.confirmationService.requests$.subscribe((req) => {
+      this.request = req;
+      this.active = true;
+    });
+  }
+
+  confirm(result: boolean): void {
+    this.active = false;
+    this.request!.response$.next(result);
+    this.request!.response$.complete();
+  }
 }

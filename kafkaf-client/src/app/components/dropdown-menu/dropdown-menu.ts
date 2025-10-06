@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { ClickOutsideDirective } from '../../directives/click-outside';
+import { ConfirmationService } from '../../services/confirmation-service';
 
 export type DropdownMenuCommand = 'ClearMessages' | 'RecreateTopic' | 'RemoveTopic';
 
@@ -11,23 +12,20 @@ export type DropdownMenuCommand = 'ClearMessages' | 'RecreateTopic' | 'RemoveTop
 })
 export class DropdownMenu {
   isActive = false;
+  isRight = false;
+
   commandSelected = output<DropdownMenuCommand>();
+
+  protected readonly confirmationService = inject(ConfirmationService);
 
   onCommandClick(event: Event, command: DropdownMenuCommand): void {
     event.preventDefault();
 
-    const text = this.getConfirmationText(command);
-
-    if (window.confirm(text)) {
-      this.commandSelected.emit(command);
-    }
-
-    // TODO: Temporary workaround – manually dispatch a synthetic click event
-    // to trigger the global "clickOutside" handler and close the menu.
-    // This is needed because window.confirm() blocks Angular's change detection,
-    // so a direct `this.isActive = false` assignment is not reflected.
-    // Replace with proper dialog + direct state update when confirm() is removed.
-    document.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    this.confirmationService
+      .confirm(this.confirmationTitle, this.getConfirmationBody(command))
+      .subscribe((_) => {
+        this.isActive = false;
+      });
   }
 
   onClickedOutside(): void {
@@ -36,8 +34,12 @@ export class DropdownMenu {
     }
   }
 
-  protected getConfirmationText(_: DropdownMenuCommand): string {
+  protected getConfirmationBody(_: DropdownMenuCommand): string {
     return '';
+  }
+
+  protected get confirmationTitle(): string {
+    return 'Confirm the action';
   }
 }
 
@@ -46,25 +48,40 @@ export class DropdownMenu {
   imports: [DropdownMenu],
   template: `
     <dropdown-menu>
-      <a (click)="onCommandClick($event, 'ClearMessages')" class="dropdown-item">Clear Messages</a>
-      <a (click)="onCommandClick($event, 'RecreateTopic')" class="dropdown-item">Recreate Topic</a>
-      <a (click)="onCommandClick($event, 'RemoveTopic')" class="dropdown-item">Remove Topic</a>
+      <a (click)="onCommandClick($event, 'ClearMessages')" class="dropdown-item has-text-danger"
+        >Clear Messages</a
+      >
+      <i class="dropdown-item is-size-7"
+        >Clearing messages is only allowed for topics with DELETE policy</i
+      >
+      <a (click)="onCommandClick($event, 'RecreateTopic')" class="dropdown-item has-text-danger"
+        >Recreate Topic</a
+      >
+      <a (click)="onCommandClick($event, 'RemoveTopic')" class="dropdown-item has-text-danger"
+        >Remove Topic</a
+      >
     </dropdown-menu>
   `,
 })
 export class TopicsDropdownMenu extends DropdownMenu {
   topicName = input<string>();
 
-  protected override getConfirmationText(command: DropdownMenuCommand): string {
+  constructor() {
+    super();
+
+    this.isRight = true;
+  }
+
+  protected override getConfirmationBody(command: DropdownMenuCommand): string {
     switch (command) {
       case 'ClearMessages':
         return 'Are you sure want to clear topic messages?';
 
       case 'RecreateTopic':
-        return `Are you sure to recreate ${this.topicName() || '?'} topic?`;
+        return `Are you sure to recreate <b>${this.topicName() || '?'}</b> topic?`;
 
       case 'RemoveTopic':
-        return `Are you sure want to remove ${this.topicName() || '?'} topic?`;
+        return `Are you sure want to remove <b>${this.topicName() || '?'}</b> topic?`;
 
       default:
         return 'Confirm the action';

@@ -3,11 +3,12 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { Navbar } from './components/navbar/navbar';
 import { ClusterInfo, ClustersStore, tKafkaSection } from './services/clusters-store';
 import { ClusterSideMenu } from './components/cluster-side-menu/cluster-side-menu';
+import { ConfirmationModal } from './components/confirmation-modal/confirmation-modal';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Navbar, RouterLink, ClusterSideMenu],
+  imports: [RouterOutlet, Navbar, RouterLink, ClusterSideMenu, ConfirmationModal],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
