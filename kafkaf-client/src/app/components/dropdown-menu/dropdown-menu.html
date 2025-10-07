@@ -4,9 +4,13 @@
     dropdown: true,
     'is-active': isActive,
     'is-right': true
-   }"
+  }"
 >
-  <div class="dropdown-trigger" (click)="isActive = !isActive">
+  <div
+    class="dropdown-trigger"
+    (keydown)="handleKeyDown($event)"
+    (click)="isActive = !isActive"
+  >
     <span class="icon">
       <i class="fas fa-ellipsis-vertical"></i>
     </span>

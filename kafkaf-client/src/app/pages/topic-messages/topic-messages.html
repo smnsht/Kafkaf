@@ -30,7 +30,7 @@
     <ddl-sort-order [(sortOrder)]="searchMessagesOptions.sortOrder" />
   </div>
 </div>
-<pre>partitions {{ searchMessagesOptions.partitions.length}}</pre>
+<pre>partitions {{ searchMessagesOptions.partitions.length }}</pre>
 <!-- Search input & filters -->
 <div class="columns">
   <div class="column is-one-third">
@@ -87,7 +87,11 @@
       @for (msg of messages(); track $index) { @let expanded = expandedRows.get($index);
       <tr class="main-row">
         <td>
-          <span class="icon has-text-info" (click)="onToggleRowClick($index)">
+          <span
+            class="icon has-text-info"
+            (click)="onToggleRowClick($index)"
+            (keydown.escape)="onToggleRowClick($index)"
+          >
             <i
               class="fas fa-plus-square"
               [ngClass]="{

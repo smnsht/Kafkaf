@@ -34,6 +34,10 @@ export class DropdownMenu {
     }
   }
 
+  handleKeyDown(event: KeyboardEvent) {
+    console.log(event)
+  }
+
   protected getConfirmationBody(_: DropdownMenuCommand): string {
     return '';
   }

@@ -20,7 +20,7 @@ export class Dashboard implements OnInit {
   public error: Signal<string | null>;
 
   public cardItems = computed(() => {
-    var stats = this.clusters().reduce(
+    const stats = this.clusters().reduce(
       (acc, info) => {
         if (info.isOffline) {
           acc.offline += 1;
