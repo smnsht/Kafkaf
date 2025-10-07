@@ -2,7 +2,8 @@ import { Component, effect } from '@angular/core';
 import { TopicDetailsStore } from '../../services/topic-details-store';
 import { DDLSerde, SerdeTypes } from '../ddl-serde/ddl-serde';
 import { FormsModule } from '@angular/forms';
-import { JsonValidatorDirective } from "../../directives/json-validator-directive";
+import { JsonValidatorDirective } from '../../directives/json-validator-directive';
+import { LoggerService } from '../../services/logger.service';
 
 interface CreateMessage {
   partition: number;
@@ -30,7 +31,7 @@ const defaultPayload: CreateMessage = {
 export class MessageForm {
   payload: CreateMessage;
 
-  constructor(readonly store: TopicDetailsStore) {
+  constructor(readonly store: TopicDetailsStore, private readonly logger: LoggerService) {
     this.payload = { ...defaultPayload };
 
     effect(() => {
@@ -42,7 +43,7 @@ export class MessageForm {
   }
 
   onProduceMessageClick(): void {
-    console.log(this.payload);
+    this.logger.debug('[MessageForm]: ', this.payload);
     window.alert('not imeplemented yet');
   }
 }

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, input, output } from '@angular/core';
 import { ClickOutsideDirective } from '../../directives/click-outside';
 import { ConfirmationService } from '../../services/confirmation-service';
+import { LoggerService } from '../../services/logger.service';
 
 export type DropdownMenuCommand = 'ClearMessages' | 'RecreateTopic' | 'RemoveTopic';
 
@@ -17,6 +18,7 @@ export class DropdownMenu {
   commandSelected = output<DropdownMenuCommand>();
 
   protected readonly confirmationService = inject(ConfirmationService);
+  protected readonly logger = inject(LoggerService);
 
   onCommandClick(event: Event, command: DropdownMenuCommand): void {
     event.preventDefault();
@@ -35,7 +37,7 @@ export class DropdownMenu {
   }
 
   handleKeyDown(event: KeyboardEvent) {
-    console.log(event)
+    this.logger.debug('[DropdownMenu]: ', event);
   }
 
   protected getConfirmationBody(_: DropdownMenuCommand): string {

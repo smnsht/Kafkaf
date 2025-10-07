@@ -1,10 +1,15 @@
 import { Directive, ElementRef, Renderer2 } from '@angular/core';
+import { LoggerService } from '../services/logger.service';
 
 @Directive({
   selector: '[appKafkafTable]',
 })
 export class KafkafTable {
-  constructor(private el: ElementRef, private renderer: Renderer2) {
+  constructor(
+    private el: ElementRef,
+    private renderer: Renderer2,
+    private readonly logger: LoggerService
+  ) {
     const nativeEl = this.el.nativeElement;
 
     if (nativeEl.tagName && nativeEl.tagName.toLowerCase() === 'table') {
@@ -12,7 +17,7 @@ export class KafkafTable {
       this.renderer.addClass(this.el.nativeElement, 'is-hoverable');
       this.renderer.addClass(this.el.nativeElement, 'is-fullwidth');
     } else {
-      console.log('This element is NOT a table.');
+      this.logger.warn('[KafkafTable]: This element is NOT a table.');
     }
   }
 }

@@ -3,6 +3,7 @@ import { MessageRow } from '../../response.models';
 import { TimestampPipe } from '../../pipes/timestamp-pipe';
 import { Subject, switchMap, tap, timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { LoggerService } from '../../services/logger.service';
 
 type tMessageTab = 'Key' | 'Value' | 'Headers';
 @Component({
@@ -44,7 +45,7 @@ export class MessageDetails {
     return JSON.stringify(msgCopy, null, 2);
   });
 
-  constructor(destroyRef: DestroyRef) {
+  constructor(destroyRef: DestroyRef, private readonly logger: LoggerService) {
     this.hideCopiedSuccessfullySubject.pipe(
       takeUntilDestroyed(destroyRef),
       switchMap(() => {
@@ -66,7 +67,7 @@ export class MessageDetails {
         this.showCopiedSuccessfully = true;
         this.hideCopiedSuccessfullySubject.next();
       })
-      .catch((err) => console.error('Failed to copy: ', err));
+      .catch((err) => this.logger.error('Failed to copy: ', err));
   }
 
   onSaveAsFileClick(): void {
