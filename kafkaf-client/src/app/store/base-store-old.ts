@@ -1,29 +1,15 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, signal, WritableSignal } from '@angular/core';
 import { forkJoin, Observable, tap } from 'rxjs';
+import { BaseState_OLD, ItemIdPK, PageState } from './models';
 
-export interface BaseState<T> {
-  itemsMap: Map<number, T[]>;
-  clusterIdx: number;
-  loading?: boolean | null;
-  error?: string | null;
-  notice?: string | null;
-}
 
-export interface PageState {
-  loading?: boolean | null;
-  error?: string | null;
-  notice?: string | null;
-}
-
-export type ItemIdPK = string | number;
-
-export abstract class BaseStore<T> {
+export abstract class BaseStore_OLD<T> {
   protected readonly http = inject(HttpClient);
-  protected readonly state: WritableSignal<BaseState<T>>;
+  protected readonly state: WritableSignal<BaseState_OLD<T>>;
 
-  constructor(initialState?: Partial<BaseState<T>>) {
-    this.state = signal<BaseState<T>>({
+  constructor(initialState?: Partial<BaseState_OLD<T>>) {
+    this.state = signal<BaseState_OLD<T>>({
       itemsMap: new Map<number, T[]>(),
       clusterIdx: NaN,
       loading: false,
@@ -228,3 +214,4 @@ export abstract class BaseStore<T> {
     );
   }
 }
+

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { PageState } from '../../services/base-store';
+import { PageState } from '../../store/models';
 
 type SpinnerFontSize = 1 | 2 | 3 | 4;
 

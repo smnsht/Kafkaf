@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { PageState } from './base-store';
+import { PageState } from '../store/models';
 
 export interface BrokerInfoRow {
   brokerID: number;

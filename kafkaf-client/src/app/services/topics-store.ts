@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { forkJoin } from 'rxjs';
 import { TopicsListViewModel } from '../response.models';
-import { BaseStore } from './base-store';
+import { BaseStore_OLD } from '../store/base-store-old';
 
 interface TopicsState {
   topicsMap: Map<number, TopicsListViewModel[]>;
@@ -20,7 +20,7 @@ const initialState: TopicsState = {
 @Injectable({
   providedIn: 'root',
 })
-export class TopicsStore extends BaseStore<TopicsListViewModel> {
+export class TopicsStore extends BaseStore_OLD<TopicsListViewModel> {
   constructor() {
     super(initialState);
   }
