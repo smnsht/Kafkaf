@@ -21,6 +21,7 @@ public class BrokersInfoViewModel
 
 				return row;
 			})
+			.OrderBy(row => row.BrokerID)
 			.ToArray();
 	}
 }

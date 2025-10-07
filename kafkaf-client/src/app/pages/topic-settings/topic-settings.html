@@ -1,24 +1,20 @@
-aa
-
-<table appKafkafTable>
-	<thead>
-		<tr>
-			<th>Key</th>
-			<th>Value</th>
-			<th>Default Value</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>a</td>
-			<td>b</td>
-			<td>c</td>
-		</tr>
-		<tr>
-			<td>2a</td>
-			<td>2b</td>
-			<td>2c</td>
-		</tr>
-	</tbody>
-</table>
-
+<app-page-wrapper [error]="store.errorSettings()" [loading]="store.loadingSettings()">
+  <table appKafkafTable>
+    <thead>
+      <tr>
+        <th>Key</th>
+        <th>Value</th>
+        <th>Default Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of store.settings(); track $index) {
+      <tr>
+        <td>{{ row.name }}</td>
+        <td>{{ row.value }}</td>
+        <td>{{ row.defaultValue }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</app-page-wrapper>

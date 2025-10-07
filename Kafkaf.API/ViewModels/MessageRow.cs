@@ -4,7 +4,7 @@ using Confluent.Kafka;
 
 namespace Kafkaf.API.ViewModels;
 
-public record ReadMessagesViewModel(
+public record MessageRow(
 	long offset,
 	int partition,
 	Timestamp timestamp,
@@ -13,7 +13,7 @@ public record ReadMessagesViewModel(
 	string? headers
 )
 {
-	public ReadMessagesViewModel(ConsumeResult<byte[]?, byte[]?> cr)
+	public MessageRow(ConsumeResult<byte[]?, byte[]?> cr)
 		: this(
 			offset: cr.Offset.Value,
 			partition: cr.Partition,
@@ -37,9 +37,9 @@ public record ReadMessagesViewModel(
 			});
 		}
 	}
-
-	public static IEnumerable<ReadMessagesViewModel> FromResults(List<ConsumeResult<byte[]?, byte[]?>> results) =>
-		results.Select(result => new ReadMessagesViewModel(result));
+	
+	public static MessageRow FromResult(ConsumeResult<byte[]?, byte[]?> result) =>
+		new MessageRow(result);
 
 	internal static string _str(byte[]? bytes) =>
 		bytes is null ? string.Empty : Encoding.UTF8.GetString(bytes);

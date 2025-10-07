@@ -28,7 +28,10 @@ public class TopicController : ControllerBase
 	/// <param name="topicName"></param>
 	/// <returns></returns>
 	[HttpGet]
-	public async Task<ActionResult<string>> GetAsync(int clusterIdx, string topicName)
+	public async Task<ActionResult<TopicDetailsViewModel>> GetTopicDetailsAsync(
+		int clusterIdx,
+		string topicName
+	)
 	{
 		DescribeTopicsResult topicResult = default!;
 		try
@@ -45,7 +48,7 @@ public class TopicController : ControllerBase
 			topicResult.TopicDescriptions.FirstOrDefault()
 			?? throw new InvalidOperationException(
 				$"Topic '{topicName}' was not found in cluster {clusterIdx}."
-			);		
+			);
 
 		var partitionOffsets = _consumerService.GetWatermarkOffsets(
 			clusterIdx,
@@ -53,9 +56,35 @@ public class TopicController : ControllerBase
 			desc.Partitions.Select(p => p.Partition).ToArray()
 		);
 
-		var topicConfigs = new TopicDetailsViewModel(desc, partitionOffsets);
+		var topicDetails = new TopicDetailsViewModel(desc, partitionOffsets);
 
-		return Ok(topicConfigs);
+		return Ok(topicDetails);
+	}
+
+	[HttpGet("settings")]
+	public async Task<ActionResult<TopicSettingRow[]>> GetTopicSettingsAsync(
+		int clusterIdx,
+		string topicName
+	)
+	{
+		var topicConfig = await _topicsService.DescribeTopicConfigsAsync(clusterIdx, topicName);
+
+		if (topicConfig is DescribeConfigsResult configs)
+		{
+			return Ok(TopicSettingRow.FromResult(configs));
+		}
+
+		return NotFound($"Can't get configs for topic");
+	}
+
+	[HttpGet("consumers")]
+	public async Task<ActionResult<ConsumerGroupListing[]>> GetTopicConsumersAsync(
+		int clusterIdx,
+		string topicName
+	)
+	{
+		var consumerGroups = await _topicsService.GetTopicConsumersAsync(clusterIdx, topicName);
+		return Ok(consumerGroups.Select(ConsumerGroupRow.FromConsumerGroupListing));
 	}
 
 	/// <summary>
@@ -72,7 +101,7 @@ public class TopicController : ControllerBase
 			await _topicsService.DeleteTopicAsync(clusterIdx, topicName);
 			return Ok();
 		}
-		catch(DeleteTopicsException dte) when (dte.Message.Contains("Unknown topic or partition"))
+		catch (DeleteTopicsException dte) when (dte.Message.Contains("Unknown topic or partition"))
 		{
 			return NotFound(dte.Message);
 		}

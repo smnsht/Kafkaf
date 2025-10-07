@@ -1,0 +1,12 @@
+<div class="field">
+  <label class="label">{{ label() }}</label>
+  <div class="control">
+    <div class="select is-fullwidth">
+      <select [ngModel]="serde()" (ngModelChange)="serde.set($event)">
+        @for (serde of options; track $index) {
+        <option [value]="serde">{{ serde }}</option>
+        }
+      </select>
+    </div>
+  </div>
+</div>

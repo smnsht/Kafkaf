@@ -1,1 +1,37 @@
-<p>consumers works!</p>
+<app-page-wrapper>
+  <h1 class="title is-size-4">Consumers</h1>
+
+  <div class="columns">
+    <div class="column is-one-third">
+      <div class="control has-icons-left">
+        <input class="input" type="search" placeholder="Search by Consumer Group ID" />
+        <span class="icon is-small is-left">
+          <i class="fas fa-search"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <table appKafkafTable>
+    <thead>
+      <tr>
+        <th>Group ID</th>
+        <th>Num Of Members</th>
+        <th>Num Of Topics</th>
+        <th>Consumer Lag</th>
+        <th>Coordinator</th>
+        <th>State</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>TODO</td>
+        <td>TODO</td>
+        <td>TODO</td>
+        <td>TODO</td>
+        <td>TODO</td>
+        <td>TODO</td>
+      </tr>
+    </tbody>
+  </table>
+</app-page-wrapper>

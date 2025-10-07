@@ -1,0 +1,63 @@
+<p class="has-text-weight-bold mt-4 mb-4">Custom parameters</p>
+
+@if (topicForm() && customParameters()) {
+<form [formGroup]="topicForm()!">
+  <ng-container formArrayName="customParameters">
+    @for (pair of customParameters()?.controls; track $index; let i = $index) {
+    <div class="columns" [formGroupName]="i">
+      <div class="column is-one-fifth">
+        <bulma-field
+          label="Custom Parameter"
+          [for]="idForSelect($index)"
+          [control]="pair.get('key')"
+        >
+          <div class="select is-fullwidth">
+            <select [id]="idForSelect($index)" formControlName="key">
+              <option value="1">1 GB</option>
+              <option value="10">10 GB</option>
+              <option value="20">20 GB</option>
+              <option value="50">50 GB</option>
+            </select>
+          </div>
+        </bulma-field>
+      </div>
+
+      <div class="column is-one-fifth">
+        <bulma-field label="Value" [for]="idForInput($index)" [control]="pair.get('value')">
+          <input
+            class="input"
+            type="text"
+            placeholder="Value"
+            [id]="idForInput($index)"
+            formControlName="value"
+          />
+        </bulma-field>
+      </div>
+
+      <div class="column is-one-fifth">
+        <div class="label">&nbsp;</div>
+        <div class="control">
+          <button
+            class="button"
+            [title]="'Delete custom parameter #' + $index"
+            (click)="removePair($index)"
+          >
+            <span class="icon is-small">
+              <i class="fas fa-xmark-circle"></i>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+  </ng-container>
+</form>
+
+<button class="button is-primary mb-4 mt-4" (click)="addCustomParameter()">
+  <span class="icon">
+    <i class="fas fa-plus"></i>
+  </span>
+  <span>Add Custom Parameter</span>
+</button>
+
+}

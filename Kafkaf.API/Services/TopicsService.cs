@@ -24,6 +24,26 @@ public class TopicsService
 		return await adminClient.DescribeTopicsAsync(topics);
 	}
 
+	public async Task<DescribeConfigsResult> DescribeTopicConfigsAsync(
+		int clusterIdx,
+		string topicName
+	)
+	{
+		var adminClient = _clientPool.GetClient(clusterIdx);
+		var topicResource = new ConfigResource() { Name = topicName, Type = ResourceType.Topic };
+		var config = await adminClient.DescribeConfigsAsync([topicResource]);
+		return config[0];
+	}
+
+
+	public async Task<ConsumerGroupListing[]> GetTopicConsumersAsync(int clusterIdx, string topicName)
+	{
+		var adminClient = _clientPool.GetClient(clusterIdx);
+		var consumerGroups = await adminClient.ListConsumerGroupsAsync();
+
+		return consumerGroups.Valid.ToArray();		
+	}
+
 	public async Task CreateTopicsAsync(
 		int clusterIdx,
 		TopicSpecification topic,
@@ -84,12 +104,7 @@ public class TopicsService
 
 		await adminClient.DeleteTopicsAsync(
 			[topic],
-			new DeleteTopicsOptions()
-			{
-				OperationTimeout = timeout,
-				RequestTimeout = timeout,
-			}
+			new DeleteTopicsOptions() { OperationTimeout = timeout, RequestTimeout = timeout }
 		);
-
 	}
 }

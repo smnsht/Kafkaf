@@ -6,7 +6,7 @@ using Kafkaf.API.Services;
 
 namespace Kafkaf.API
 {
-	public class Program
+	public static class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -33,6 +33,16 @@ namespace Kafkaf.API
 			{
 				options.ConstraintMap.Add("clusterIndex", typeof(ClusterIndexConstraint));
 				options.ConstraintMap.Add("topicName", typeof(KafkaTopicConstraint));
+			});
+
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy(name: "dev", policy =>
+				{
+					policy.WithOrigins("http://localhost:4200", "https://localhost:4200");
+					policy.AllowAnyHeader();
+					policy.AllowAnyMethod();
+				});
 			});
 
 			builder.Services.AddControllers();
@@ -64,8 +74,9 @@ namespace Kafkaf.API
 				});
 			}
 
-			app.UseAuthorization();
+			app.UseCors("dev");
 
+			app.UseAuthorization();
 
 			app.MapControllers();
 
