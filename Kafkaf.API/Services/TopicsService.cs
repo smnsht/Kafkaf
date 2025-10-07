@@ -41,24 +41,7 @@ public class TopicsService
 		var adminClient = _clientPool.GetClient(clusterIdx);
 		var consumerGroups = await adminClient.ListConsumerGroupsAsync();
 
-		return consumerGroups.Valid.ToArray();
-		//if (consumerGroups != null)
-		//{
-		//	foreach (var group in consumerGroups)
-		//	{
-		//		var describedGroup = await adminClient.DescribeConsumerGroupsAsync(new[] { group.GroupId });
-
-		//		foreach (var member in describedGroup.First().Members)
-		//		{
-		//			// Check if this member is assigned partitions of the target topic
-		//			// This often involves inspecting the 'Assignment' property of the member
-		//			// and looking for partitions belonging to 'topicName'.
-		//			// The exact structure of 'Assignment' might require further parsing.
-		//		}
-		//	}
-
-		//}
-
+		return consumerGroups.Valid.ToArray();		
 	}
 
 	public async Task CreateTopicsAsync(

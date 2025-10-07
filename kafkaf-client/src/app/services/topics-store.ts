@@ -56,7 +56,7 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
   purgeMessages(topicNames: string[]): Promise<void> {
     const clusterIdx = this.clusterIdx();
 
-    var requests = topicNames.map((topic) => {
+    const requests = topicNames.map((topic) => {
       const topicUrl = this.resourceItemUrl(clusterIdx, topic);
       return this.http.delete<number>(`${topicUrl}/messages`);
     });
