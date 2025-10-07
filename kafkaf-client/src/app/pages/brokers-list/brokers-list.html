@@ -1,4 +1,4 @@
-<app-page-wrapper [state]="pageState()">
+<app-page-wrapper [state]="store.pageState()">
   <h1 class="title is-size-4">Brokers</h1>
 
   <app-stats-card [cardItems]="cardItems()" [placeholderCount]="1" />
@@ -20,7 +20,7 @@
       >
         <td>
           {{ row.brokerID }}
-          @if( row.brokerID == brokersInfo()?.controller ){
+          @if( row.brokerID == controller() ){
           <span class="icon has-text-success" title="Active controller">
             <i class="fas fa-check-square"></i>
           </span>

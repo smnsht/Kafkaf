@@ -26,7 +26,9 @@ export abstract class BaseStore<T> {
   protected abstract getItemKey(item: T): string | number;
 
   // Common getters
+  readonly wholeState = computed(() => this.state());
   readonly items = computed(() => this.state().items);
+  readonly item = computed(() => this.state().item);
   readonly clusterIdx = computed(() => this.state().clusterIdx);
   readonly loading = computed(() => this.state().loading);
   readonly error = computed(() => this.state().error);
@@ -36,6 +38,10 @@ export abstract class BaseStore<T> {
     const { loading, error, notice } = this.state();
     return { loading, error, notice };
   });
+
+  setState(state: BaseState<T>): void {
+    this.state.set(state);
+  }
 
   setLoading(loading: boolean): void {
     this.state.update((state) => ({
@@ -80,7 +86,7 @@ export abstract class BaseStore<T> {
   loadCollection(override = false): boolean {
     const clusterIdx = this.clusterIdx();
 
-    if (clusterIdx <= 0) {
+    if (!(clusterIdx >= 0)) {
       return false;
     }
 
@@ -95,6 +101,27 @@ export abstract class BaseStore<T> {
     }));
 
     this.fetchItems(clusterIdx);
+    return true;
+  }
+
+  loadItem(pk: ItemIdPK, override = false): boolean {
+    const clusterIdx = this.clusterIdx();
+
+    if (!(clusterIdx >= 0)) {
+      return false;
+    }
+
+    if (this.item() && !override) {
+      return false;
+    }
+
+    this.state.update((state) => ({
+      ...state,
+      loading: true,
+      error: undefined,
+    }));
+
+    this.fetchItem(clusterIdx, pk);
     return true;
   }
 
@@ -121,6 +148,33 @@ export abstract class BaseStore<T> {
           return {
             ...state,
             items,
+            clusterIdx,
+            loading: false,
+          };
+        });
+      },
+      error: (err: HttpErrorResponse) => {
+        this.logger.error(err.message, err);
+
+        this.setPageState({
+          loading: false,
+          error: err.message,
+        });
+      },
+    });
+  }
+
+  protected fetchItem(clusterIdx: number, pk: ItemIdPK): void {
+    const url = this.resourceItemUrl(clusterIdx, pk);
+
+    this.http.get<T>(url).subscribe({
+      next: (item) => {
+        this.logger.debug('[store fetchItem]: ', item);
+
+        this.state.update((state) => {
+          return {
+            ...state,
+            item,
             clusterIdx,
             loading: false,
           };

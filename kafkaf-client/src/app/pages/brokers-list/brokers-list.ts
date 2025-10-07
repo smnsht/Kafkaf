@@ -1,10 +1,9 @@
-import { Component, computed, signal, Signal } from '@angular/core';
+import { Component, computed, effect, OnInit } from '@angular/core';
 import { StatsCard, StatsCardItem } from '../../components/stats-card/stats-card';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { KafkafTable } from '../../directives/kafkaf-table';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
-import { BrokersInfoView, BrokersStore } from '../../services/brokers-store';
-import { PageState } from '../../store/models';
+import { BrokersStore, provideBrokersStore } from '../../store/brokers-store';
 
 const defaultCardItems: ReadonlyArray<StatsCardItem> = [
   { label: 'Broker Count', value: 0, icon: 'danger' },
@@ -20,52 +19,41 @@ const defaultCardItems: ReadonlyArray<StatsCardItem> = [
   selector: 'app-brokers-list',
   standalone: true,
   imports: [StatsCard, KafkafTable, PageWrapper],
+  providers: [provideBrokersStore()],
   templateUrl: './brokers-list.html',
   styleUrl: './brokers-list.scss',
 })
 export class BrokersList {
-  pageState: Signal<PageState>;
-  brokersInfo: Signal<BrokersInfoView | undefined>;
-
-  brokers = computed(() => {
-    const info = this.brokersInfo();
-    return info?.brokers ?? [];
-  });
+  brokers = computed(() => this.store.item()?.brokers ?? []);
+  controller = computed(() => this.store.item()?.controller);
 
   cardItems = computed(() => {
-    const info = this.brokersInfo();
+    const brokersInfo = this.store.item();
     const cardItems = [...defaultCardItems];
 
-    if (info != null) {
+    if (brokersInfo != null) {
       // Broker Count
       cardItems[0] = {
         ...cardItems[0],
-        value: info.brokers.length,
-        icon: info.brokers.length == 0 ? 'danger' : undefined,
+        value: brokersInfo.brokers.length,
+        icon: brokersInfo.brokers.length == 0 ? 'danger' : undefined,
       };
 
       // Active Controller
       cardItems[1] = {
         ...cardItems[1],
-        value: info.controller,
+        value: brokersInfo.controller,
         icon: undefined,
       };
     }
     return cardItems;
   });
 
-  constructor(private router: Router, store: BrokersStore, route: ActivatedRoute) {
-    const clusterIdxSignal = signal(NaN);
-
-    this.pageState = store.pageState;
-    this.brokersInfo = store.brokersInfoFor(clusterIdxSignal);
-
-    route.paramMap.subscribe((params) => {
-      const cluster = params.get('cluster') ?? '';
-      const clusterIdx = parseInt(cluster);
-
-      clusterIdxSignal.set(clusterIdx);
-      store.loadBrokers(clusterIdx);
+  constructor(private router: Router, readonly store: BrokersStore) {
+    effect(() => {
+      if (!isNaN(store.clusterIdx())) {
+        store.loadBrokers();
+      }
     });
   }
 

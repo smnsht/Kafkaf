@@ -8,6 +8,7 @@ export interface BaseState_OLD<T> {
 
 export interface BaseState<T> {
   items: T[];
+  item?: T;
   clusterIdx: number;
   loading?: boolean | null;
   error?: string | null;
@@ -21,3 +22,14 @@ export interface PageState {
 }
 
 export type ItemIdPK = string | number;
+
+export interface BrokerInfoRow {
+  brokerID: number;
+  port: number;
+  host: string;
+}
+
+export interface BrokersInfoView {
+  controller: number;
+  brokers: BrokerInfoRow[];
+}
