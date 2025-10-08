@@ -18,6 +18,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(),
     { provide: TitleStrategy, useClass: KafkafTitleStrategy },
-    { provide: LoggerService, useFactory: () => new LoggerService(environment.logLevel) },
+    { provide: LoggerService, useFactory: () => new LoggerService(environment.logLevel) }
   ],
 };

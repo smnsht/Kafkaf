@@ -1,9 +1,9 @@
-import { Component, computed, effect, OnInit } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { StatsCard, StatsCardItem } from '../../components/stats-card/stats-card';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { KafkafTable } from '../../directives/kafkaf-table';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
-import { BrokersStore, provideBrokersStore } from '../../store/brokers-store';
+import { BrokersStore } from '../../store/brokers-store';
 
 const defaultCardItems: ReadonlyArray<StatsCardItem> = [
   { label: 'Broker Count', value: 0, icon: 'danger' },
@@ -19,41 +19,41 @@ const defaultCardItems: ReadonlyArray<StatsCardItem> = [
   selector: 'app-brokers-list',
   standalone: true,
   imports: [StatsCard, KafkafTable, PageWrapper],
-  providers: [provideBrokersStore()],
   templateUrl: './brokers-list.html',
   styleUrl: './brokers-list.scss',
 })
 export class BrokersList {
-  brokers = computed(() => this.store.item()?.brokers ?? []);
-  controller = computed(() => this.store.item()?.controller);
-
   cardItems = computed(() => {
-    const brokersInfo = this.store.item();
+    const brokers = this.store.currentItems();
     const cardItems = [...defaultCardItems];
 
-    if (brokersInfo != null) {
+    if (brokers) {
       // Broker Count
       cardItems[0] = {
         ...cardItems[0],
-        value: brokersInfo.brokers.length,
-        icon: brokersInfo.brokers.length == 0 ? 'danger' : undefined,
+        value: brokers.length,
+        icon: brokers.length == 0 ? 'danger' : undefined,
       };
 
       // Active Controller
       cardItems[1] = {
         ...cardItems[1],
-        value: brokersInfo.controller,
+        value: brokers[0]?.controller,
         icon: undefined,
       };
     }
     return cardItems;
   });
 
-  constructor(private router: Router, readonly store: BrokersStore) {
-    effect(() => {
-      if (!isNaN(store.clusterIdx())) {
-        store.loadBrokers();
-      }
+  constructor(
+    private readonly router: Router,
+    readonly store: BrokersStore,
+    route: ActivatedRoute
+  ) {
+    route.paramMap.subscribe((params) => {
+      const cluster = parseInt(params.get('cluster')!);
+      store.selectCluster(cluster);
+      store.loadCollection();
     });
   }
 

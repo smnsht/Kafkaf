@@ -2,16 +2,14 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, signal, WritableSignal } from '@angular/core';
 import { forkJoin, Observable, tap } from 'rxjs';
 import { BaseState, ItemIdPK, PageState } from './models';
-import { LoggerService } from '../services/logger.service';
 
 export abstract class BaseStore<T> {
   protected readonly http = inject(HttpClient);
-  protected readonly logger = inject(LoggerService);
   protected readonly state: WritableSignal<BaseState<T>>;
 
   constructor(initialState?: Partial<BaseState<T>>) {
     this.state = signal<BaseState<T>>({
-      items: new Array<T>(),
+      itemsMap: new Map<number, T[]>(),
       clusterIdx: NaN,
       loading: false,
       error: undefined,
@@ -26,22 +24,23 @@ export abstract class BaseStore<T> {
   protected abstract getItemKey(item: T): string | number;
 
   // Common getters
-  readonly wholeState = computed(() => this.state());
-  readonly items = computed(() => this.state().items);
-  readonly item = computed(() => this.state().item);
+  readonly itemsMap = computed(() => this.state().itemsMap);
   readonly clusterIdx = computed(() => this.state().clusterIdx);
   readonly loading = computed(() => this.state().loading);
   readonly error = computed(() => this.state().error);
   readonly notice = computed(() => this.state().notice);
+
+  readonly keys = computed(() => Array.from(this.state().itemsMap.keys()));
 
   readonly pageState = computed<PageState>(() => {
     const { loading, error, notice } = this.state();
     return { loading, error, notice };
   });
 
-  setState(state: BaseState<T>): void {
-    this.state.set(state);
-  }
+  readonly currentItems = computed(() => {
+    const { itemsMap, clusterIdx } = this.state();
+    return itemsMap.get(clusterIdx);
+  });
 
   setLoading(loading: boolean): void {
     this.state.update((state) => ({
@@ -83,110 +82,65 @@ export abstract class BaseStore<T> {
     }
   }
 
-  loadCollection(override = false): boolean {
+  clearCurrentCluster(): void {
     const clusterIdx = this.clusterIdx();
 
-    if (!(clusterIdx >= 0)) {
-      return false;
+    if (clusterIdx >= 0) {
+      this.state.update((state) => {
+        const { itemsMap } = state;
+        itemsMap.delete(clusterIdx);
+
+        return { ...state, itemsMap };
+      });
     }
-
-    if (this.items().length > 0 && !override) {
-      return false;
-    }
-
-    this.state.update((state) => ({
-      ...state,
-      loading: true,
-      error: undefined,
-    }));
-
-    this.fetchItems(clusterIdx);
-    return true;
   }
 
-  loadItem(pk: ItemIdPK, override = false): boolean {
+  loadCollection(): boolean {
+    const keys = this.keys();
     const clusterIdx = this.clusterIdx();
 
-    if (!(clusterIdx >= 0)) {
-      return false;
+    if (clusterIdx >= 0 && !keys.includes(clusterIdx)) {
+      this.state.update((state) => ({
+        ...state,
+        loading: true,
+        error: undefined,
+      }));
+
+      this.fetchCollection(clusterIdx);
+      return true;
     }
 
-    if (this.item() && !override) {
-      return false;
-    }
-
-    this.state.update((state) => ({
-      ...state,
-      loading: true,
-      error: undefined,
-    }));
-
-    this.fetchItem(clusterIdx, pk);
-    return true;
+    return false;
   }
 
   removeItem(itemId: ItemIdPK, reload = false, successNotice?: string): Observable<void> {
     this.setPageState({ loading: true });
-
     return this.deleteItem(this.clusterIdx(), itemId, reload, successNotice);
   }
 
   removeItems(ids: ItemIdPK[], reload = false): Observable<void[]> {
     this.setPageState({ loading: true });
-
     return this.deleteMany(this.clusterIdx(), ids, reload);
   }
 
-  protected fetchItems(clusterIdx: number): void {
+  protected fetchCollection(clusterIdx: number): void {
     const url = this.resourceUrl(clusterIdx);
 
     this.http.get<T[]>(url).subscribe({
-      next: (items) => {
-        this.logger.debug('[store fetchItems]: ', items);
-
+      next: (data) => {
         this.state.update((state) => {
+          const { itemsMap } = state;
+          itemsMap.set(clusterIdx, data);
           return {
             ...state,
-            items,
+            itemsMap,
             clusterIdx,
             loading: false,
           };
         });
       },
       error: (err: HttpErrorResponse) => {
-        this.logger.error(err.message, err);
-
-        this.setPageState({
-          loading: false,
-          error: err.message,
-        });
-      },
-    });
-  }
-
-  protected fetchItem(clusterIdx: number, pk: ItemIdPK): void {
-    const url = this.resourceItemUrl(clusterIdx, pk);
-
-    this.http.get<T>(url).subscribe({
-      next: (item) => {
-        this.logger.debug('[store fetchItem]: ', item);
-
-        this.state.update((state) => {
-          return {
-            ...state,
-            item,
-            clusterIdx,
-            loading: false,
-          };
-        });
-      },
-      error: (err: HttpErrorResponse) => {
-        this.logger.error(err.message, err);
-
-        this.setPageState({
-          loading: false,
-          error: err.message,
-        });
+        this.setPageState({ loading: false, error: err.message });
       },
     });
   }
@@ -203,20 +157,18 @@ export abstract class BaseStore<T> {
       tap(() => {
         if (reload) {
           // Option 1: reload the whole collection
-          this.logger.debug('[store deleteItem]: will reload collection');
-
-          this.fetchItems(clusterIdx);
+          this.fetchCollection(clusterIdx);
         } else {
           // Option 2: update state locally
-          this.logger.debug('[store deleteItem]: will update state locally');
-
           this.state.update((state) => {
-            const items = state.items.filter((x: any) => this.getItemKey(x) !== itemId);
+            const { itemsMap } = state;
+            const existing = (itemsMap.get(clusterIdx) as T[]) ?? [];
+            const updated = existing.filter((x: any) => this.getItemKey(x) !== itemId);
 
-            //itemsMap.set(clusterIdx, updated);
+            itemsMap.set(clusterIdx, updated);
             return {
               ...state,
-              items,
+              itemsMap,
               notice: successNotice,
               loading: false,
             };
@@ -240,22 +192,19 @@ export abstract class BaseStore<T> {
         const notice = `${itemIds.length} items deleted successfully`;
 
         if (reload) {
-          this.logger.debug('[store deleteMany]: will reload collection');
-
-          this.fetchItems(clusterIdx);
-
+          this.fetchCollection(clusterIdx);
           this.state.update((state) => {
             return { ...state, notice, loading: false };
           });
         } else {
-          this.logger.debug('[store deleteMany]: will update state locally');
-
           this.state.update((state) => {
-            const items = state.items.filter((x) => !itemIds.includes(this.getItemKey(x)));
-
+            const { itemsMap } = state;
+            const existing = (itemsMap.get(clusterIdx) as T[]) ?? [];
+            const updated = existing.filter((x) => !itemIds.includes(this.getItemKey(x)));
+            itemsMap.set(clusterIdx, updated);
             return {
               ...state,
-              items,
+              itemsMap,
               notice,
               loading: false,
             };
@@ -265,3 +214,4 @@ export abstract class BaseStore<T> {
     );
   }
 }
+

@@ -1,22 +1,23 @@
 import { Routes } from '@angular/router';
 import { clusterBrokerGuardFn, clusterGuardFn } from './app.guards';
 
-import { Dashboard } from './pages/dashboard/dashboard';
-import { Consumers } from './pages/consumers/consumers';
-import { BrokersList } from './pages/brokers-list/brokers-list';
-import { TopicsList } from './pages/topics-list/topics-list';
-import { TopicDetails } from './pages/topic-details/topic-details';
-import { TopicMessages } from './pages/topic-messages/topic-messages';
-import { TopicConsumers } from './pages/topic-consumers/topic-consumers';
-import { TopicSettings } from './pages/topic-settings/topic-settings';
-import { TopicStatistics } from './pages/topic-statistics/topic-statistics';
-import { BrokerDetails } from './pages/broker-details/broker-details';
-import { BrokerConfigs } from './pages/broker-configs/broker-configs';
-import { BrokerMetrics } from './pages/broker-metrics/broker-metrics';
-import { BrokerLogDirectories } from './pages/broker-log-directories/broker-log-directories';
-import { TopicOverview } from './pages/topic-overview/topic-overview';
-import { TopicsCreate } from './pages/topics-create/topics-create';
-
+import {
+  BrokerConfigs,
+  BrokerDetails,
+  BrokerLogDirectories,
+  BrokerMetrics,
+  BrokersList,
+  Consumers,
+  Dashboard,
+  TopicConsumers,
+  TopicDetails,
+  TopicMessages,
+  TopicOverview,
+  TopicsCreate,
+  TopicSettings,
+  TopicsList,
+  TopicStatistics,
+} from './pages';
 
 export const routes: Routes = [
   { path: '', component: Dashboard },

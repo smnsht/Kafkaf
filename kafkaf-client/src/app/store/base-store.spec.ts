@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-import { BaseStore_OLD } from './base-store-old';
+import { BaseStore } from './base-store';
 
 
 
-describe('BaseStore_OLD', () => {
-  let service: BaseStore_OLD<undefined>;
+describe('BaseStore', () => {
+  let service: BaseStore<undefined>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(BaseStore_OLD);
+    service = TestBed.inject(BaseStore);
   });
 
   it('should be created', () => {
