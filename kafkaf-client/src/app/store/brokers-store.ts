@@ -1,7 +1,15 @@
 import { computed, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { BrokerInfoRow, ItemIdPK } from '../store/models';
+import { ItemIdPK } from '../store/models';
 import { BaseStore } from './base-store';
+
+
+export interface BrokerInfoRow {
+  brokerID: number;
+  port: number;
+  host: string;
+  controller: number;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +26,7 @@ export class BrokersStore extends BaseStore<BrokerInfoRow> {
   }
 
   protected override resourceItemUrl(clusterIdx: number, brokerId: ItemIdPK): string {
-    return `${environment.apiUrl}/clusters/${clusterIdx}/brokers/${brokerId}`;
+    return `${this.resourceUrl(clusterIdx)}/${brokerId}`;
   }
 
   protected override getItemKey(item: BrokerInfoRow): string | number {

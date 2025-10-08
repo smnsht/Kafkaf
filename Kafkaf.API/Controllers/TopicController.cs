@@ -98,7 +98,8 @@ public class TopicController : ControllerBase
 	{
 		try
 		{
-			await _topicsService.DeleteTopicAsync(clusterIdx, topicName);
+			//await _topicsService.DeleteTopicAsync(clusterIdx, topicName);
+			await Task.Delay(10);
 			return Ok();
 		}
 		catch (DeleteTopicsException dte) when (dte.Message.Contains("Unknown topic or partition"))

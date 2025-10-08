@@ -96,6 +96,7 @@
         <td>
           <topics-dropdown-menu
             [topicName]="topic.topicName"
+            [disabled]="topic.isInternal"
             (commandSelected)="onCommandSelected($event, topic)"
           />
         </td>

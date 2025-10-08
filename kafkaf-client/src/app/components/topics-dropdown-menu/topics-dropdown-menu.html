@@ -1,0 +1,20 @@
+@if(disabled()) {
+<span class="icon" style="color: gainsboro">
+  <i class="fas fa-ellipsis-vertical"></i>
+</span>
+} @else {
+<dropdown-menu>
+  <a (click)="onCommandClick($event, 'ClearMessages')" class="dropdown-item has-text-danger"
+    >Clear Messages</a
+  >
+  <i class="dropdown-item is-size-7"
+    >Clearing messages is only allowed for topics with DELETE policy</i
+  >
+  <a (click)="onCommandClick($event, 'RecreateTopic')" class="dropdown-item has-text-danger"
+    >Recreate Topic</a
+  >
+  <a (click)="onCommandClick($event, 'RemoveTopic')" class="dropdown-item has-text-danger"
+    >Remove Topic</a
+  >
+</dropdown-menu>
+}

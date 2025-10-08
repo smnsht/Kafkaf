@@ -1,11 +1,12 @@
 import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { KafkafTable } from '../../directives/kafkaf-table';
-import { TopicsStore } from '../../services/topics-store';
-import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
-import {  DropdownMenuCommand, TopicsDropdownMenu } from "../../components/dropdown-menu/dropdown-menu";
+import { TopicsDropdownMenu, PageWrapper } from '../../components/index';
 import { TopicsListViewModel } from '../../response.models';
+import { TopicsStore } from '../../store/topics-store';
+import { DropdownMenuCommand } from '../../components/dropdown-menu/dropdown-menu';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-topics-list',
@@ -36,7 +37,11 @@ export class TopicsList {
     });
   });
 
-  constructor(public store: TopicsStore, route: ActivatedRoute) {
+  constructor(
+    public readonly store: TopicsStore,
+    private readonly router: Router,
+    route: ActivatedRoute
+  ) {
     route.paramMap.subscribe((params) => {
       const clusterIdx = parseInt(params.get('cluster')!);
       store.selectCluster(clusterIdx);
@@ -53,23 +58,115 @@ export class TopicsList {
   }
 
   onDeleteTopicsClick(): void {
-    this.store.deleteTopics(this.selectedTopics).then(() => {
+    this.store.deleteTopics(this.selectedTopics).subscribe(() => {
       this.selectedTopics = [];
     });
   }
 
   onCopyTopicClick(): void {
-    console.log('onCopyTopicClick', this.selectedTopics);
+    try {
+      const topic = this.getTopicByName(this.selectedTopics[0]);
+
+      this.getTopicQueryParams(topic).subscribe((queryParams) => {
+        this.router.navigate([this.router.url, 'create'], { queryParams });
+      });
+    } catch (err: any) {
+      this.store.setError(err.message);
+    }
   }
 
   onPurgeMessagesClick(): void {
-    this.store.purgeMessages(this.selectedTopics).then(() => {
+    this.store.purgeMessages(this.selectedTopics).subscribe((res) => {
+      this.store.setNotice(
+        `Messages purged of ${res.length} ${res.length == 1 ? 'topic' : 'topics'}.`
+      );
       this.selectedTopics = [];
     });
   }
 
-  onCommandSelected(event: DropdownMenuCommand, topic: TopicsListViewModel): void {
-    console.log(event);
-    console.log(topic);
+  onCommandSelected(command: DropdownMenuCommand, topic: TopicsListViewModel): void {
+    switch (command) {
+      case 'ClearMessages':
+        this.selectedTopics = [topic.topicName];
+        this.onPurgeMessagesClick();
+        break;
+
+      case 'RemoveTopic':
+        this.selectedTopics = [topic.topicName];
+        this.onDeleteTopicsClick();
+        break;
+
+      case 'RecreateTopic':
+        this.recreateTopic(topic);
+        break;
+
+      default:
+        this.store.setError(`unknown command ${command}`);
+    }
+  }
+
+  private getTopicByName(topicName: string): TopicsListViewModel {
+    const topic = this.store.currentItems()?.find((topic) => topic.topicName == topicName);
+    if (!topic) {
+      //this.store.setError();
+      throw new Error(`Can't find topic name ${topicName}!`);
+    }
+
+    return topic;
+  }
+
+  private getTopicQueryParams(topic: TopicsListViewModel): Observable<any> {
+    return this.store.loadTopicSettings(topic.topicName).pipe(
+      map((settings) => {
+        const queryParams: any = {
+          name: topic.topicName,
+          numPartitions: topic.partitionsCount,
+          replicationFactor: topic.replicationFactor,
+        };
+
+        settings.forEach((setting) => {
+          switch (setting.name) {
+            case 'cleanup.policy':
+              queryParams['cleanupPolicy'] = setting.value;
+              break;
+
+            case 'min.insync.replicas':
+              queryParams['minInSyncReplicas'] = setting.value;
+              break;
+
+            case 'retention.ms':
+              queryParams['timeToRetain'] = setting.value;
+              break;
+
+            case 'max.message.bytes':
+              queryParams['maxMessageBytes'] = setting.value;
+              break;
+          }
+        });
+
+        return queryParams;
+      })
+    );
+  }
+
+  private recreateTopic(topic: TopicsListViewModel): void {
+    const topicSpecification = {
+        name: topic.topicName + Date.now(),
+        numPartitions: topic.partitionsCount,
+        configs: new Map<string, string>()
+      };
+
+      this.store.loadTopicSettings(topic.topicName).subscribe(settings => {
+        settings.forEach(setting => {
+          if (setting.value != null) {
+            topicSpecification.configs.set(setting.name, setting.value)
+          }
+        });
+
+        this.store.createTopic(topicSpecification).subscribe();
+      });
+
+
+
   }
 }

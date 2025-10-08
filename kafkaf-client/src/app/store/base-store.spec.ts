@@ -1,8 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { BaseStore } from './base-store';
 
-
-
 describe('BaseStore', () => {
   let service: BaseStore<undefined>;
 

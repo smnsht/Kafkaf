@@ -2,9 +2,12 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, signal, WritableSignal } from '@angular/core';
 import { forkJoin, Observable, tap } from 'rxjs';
 import { BaseState, ItemIdPK, PageState } from './models';
+import { LoggerService } from '../services/logger.service';
 
 export abstract class BaseStore<T> {
   protected readonly http = inject(HttpClient);
+  private readonly logger = inject(LoggerService);
+
   protected readonly state: WritableSignal<BaseState<T>>;
 
   constructor(initialState?: Partial<BaseState<T>>) {
@@ -114,12 +117,22 @@ export abstract class BaseStore<T> {
   }
 
   removeItem(itemId: ItemIdPK, reload = false, successNotice?: string): Observable<void> {
-    this.setPageState({ loading: true });
+    this.setPageState({
+      loading: true,
+      notice: undefined,
+      error: undefined,
+    });
+
     return this.deleteItem(this.clusterIdx(), itemId, reload, successNotice);
   }
 
   removeItems(ids: ItemIdPK[], reload = false): Observable<void[]> {
-    this.setPageState({ loading: true });
+    this.setPageState({
+      loading: true,
+      notice: undefined,
+      error: undefined,
+    });
+
     return this.deleteMany(this.clusterIdx(), ids, reload);
   }
 
@@ -140,7 +153,12 @@ export abstract class BaseStore<T> {
         });
       },
       error: (err: HttpErrorResponse) => {
-        this.setPageState({ loading: false, error: err.message });
+        this.logger.error(`[fetchCollection] ${url}:`, err);
+
+        this.setPageState({
+          loading: false,
+          error: err.message,
+        });
       },
     });
   }
@@ -154,26 +172,37 @@ export abstract class BaseStore<T> {
     const url = this.resourceItemUrl(clusterIdx, itemId);
 
     return this.http.delete<void>(url).pipe(
-      tap(() => {
-        if (reload) {
-          // Option 1: reload the whole collection
-          this.fetchCollection(clusterIdx);
-        } else {
-          // Option 2: update state locally
-          this.state.update((state) => {
-            const { itemsMap } = state;
-            const existing = (itemsMap.get(clusterIdx) as T[]) ?? [];
-            const updated = existing.filter((x: any) => this.getItemKey(x) !== itemId);
+      tap({
+        next: () => {
+          if (reload) {
+            // Option 1: reload the whole collection
+            this.fetchCollection(clusterIdx);
+          } else {
+            // Option 2: update state locally
+            this.state.update((state) => {
+              const { itemsMap } = state;
+              const existing = (itemsMap.get(clusterIdx) as T[]) ?? [];
+              const updated = existing.filter((x: any) => this.getItemKey(x) !== itemId);
 
-            itemsMap.set(clusterIdx, updated);
-            return {
-              ...state,
-              itemsMap,
-              notice: successNotice,
-              loading: false,
-            };
+              itemsMap.set(clusterIdx, updated);
+
+              return {
+                ...state,
+                itemsMap,
+                notice: successNotice,
+                loading: false,
+              };
+            });
+          }
+        },
+        error: (err: HttpErrorResponse) => {
+          this.logger.error(`[deleteItem] ${url}:`, err);
+
+          this.setPageState({
+            loading: false,
+            error: err.message,
           });
-        }
+        },
       })
     );
   }
@@ -188,30 +217,39 @@ export abstract class BaseStore<T> {
     );
 
     return forkJoin(requests).pipe(
-      tap(() => {
-        const notice = `${itemIds.length} items deleted successfully`;
+      tap({
+        next: () => {
+          const notice = `${itemIds.length} items deleted successfully`;
 
-        if (reload) {
-          this.fetchCollection(clusterIdx);
-          this.state.update((state) => {
-            return { ...state, notice, loading: false };
+          if (reload) {
+            this.fetchCollection(clusterIdx);
+            this.state.update((state) => {
+              return { ...state, notice, loading: false };
+            });
+          } else {
+            this.state.update((state) => {
+              const { itemsMap } = state;
+              const existing = (itemsMap.get(clusterIdx) as T[]) ?? [];
+              const updated = existing.filter((x) => !itemIds.includes(this.getItemKey(x)));
+              itemsMap.set(clusterIdx, updated);
+              return {
+                ...state,
+                itemsMap,
+                notice,
+                loading: false,
+              };
+            });
+          }
+        },
+        error: (err: HttpErrorResponse) => {
+          this.logger.error('[deleteMany]: ', err);
+
+          this.setPageState({
+            loading: false,
+            error: err.message,
           });
-        } else {
-          this.state.update((state) => {
-            const { itemsMap } = state;
-            const existing = (itemsMap.get(clusterIdx) as T[]) ?? [];
-            const updated = existing.filter((x) => !itemIds.includes(this.getItemKey(x)));
-            itemsMap.set(clusterIdx, updated);
-            return {
-              ...state,
-              itemsMap,
-              notice,
-              loading: false,
-            };
-          });
-        }
+        },
       })
     );
   }
 }
-

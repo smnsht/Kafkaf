@@ -13,10 +13,3 @@ export interface PageState {
 }
 
 export type ItemIdPK = string | number;
-
-export interface BrokerInfoRow {
-  brokerID: number;
-  port: number;
-  host: string;
-  controller: number;
-}

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -17,30 +17,31 @@ import { TopicForm } from '../../components/topic-form/topic-form';
   templateUrl: './topics-create.html',
   styleUrl: './topics-create.scss',
 })
-export class TopicsCreate implements OnInit {
+export class TopicsCreate {
   topicForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, route: ActivatedRoute) {
+    console.log(route.snapshot.queryParamMap);
+    const query = route.snapshot.queryParamMap;
+
+    this.topicForm = this.fb.group({
+      name: [
+        query.get('name'),
+        [Validators.required, Validators.maxLength(255), Validators.pattern(/^[a-zA-Z0-9._-]+$/)],
+      ],
+      numPartitions: [query.get('numPartitions'), Validators.required],
+      cleanupPolicy: [query.get('cleanupPolicy'), Validators.required],
+      minInSyncReplicas: [query.get('minInSyncReplicas')],
+      replicationFactor: [query.get('replicationFactor')],
+      timeToRetain: [query.get('timeToRetain')],
+      maxMessageBytes: [query.get('maxMessageBytes')],
+      retentionBytes: [''],
+      customParameters: this.fb.array([]),
+    });
+  }
 
   get customParameters(): FormArray {
     return this.topicForm?.get('customParameters') as FormArray;
-  }
-
-  ngOnInit(): void {
-    this.topicForm = this.fb.group({
-      name: [
-        '',
-        [Validators.required, Validators.maxLength(255), Validators.pattern(/^[a-zA-Z0-9._-]+$/)],
-      ],
-      numPartitions: [null, Validators.required],
-      cleanupPolicy: [null, Validators.required],
-      minInSyncReplicas: [null],
-      replicationFactor: [null],
-      timeToRetain: [null],
-      retentionBytes: [null],
-      maxMessageBytes: [null],
-      customParameters: this.fb.array([]),
-    });
   }
 
   onCreateTopicClick(): void {
