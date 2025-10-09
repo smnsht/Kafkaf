@@ -1,8 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, signal, WritableSignal } from '@angular/core';
 import { forkJoin, Observable, tap } from 'rxjs';
-import { BaseState, ItemIdPK, PageState, ProblemDetails } from './models';
+import { BaseState, ItemIdPK, PageState } from './models';
 import { LoggerService } from '../services/logger.service';
+import { ProblemDetails } from '../response.models';
 
 export abstract class BaseStore<T> {
   protected readonly http = inject(HttpClient);

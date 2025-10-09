@@ -1,13 +1,14 @@
 import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { concatMap, filter, map, Observable } from 'rxjs';
 import { KafkafTable } from '../../directives/kafkaf-table';
 import { TopicsDropdownMenu, PageWrapper } from '../../components/index';
 import { TopicsListViewModel } from '../../response.models';
 import { TopicsStore } from '../../store/topics-store';
-import { DropdownMenuCommand } from '../../components/dropdown-menu/dropdown-menu';
-import { map, Observable } from 'rxjs';
-import { CreateTopicModel, RecreateTopicModel } from '../../store/request.models';
+import { DropdownMenuEvent } from '../../components/dropdown-menu/dropdown-menu';
+import { CreateTopicModel } from '../../store/request.models';
+import { ConfirmationService } from '../../services/confirmation-service';
 
 @Component({
   selector: 'app-topics-list',
@@ -41,6 +42,7 @@ export class TopicsList {
   constructor(
     public readonly store: TopicsStore,
     private readonly router: Router,
+    private readonly confirmationService: ConfirmationService,
     route: ActivatedRoute
   ) {
     route.paramMap.subscribe((params) => {
@@ -59,9 +61,15 @@ export class TopicsList {
   }
 
   onDeleteTopicsClick(): void {
-    this.store.deleteTopics(this.selectedTopics).subscribe(() => {
-      this.selectedTopics = [];
-    });
+    this.confirmationService
+      .confirm('Confirm Deletion', 'Are you sure you want to delete the selected topics?')
+      .pipe(
+        filter((confirmed) => confirmed),
+        concatMap(() => this.store.deleteTopics(this.selectedTopics))
+      )
+      .subscribe(() => {
+        this.selectedTopics = [];
+      });
   }
 
   onCopyTopicClick(): void {
@@ -79,32 +87,45 @@ export class TopicsList {
   }
 
   onPurgeMessagesClick(): void {
-    this.store.purgeMessages(this.selectedTopics).subscribe((res) => {
-      this.store.setNotice(
-        `Messages purged of ${res.length} ${res.length == 1 ? 'topic' : 'topics'}.`
-      );
-      this.selectedTopics = [];
-    });
+    this.confirmationService
+      .confirm(
+        'Purge Messages',
+        'This will permanently delete all messages from the selected topics. This action cannot be undone. Do you want to continue?'
+      )
+      .pipe(
+        filter((confirmed) => confirmed),
+        concatMap(() => this.store.purgeMessages(this.selectedTopics))
+      )
+      .subscribe((res) => {
+        this.store.setNotice(
+          `Successfully purged messages from ${res.length} ${
+            res.length === 1 ? 'topic' : 'topics'
+          }.`
+        );
+        this.selectedTopics = [];
+      });
   }
 
-  onCommandSelected(command: DropdownMenuCommand, topic: TopicsListViewModel): void {
-    switch (command) {
-      case 'ClearMessages':
-        this.selectedTopics = [topic.topicName];
-        this.onPurgeMessagesClick();
-        break;
+  onCommandSelected(event: DropdownMenuEvent, topic: TopicsListViewModel): void {
+    if (event.confirmed) {
+      switch (event.command) {
+        case 'ClearMessages':
+          this.selectedTopics = [topic.topicName];
+          this.onPurgeMessagesClick();
+          break;
 
-      case 'RemoveTopic':
-        this.selectedTopics = [topic.topicName];
-        this.onDeleteTopicsClick();
-        break;
+        case 'RemoveTopic':
+          this.selectedTopics = [topic.topicName];
+          this.onDeleteTopicsClick();
+          break;
 
-      case 'RecreateTopic':
-        this.recreateTopic(topic);
-        break;
+        case 'RecreateTopic':
+          this.recreateTopic(topic);
+          break;
 
-      default:
-        this.store.setError(`unknown command ${command}`);
+        default:
+          this.store.setError(`unknown command ${event.command}`);
+      }
     }
   }
 

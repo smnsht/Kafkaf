@@ -6,6 +6,11 @@ import { LoggerService } from '../../services/logger.service';
 
 export type DropdownMenuCommand = 'ClearMessages' | 'RecreateTopic' | 'RemoveTopic';
 
+export interface DropdownMenuEvent {
+  command: DropdownMenuCommand;
+  confirmed: boolean;
+}
+
 @Component({
   selector: 'dropdown-menu',
   imports: [CommonModule, ClickOutsideDirective],
@@ -15,7 +20,7 @@ export class DropdownMenu {
   isActive = false;
   isRight = false;
 
-  commandSelected = output<DropdownMenuCommand>();
+  commandSelected = output<DropdownMenuEvent>();
 
   protected readonly confirmationService = inject(ConfirmationService);
   protected readonly logger = inject(LoggerService);
@@ -25,8 +30,8 @@ export class DropdownMenu {
 
     this.confirmationService
       .confirm(this.confirmationTitle, this.getConfirmationBody(command))
-      .subscribe((_) => {
-        this.commandSelected.emit(command);
+      .subscribe((confirmed) => {
+        this.commandSelected.emit({ command, confirmed });
         this.isActive = false;
       });
   }
