@@ -1,12 +1,12 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, signal, WritableSignal } from '@angular/core';
 import { forkJoin, Observable, tap } from 'rxjs';
-import { BaseState, ItemIdPK, PageState } from './models';
+import { BaseState, ItemIdPK, PageState, ProblemDetails } from './models';
 import { LoggerService } from '../services/logger.service';
 
 export abstract class BaseStore<T> {
   protected readonly http = inject(HttpClient);
-  private readonly logger = inject(LoggerService);
+  protected readonly logger = inject(LoggerService);
 
   protected readonly state: WritableSignal<BaseState<T>>;
 
@@ -251,5 +251,24 @@ export abstract class BaseStore<T> {
         },
       })
     );
+  }
+
+  protected handleError(err: HttpErrorResponse): void {
+    let errorMessage = 'An unexpected error occurred';
+
+    // Check if the response body looks like ProblemDetails
+    const problem = err.error as ProblemDetails;
+    if (problem && (problem.title || problem.detail)) {
+      errorMessage = problem.detail || problem.title!;
+    } else if (err.message) {
+      errorMessage = err.message;
+    }
+
+    this.logger.error(errorMessage, err);
+
+    this.setPageState({
+      loading: false,
+      error: errorMessage,
+    });
   }
 }

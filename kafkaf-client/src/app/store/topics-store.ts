@@ -1,14 +1,24 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Observable, tap } from 'rxjs';
+import { finalize, Observable, tap } from 'rxjs';
 import { TopicSettingRow, TopicsListViewModel } from '../response.models';
 import { BaseStore } from './base-store';
 import { CreateTopicModel, RecreateTopicModel } from './request.models';
+import { HttpErrorResponse } from '@angular/common/http';
+
+export interface TopicConfigRow {
+  key: string;
+  type: string;
+  defaultValue: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class TopicsStore extends BaseStore<TopicsListViewModel> {
+  topicConfigRows = signal<TopicConfigRow[]>([]);
+  loadingConfigRows = signal(false);
+
   constructor() {
     super({});
   }
@@ -24,6 +34,7 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
   protected override getItemKey(item: TopicsListViewModel): string | number {
     return item.topicName;
   }
+
 
   loadTopics(): boolean {
     return this.loadCollection();
@@ -72,9 +83,7 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
             loading: false,
           }));
         },
-        error: (err) => {
-          this.setPageState({ loading: false, error: err.message });
-        },
+        error: this.handleError.bind(this)
       })
     );
   }
@@ -99,9 +108,7 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
             loading: false,
           }));
         },
-        error: (err) => {
-          this.setPageState({ loading: false, error: err.message });
-        },
+        error: this.handleError.bind(this),
       })
     );
   }
@@ -113,5 +120,25 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
   purgeMessages(topicNames: string[]): Observable<void[]> {
     const paths = topicNames.map((topic) => `${topic}/messages`);
     return this.removeItems(paths, false);
+  }
+
+  loadTopicConfigRows() {
+    if (this.topicConfigRows().length == 0) {
+      const clusterIdx = this.clusterIdx();
+      const url = this.resourceItemUrl(clusterIdx, 'configs');
+
+      this.http.get<TopicConfigRow[]>(url).pipe(
+        tap(() => this.loadingConfigRows.set(true)),
+        finalize(() => this.loadingConfigRows.set(false))
+      ).subscribe({
+        next: (configs) => {
+          this.topicConfigRows.set(configs);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.logger.error('[loadTopicConfigRows()]: ', err);
+          this.setError('Error loading topic configs!');
+        }
+      });
+    }
   }
 }

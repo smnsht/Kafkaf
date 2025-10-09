@@ -27,6 +27,9 @@
       @if (errors?.['pattern']) {
         <p class="help is-danger">{{ patternMessage() }}</p>
       }
+      @if (errors?.['custom']) {
+        <p class="help is-danger">{{ errors?.['custom']?.value }}</p>
+      }
     </div>
   }
 </div>

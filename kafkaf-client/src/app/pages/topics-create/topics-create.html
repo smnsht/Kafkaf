@@ -18,22 +18,29 @@
   </div>
 </div>
 
-<topic-form [topicForm]="topicForm" />
+<app-page-wrapper [state]="store.pageState()">
+  <topic-form [topicForm]="topicForm" />
 
-<topic-custsom-parameters [topicForm]="topicForm" [customParameters]="customParameters" />
+  <topic-custsom-parameters
+    [topicForm]="topicForm"
+    [customParameters]="customParameters"
+    [configs]="store.topicConfigRows()"
+    [loadingConfigRows]="store.loadingConfigRows()"
+  />
 
-<div class="buttons">
-  <a class="button is-danger" routerLink="../">
-    <span class="icon">
-      <i class="fas fa-xmark-circle"></i>
-    </span>
-    <span>Cancel</span>
-  </a>
+  <div class="buttons">
+    <a class="button is-danger" routerLink="../">
+      <span class="icon">
+        <i class="fas fa-xmark-circle"></i>
+      </span>
+      <span>Cancel</span>
+    </a>
 
-  <button class="button is-success" [disabled]="topicForm.invalid" (click)="onCreateTopicClick()">
-    <span class="icon">
-      <i class="fas fa-save"></i>
-    </span>
-    <span>Create Topic</span>
-  </button>
-</div>
+    <button class="button is-success" [disabled]="topicForm.invalid" (click)="onCreateTopicClick()">
+      <span class="icon">
+        <i class="fas fa-save"></i>
+      </span>
+      <span>Create Topic</span>
+    </button>
+  </div>
+</app-page-wrapper>

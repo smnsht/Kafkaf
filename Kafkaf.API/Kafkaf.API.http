@@ -40,6 +40,11 @@ GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics
 Accept: application/json
 
 ###
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/configs
+Accept: application/json
+
+
+###
 
 POST {{Kafkaf.API_HostAddress}}/api/clusters/0/topics
 Content-Type: application/json

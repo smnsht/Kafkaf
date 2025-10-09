@@ -12,11 +12,10 @@
           [control]="pair.get('key')"
         >
           <div class="select is-fullwidth">
-            <select [id]="idForSelect($index)" formControlName="key">
-              <option value="1">1 GB</option>
-              <option value="10">10 GB</option>
-              <option value="20">20 GB</option>
-              <option value="50">50 GB</option>
+            <select [id]="idForSelect($index)" formControlName="key" (change)="onSelectChange(i)">
+              @for (config of configs(); track $index) {
+              <option [value]="config.key">{{ config.key }}</option>
+              }
             </select>
           </div>
         </bulma-field>
@@ -24,13 +23,22 @@
 
       <div class="column is-one-fifth">
         <bulma-field label="Value" [for]="idForInput($index)" [control]="pair.get('value')">
+          @if ('checkbox' === $any(pair)._inputType) {
+          <div class="select">
+            <select [id]="idForInput($index)" formControlName="value">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+          } @else {
           <input
             class="input"
-            type="text"
+            [type]="$any(pair)._inputType"
             placeholder="Value"
             [id]="idForInput($index)"
             formControlName="value"
           />
+          }
         </bulma-field>
       </div>
 
@@ -53,7 +61,11 @@
   </ng-container>
 </form>
 
-<button class="button is-primary mb-4 mt-4" (click)="addCustomParameter()">
+<button
+  class="button is-primary mb-4 mt-4"
+  (click)="addCustomParameter()"
+  [class.is-loading]="loadingConfigRows()"
+>
   <span class="icon">
     <i class="fas fa-plus"></i>
   </span>
