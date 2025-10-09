@@ -98,11 +98,11 @@ export abstract class BaseStore<T> {
     }
   }
 
-  loadCollection(): boolean {
+  loadCollection(forceReload = false): boolean {
     const keys = this.keys();
     const clusterIdx = this.clusterIdx();
 
-    if (clusterIdx >= 0 && !keys.includes(clusterIdx)) {
+    if (clusterIdx >= 0 && (!keys.includes(clusterIdx) || forceReload)) {
       this.state.update((state) => ({
         ...state,
         loading: true,

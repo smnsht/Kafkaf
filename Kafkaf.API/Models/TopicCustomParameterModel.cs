@@ -30,7 +30,7 @@ public class TopicCustomParameterModel : IValidatableObject, ICloneable
 		{
 			yield return new ValidationResult("Unknown or blank custom property name.");
 			yield break;
-		}
+		}		
 
 		// Type-specific validation
 		var valid = topicConfig.Type switch
@@ -38,6 +38,7 @@ public class TopicCustomParameterModel : IValidatableObject, ICloneable
 			"string" => true,
 			"long" => long.TryParse(v, out _),
 			"int" => int.TryParse(v, out _),
+			"double" => double.TryParse(v, out _),
 			"boolean" => bool.TryParse(v, out _),
 			_ => throw new ArgumentException(
 							 $"Unknown topic config type '{topicConfig.Type}'!")

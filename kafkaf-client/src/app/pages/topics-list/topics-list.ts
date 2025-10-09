@@ -7,6 +7,7 @@ import { TopicsListViewModel } from '../../response.models';
 import { TopicsStore } from '../../store/topics-store';
 import { DropdownMenuCommand } from '../../components/dropdown-menu/dropdown-menu';
 import { map, Observable } from 'rxjs';
+import { CreateTopicModel, RecreateTopicModel } from '../../store/request.models';
 
 @Component({
   selector: 'app-topics-list',
@@ -64,15 +65,17 @@ export class TopicsList {
   }
 
   onCopyTopicClick(): void {
-    try {
-      const topic = this.getTopicByName(this.selectedTopics[0]);
+    const topicName = this.selectedTopics[0];
+    const topic = this.store.currentItems()?.find((topic) => topic.topicName == topicName);
 
-      this.getTopicQueryParams(topic).subscribe((queryParams) => {
-        this.router.navigate([this.router.url, 'create'], { queryParams });
-      });
-    } catch (err: any) {
-      this.store.setError(err.message);
+    if (!topic) {
+      this.store.setError(`Can't find topic name ${topicName}!`);
+      return;
     }
+
+    this.getTopicQueryParams(topic).subscribe((queryParams) => {
+      this.router.navigate([this.router.url, 'create'], { queryParams });
+    });
   }
 
   onPurgeMessagesClick(): void {
@@ -105,41 +108,31 @@ export class TopicsList {
     }
   }
 
-  private getTopicByName(topicName: string): TopicsListViewModel {
-    const topic = this.store.currentItems()?.find((topic) => topic.topicName == topicName);
-    if (!topic) {
-      //this.store.setError();
-      throw new Error(`Can't find topic name ${topicName}!`);
-    }
-
-    return topic;
-  }
-
-  private getTopicQueryParams(topic: TopicsListViewModel): Observable<any> {
+  private getTopicQueryParams(topic: TopicsListViewModel): Observable<CreateTopicModel> {
     return this.store.loadTopicSettings(topic.topicName).pipe(
       map((settings) => {
-        const queryParams: any = {
+        const queryParams: CreateTopicModel = {
           name: topic.topicName,
           numPartitions: topic.partitionsCount,
-          replicationFactor: topic.replicationFactor,
+          customParameters: [],
         };
 
         settings.forEach((setting) => {
           switch (setting.name) {
             case 'cleanup.policy':
-              queryParams['cleanupPolicy'] = setting.value;
+              queryParams.cleanupPolicy = setting.value;
               break;
 
             case 'min.insync.replicas':
-              queryParams['minInSyncReplicas'] = setting.value;
+              queryParams.minInSyncReplicas = parseInt(setting.value);
               break;
 
             case 'retention.ms':
-              queryParams['timeToRetain'] = setting.value;
+              queryParams.timeToRetain = parseInt(setting.value);
               break;
 
             case 'max.message.bytes':
-              queryParams['maxMessageBytes'] = setting.value;
+              queryParams.maxMessageBytes = parseInt(setting.value);
               break;
           }
         });
@@ -150,23 +143,13 @@ export class TopicsList {
   }
 
   private recreateTopic(topic: TopicsListViewModel): void {
-    const topicSpecification = {
-        name: topic.topicName + Date.now(),
+    this.store
+      .recreateTopic(topic.topicName, {
         numPartitions: topic.partitionsCount,
-        configs: new Map<string, string>()
-      };
-
-      this.store.loadTopicSettings(topic.topicName).subscribe(settings => {
-        settings.forEach(setting => {
-          if (setting.value != null) {
-            topicSpecification.configs.set(setting.name, setting.value)
-          }
-        });
-
-        this.store.createTopic(topicSpecification).subscribe();
+        replicationFactor: topic.partitionsCount,
+      })
+      .subscribe(() => {
+        this.store.loadCollection(true);
       });
-
-
-
   }
 }

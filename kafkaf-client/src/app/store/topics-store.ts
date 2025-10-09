@@ -3,6 +3,7 @@ import { environment } from '../../environments/environment';
 import { Observable, tap } from 'rxjs';
 import { TopicSettingRow, TopicsListViewModel } from '../response.models';
 import { BaseStore } from './base-store';
+import { CreateTopicModel, RecreateTopicModel } from './request.models';
 
 @Injectable({
   providedIn: 'root',
@@ -51,25 +52,56 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
     );
   }
 
-  createTopic(topicCreateRequest: any): Observable<void> {
+  createTopic(req: CreateTopicModel, notice = 'New Topic Created.'): Observable<void> {
     this.setPageState({
       loading: true,
       notice: undefined,
       error: undefined,
     });
 
-
     const clusterIdx = this.clusterIdx();
     const url = this.resourceUrl(clusterIdx);
 
-    return this.http.post<void>(url, topicCreateRequest ).pipe(
+    return this.http.post<void>(url, req).pipe(
       tap({
-        next: (res) => {
-          console.log(res)
+        next: () => {
+          this.setPageState({ loading: false });
+          this.state.update((state) => ({
+            ...state,
+            notice,
+            loading: false,
+          }));
         },
         error: (err) => {
-          console.error(err)
-        }
+          this.setPageState({ loading: false, error: err.message });
+        },
+      })
+    );
+  }
+
+  recreateTopic(topicName: string, req: RecreateTopicModel): Observable<void> {
+    this.setPageState({
+      loading: true,
+      notice: undefined,
+      error: undefined,
+    });
+
+    const clusterIdx = this.clusterIdx();
+    const url = this.resourceItemUrl(clusterIdx, `${topicName}/recreate`);
+
+    return this.http.post<void>(url, req).pipe(
+      tap({
+        next: () => {
+          this.setPageState({ loading: false });
+          this.state.update((state) => ({
+            ...state,
+            notice: `Topic ${topicName} recreated.`,
+            loading: false,
+          }));
+        },
+        error: (err) => {
+          this.setPageState({ loading: false, error: err.message });
+        },
       })
     );
   }
