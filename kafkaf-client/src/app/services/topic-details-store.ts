@@ -10,6 +10,7 @@ import { environment } from '../../environments/environment';
 import { SeekType } from '../components/ddl-seek-type/ddl-seek-type';
 import { SerdeType } from '../components/ddl-serde/ddl-serde';
 import { SortOrderType } from '../components/ddl-sort-order/ddl-sort-order';
+import { getErrorMessage } from '../store/base-store';
 
 export interface SearchMessagesOptions {
   seekType: SeekType;
@@ -149,11 +150,11 @@ export class TopicDetailsStore {
           details: topicDetails,
           loadingDetails: false,
         })),
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.state.update((state) => ({
           ...state,
           loadingDetails: false,
-          errorDetails: err.message,
+          errorDetails: getErrorMessage(err),
         }));
       },
     });
@@ -167,7 +168,7 @@ export class TopicDetailsStore {
         this.state.update((state) => ({
           ...state,
           loadingSettings: false,
-          errorSettings: err.message,
+          errorSettings: getErrorMessage(err),
         })),
     });
   }
@@ -184,7 +185,7 @@ export class TopicDetailsStore {
         this.state.update((state) => ({
           ...state,
           loadingConsumers: false,
-          errorConsumers: err.message,
+          errorConsumers: getErrorMessage(err),
         })),
     });
   }
@@ -197,11 +198,11 @@ export class TopicDetailsStore {
           messages,
           loadingMessages: false,
         })),
-      error: (err) =>
+      error: (err: HttpErrorResponse) =>
         this.state.update((state) => ({
           ...state,
           loadingMessages: false,
-          errorDetails: err.message,
+          errorDetails: getErrorMessage(err),
         })),
     });
   }

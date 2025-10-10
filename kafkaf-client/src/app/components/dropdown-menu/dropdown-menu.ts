@@ -3,8 +3,13 @@ import { Component, inject, output } from '@angular/core';
 import { ClickOutsideDirective } from '../../directives/click-outside';
 import { ConfirmationService } from '../../services/confirmation-service';
 import { LoggerService } from '../../services/logger.service';
+import { of } from 'rxjs';
 
-export type DropdownMenuCommand = 'ClearMessages' | 'RecreateTopic' | 'RemoveTopic' | 'EditSettings';
+export type DropdownMenuCommand =
+  | 'ClearMessages'
+  | 'RecreateTopic'
+  | 'RemoveTopic'
+  | 'EditSettings';
 
 export interface DropdownMenuEvent {
   command: DropdownMenuCommand;
@@ -25,15 +30,17 @@ export class DropdownMenu {
   protected readonly confirmationService = inject(ConfirmationService);
   protected readonly logger = inject(LoggerService);
 
-  onCommandClick(event: Event, command: DropdownMenuCommand): void {
+  onCommandClick(event: Event, command: DropdownMenuCommand, showConfirmationModal = true): void {
     event.preventDefault();
 
-    this.confirmationService
-      .confirm(this.confirmationTitle, this.getConfirmationBody(command))
-      .subscribe((confirmed) => {
-        this.commandSelected.emit({ command, confirmed });
-        this.isActive = false;
-      });
+    const confirmed$ = showConfirmationModal
+      ? this.confirmationService.confirm(this.confirmationTitle, this.getConfirmationBody(command))
+      : of(true);
+
+    confirmed$.subscribe((confirmed) => {
+      this.commandSelected.emit({ command, confirmed });
+      this.isActive = false;
+    });
   }
 
   onClickedOutside(): void {

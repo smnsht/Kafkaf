@@ -1,4 +1,5 @@
-﻿using Confluent.Kafka.Admin;
+﻿using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Kafkaf.API.Models;
 using Kafkaf.API.Services;
 using Kafkaf.API.ViewModels;
@@ -34,32 +35,35 @@ public partial class TopicController : ControllerBase
 		string topicName
 	)
 	{
-		DescribeTopicsResult topicResult = default!;
 		try
 		{
 			// Will throw DescribeTopicsException when topic not found
-			topicResult = await _topicsService.DescribeTopicsAsync(clusterIdx, topicName);
+			var topicResult = await _topicsService.DescribeTopicsAsync(clusterIdx, topicName);
+
+			var desc =
+				topicResult.TopicDescriptions.FirstOrDefault()
+				?? throw new InvalidOperationException(
+					$"Topic '{topicName}' was not found in cluster {clusterIdx}."
+				);
+
+			var partitionOffsets = _consumerService.GetWatermarkOffsets(
+				clusterIdx,
+				topicName,
+				desc.Partitions.Select(p => p.Partition).ToArray()
+			);
+
+			var topicDetails = new TopicDetailsViewModel(desc, partitionOffsets);
+
+			return Ok(topicDetails);
 		}
 		catch (DescribeTopicsException dte)
 		{
 			return NotFound(dte.Message);
 		}
-
-		var desc =
-			topicResult.TopicDescriptions.FirstOrDefault()
-			?? throw new InvalidOperationException(
-				$"Topic '{topicName}' was not found in cluster {clusterIdx}."
-			);
-
-		var partitionOffsets = _consumerService.GetWatermarkOffsets(
-			clusterIdx,
-			topicName,
-			desc.Partitions.Select(p => p.Partition).ToArray()
-		);
-
-		var topicDetails = new TopicDetailsViewModel(desc, partitionOffsets);
-
-		return Ok(topicDetails);
+		catch (KafkaException kte)
+		{
+			return Problem(kte.Error.Reason);
+		}
 	}
 
 	/// <summary>
@@ -74,11 +78,18 @@ public partial class TopicController : ControllerBase
 		string topicName
 	)
 	{
-		var topicConfig = await _topicsService.DescribeTopicConfigsAsync(clusterIdx, topicName);
-
-		if (topicConfig is DescribeConfigsResult configs)
+		try
 		{
-			return Ok(TopicSettingRow.FromResult(configs));
+			var topicConfig = await _topicsService.DescribeTopicConfigsAsync(clusterIdx, topicName);
+
+			if (topicConfig is DescribeConfigsResult configs)
+			{
+				return Ok(TopicSettingRow.FromResult(configs));
+			}
+		}
+		catch (KafkaException ex)
+		{
+			return Problem(ex.Error.Reason);
 		}
 
 		return NotFound($"Can't get configs for topic");
@@ -111,7 +122,7 @@ public partial class TopicController : ControllerBase
 	{
 		try
 		{
-			await _topicsService.DeleteTopicAsync(clusterIdx, topicName);			
+			await _topicsService.DeleteTopicAsync(clusterIdx, topicName);
 			return Ok();
 		}
 		catch (DeleteTopicsException dte) when (dte.Message.Contains("Unknown topic or partition"))

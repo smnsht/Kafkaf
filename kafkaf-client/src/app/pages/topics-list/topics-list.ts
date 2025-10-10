@@ -96,12 +96,7 @@ export class TopicsList {
         filter((confirmed) => confirmed),
         concatMap(() => this.store.purgeMessages(this.selectedTopics))
       )
-      .subscribe((res) => {
-        this.store.setNotice(
-          `Successfully purged messages from ${res.length} ${
-            res.length === 1 ? 'topic' : 'topics'
-          }.`
-        );
+      .subscribe(() => {
         this.selectedTopics = [];
       });
   }
@@ -110,17 +105,22 @@ export class TopicsList {
     if (event.confirmed) {
       switch (event.command) {
         case 'ClearMessages':
-          this.selectedTopics = [topic.topicName];
-          this.onPurgeMessagesClick();
+          this.store.purgeMessages([topic.topicName]).subscribe();
           break;
 
         case 'RemoveTopic':
-          this.selectedTopics = [topic.topicName];
-          this.onDeleteTopicsClick();
+          this.store.deleteTopic(topic.topicName).subscribe();
           break;
 
         case 'RecreateTopic':
-          this.recreateTopic(topic);
+          this.store
+            .recreateTopic(topic.topicName, {
+              numPartitions: topic.partitionsCount,
+              replicationFactor: topic.partitionsCount,
+            })
+            .subscribe(() => {
+              this.store.loadTopics(true);
+            });
           break;
 
         default:
@@ -161,16 +161,5 @@ export class TopicsList {
         return queryParams;
       })
     );
-  }
-
-  private recreateTopic(topic: TopicsListViewModel): void {
-    this.store
-      .recreateTopic(topic.topicName, {
-        numPartitions: topic.partitionsCount,
-        replicationFactor: topic.partitionsCount,
-      })
-      .subscribe(() => {
-        this.store.loadCollection(true);
-      });
   }
 }

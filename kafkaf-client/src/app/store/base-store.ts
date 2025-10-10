@@ -5,6 +5,20 @@ import { BaseState, ItemIdPK, PageState } from './models';
 import { LoggerService } from '../services/logger.service';
 import { ProblemDetails } from '../response.models';
 
+export function getErrorMessage(err: HttpErrorResponse): string {
+  let errorMessage = 'An unexpected error occurred';
+
+  // Check if the response body looks like ProblemDetails
+  const problem = err.error as ProblemDetails;
+  if (problem && (problem.title || problem.detail)) {
+    errorMessage = problem.detail || problem.title!;
+  } else if (err.message) {
+    errorMessage = err.message;
+  }
+
+  return errorMessage;
+}
+
 export abstract class BaseStore<T> {
   protected readonly http = inject(HttpClient);
   protected readonly logger = inject(LoggerService);
@@ -176,6 +190,8 @@ export abstract class BaseStore<T> {
       tap({
         next: () => {
           if (reload) {
+            this.setNotice(successNotice);
+
             // Option 1: reload the whole collection
             this.fetchCollection(clusterIdx);
           } else {
@@ -211,7 +227,8 @@ export abstract class BaseStore<T> {
   protected deleteMany(
     clusterIdx: number,
     itemIds: ItemIdPK[],
-    reload = false
+    reload = false,
+    successNotice = 'Items deleted successfully.'
   ): Observable<void[]> {
     const requests = itemIds.map((id) =>
       this.http.delete<void>(this.resourceItemUrl(clusterIdx, id))
@@ -220,13 +237,8 @@ export abstract class BaseStore<T> {
     return forkJoin(requests).pipe(
       tap({
         next: () => {
-          const notice = `${itemIds.length} items deleted successfully`;
-
           if (reload) {
             this.fetchCollection(clusterIdx);
-            this.state.update((state) => {
-              return { ...state, notice, loading: false };
-            });
           } else {
             this.state.update((state) => {
               const { itemsMap } = state;
@@ -236,34 +248,19 @@ export abstract class BaseStore<T> {
               return {
                 ...state,
                 itemsMap,
-                notice,
+                notice: successNotice,
                 loading: false,
               };
             });
           }
         },
-        error: (err: HttpErrorResponse) => {
-          this.logger.error('[deleteMany]: ', err);
-
-          this.setPageState({
-            loading: false,
-            error: err.message,
-          });
-        },
+        error: this.handleError.bind(this)
       })
     );
   }
 
   protected handleError(err: HttpErrorResponse): void {
-    let errorMessage = 'An unexpected error occurred';
-
-    // Check if the response body looks like ProblemDetails
-    const problem = err.error as ProblemDetails;
-    if (problem && (problem.title || problem.detail)) {
-      errorMessage = problem.detail || problem.title!;
-    } else if (err.message) {
-      errorMessage = err.message;
-    }
+    const errorMessage = getErrorMessage(err);
 
     this.logger.error(errorMessage, err);
 
