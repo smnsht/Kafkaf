@@ -4,6 +4,10 @@
 </span>
 } @else {
 <dropdown-menu>
+  @if (showEditSettings()) {
+    <a (click)="onCommandClick($event, 'EditSettings')" class="dropdown-item has-text-danger">Edit settings</a>
+    <i class="dropdown-item is-size-7">Pay attention! This operation has especially important consequences.</i>
+  }
   <a (click)="onCommandClick($event, 'ClearMessages')" class="dropdown-item has-text-danger"
     >Clear Messages</a
   >

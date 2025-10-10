@@ -13,13 +13,17 @@
     </nav>
   </div>
   <!-- Button -->
-  <div class="column">
-    <button class="button is-primary is-pulled-right" (click)="store.setShowMessageForm(true)">
+  <div class="column is-flex is-justify-content-flex-end is-align-items-center">
+    <button class="button is-primary ml-2" (click)="store.setShowMessageForm(true)">
       <span class="icon is-small">
         <i class="fas fa-envelope"></i>
       </span>
       <span>Produce Message</span>
     </button>
+    <topics-dropdown-menu
+      [showEditSettings]="true"
+      (commandSelected)="onCommandSelected($event)"
+    ></topics-dropdown-menu>
   </div>
 </div>
 

@@ -4,7 +4,7 @@ import { ClickOutsideDirective } from '../../directives/click-outside';
 import { ConfirmationService } from '../../services/confirmation-service';
 import { LoggerService } from '../../services/logger.service';
 
-export type DropdownMenuCommand = 'ClearMessages' | 'RecreateTopic' | 'RemoveTopic';
+export type DropdownMenuCommand = 'ClearMessages' | 'RecreateTopic' | 'RemoveTopic' | 'EditSettings';
 
 export interface DropdownMenuEvent {
   command: DropdownMenuCommand;
