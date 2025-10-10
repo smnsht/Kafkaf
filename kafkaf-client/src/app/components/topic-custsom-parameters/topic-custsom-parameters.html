@@ -23,22 +23,32 @@
 
       <div class="column is-one-fifth">
         <bulma-field label="Value" [for]="idForInput($index)" [control]="pair.get('value')">
-          @if ('checkbox' === $any(pair)._inputType) {
+          @switch (configTypeForDDL(pair.get('key'))) { @case ('boolean') {
           <div class="select">
             <select [id]="idForInput($index)" formControlName="value">
               <option value="true">Yes</option>
               <option value="false">No</option>
             </select>
           </div>
-          } @else {
+          } @case ('text') {
           <input
             class="input"
-            [type]="$any(pair)._inputType"
+            type="text"
+            placeholder="Value"
+            [id]="idForInput(i)"
+            formControlName="value"
+          />
+          } @case ('list') {
+          <p>list not implemented yet</p>
+          } @default {
+          <input
+            class="input"
+            type="number"
             placeholder="Value"
             [id]="idForInput($index)"
             formControlName="value"
           />
-          }
+          }}
         </bulma-field>
       </div>
 
@@ -73,3 +83,4 @@
 </button>
 
 }
+

@@ -22,11 +22,12 @@ function usedKeyValidator(setFn: () => Set<string>): ValidatorFn {
   };
 }
 
+export type TopicConfigType = 'number' | 'boolean' | 'text' | 'list';
+
 @Component({
   selector: 'topic-custsom-parameters',
   imports: [ReactiveFormsModule, BulmaField, CommonModule],
   templateUrl: './topic-custsom-parameters.html',
-  styleUrl: './topic-custsom-parameters.scss',
 })
 export class TopicCustsomParameters {
   private configTypes = new Map<string, string>();
@@ -79,28 +80,32 @@ export class TopicCustsomParameters {
 
   onSelectChange(index: number): void {
     const group = this.customParameters()?.at(index);
-    const ddl = group?.get('key');
     const input = group?.get('value');
-    const cfgKey = ddl?.value;
 
     // reset input on ddl change
     input?.reset();
+  }
+
+  configTypeForDDL(ddl: AbstractControl | null): TopicConfigType | undefined {
+    const cfgKey = ddl?.value;
 
     switch (this.configTypes.get(cfgKey)) {
       case 'int':
       case 'long':
       case 'double':
-        (<any>group)['_inputType'] = 'number';
-        break;
+        return 'number';
 
       case 'boolean':
-        (<any>group)['_inputType'] = 'checkbox';
-        break;
+        return 'boolean';
 
       case 'string':
-      case 'list': // TODO: check
-        (<any>group)['_inputType'] = 'text';
-        break;
+        return 'text';
+
+      case 'list':
+        return 'list';
+
+      default:
+        return undefined;
     }
   }
 }
