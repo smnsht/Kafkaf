@@ -4,8 +4,5 @@ import { Component } from '@angular/core';
   selector: 'app-topic-statistics',
   imports: [],
   templateUrl: './topic-statistics.html',
-  // styleUrl: './topic-statistics.scss'
 })
-export class TopicStatistics {
-
-}
+export class TopicStatistics {}

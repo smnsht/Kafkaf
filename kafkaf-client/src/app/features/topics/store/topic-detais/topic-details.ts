@@ -1,24 +1,13 @@
 import { computed, inject, signal, WritableSignal } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import {
-  ConsumerGroupRow,
-  MessageRow,
-  TopicDetailsViewModel,
-  TopicSettingRow,
-} from '../shared/models/response.models';
-import { environment } from '../../environments/environment';
-import { SeekType } from '../components/ddl-seek-type/ddl-seek-type';
-import { SerdeType } from '../components/ddl-serde/ddl-serde';
-import { SortOrderType } from '../components/ddl-sort-order/ddl-sort-order';
-import { getErrorMessage } from '../store/base-store';
+import { ConsumerGroupRow } from '@app/features/consumers';
+import { getErrorMessage } from '@app/shared';
+import { environment } from 'environments/environment';
+import { MessageRow } from '../../models/message-row';
+import { SearchMessagesOptions } from '../../models/search-messages-options';
+import { TopicDetailsViewModel } from '../../models/topic-details-view-model';
+import { TopicSettingRow } from '../../models/topic-setting-row';
 
-export interface SearchMessagesOptions {
-  seekType: SeekType;
-  partitions: number[];
-  keySerde: SerdeType;
-  valueSerde: SerdeType;
-  sortOrder: SortOrderType;
-}
 
 export const defaultSearchMessagesOptions: SearchMessagesOptions = {
   seekType: 'Offset',

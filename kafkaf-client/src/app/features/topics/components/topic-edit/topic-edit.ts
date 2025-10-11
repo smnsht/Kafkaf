@@ -1,3 +1,4 @@
+import { JsonPipe } from '@angular/common';
 import { Component, computed, effect, inject } from '@angular/core';
 import {
   AbstractControl,
@@ -8,14 +9,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { CreateTopicModel } from '../../shared/store/request.models';
-import { TopicDetailsStore } from '../../services/topic-details-store';
-import { JsonPipe } from '@angular/common';
-import { TopicForm, PageWrapper } from '../../components';
-import { TopicCustsomParameters } from "../../components/topic-custsom-parameters/topic-custsom-parameters";
-import { TopicsStore } from '../../shared/store/topics-store';
-import { TopicConfigRow } from '../../shared/models/response.models';
-
+import { CreateTopicModel, PageWrapper } from '@app/shared';
+import { TopicDetailsStore } from '../../store/topic-detais/topic-details';
+import { TopicsStore } from '../../store/topics/topics';
+import { TopicCustsomParameters } from '../topic-custsom-parameters/topic-custsom-parameters';
+import { TopicForm } from '../topic-form/topic-form';
 
 const skipSettings = new Set<string>([
   'cleanup.policy',
@@ -145,7 +143,6 @@ class TopicFormmmm {
   selector: 'app-topic-edit',
   imports: [JsonPipe, PageWrapper, TopicForm, TopicCustsomParameters],
   templateUrl: './topic-edit.html',
-  styleUrl: './topic-edit.scss',
 })
 export class TopicEdit {
   topicForm!: FormGroup;

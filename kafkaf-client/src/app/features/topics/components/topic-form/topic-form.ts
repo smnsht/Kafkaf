@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { BulmaField } from '../../shared/components/bulma-field/bulma-field';
+import { BulmaField } from '@app/shared';
 
 @Component({
   selector: 'topic-form',

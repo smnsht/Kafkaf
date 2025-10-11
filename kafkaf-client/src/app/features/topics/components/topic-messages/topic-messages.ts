@@ -1,19 +1,17 @@
 import { Component, computed, signal } from '@angular/core';
 import { DdlSeekType } from '../../components/ddl-seek-type/ddl-seek-type';
-import { KafkafTable } from '../../directives/kafkaf-table';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { KafkafTableDirective, PageWrapper, TruncatePipe } from '@app/shared';
+import { TimestampPipe } from '../../pipes/timestamp';
 import {
   defaultSearchMessagesOptions,
   TopicDetailsStore,
-} from '../../services/topic-details-store';
-import { CommonModule } from '@angular/common';
-import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-import { FormsModule } from '@angular/forms';
-import { MessageDetails } from '../../features/topics/message-details/message-details';
-import { TimestampPipe } from '../../pipes/timestamp-pipe';
-import { TruncatePipe } from '../../pipes/truncate-pipe';
-import { DDLPartitions } from '../../components/ddl-partitions/ddl-partitions';
-import { DDLSerde } from '../../components/ddl-serde/ddl-serde';
-import { DDLSortOrder } from '../../features/messages/ddl-sort-order/ddl-sort-order';
+} from '../../store/topic-detais/topic-details';
+import { DDLPartitions } from '../ddl-partitions/ddl-partitions';
+import { DDLSerde } from '../ddl-serde/ddl-serde';
+import { DDLSortOrder } from '../ddl-sort-order/ddl-sort-order';
+import { MessageDetails } from '../message-details/message-details';
 
 @Component({
   selector: 'app-topic-messages',
@@ -23,7 +21,7 @@ import { DDLSortOrder } from '../../features/messages/ddl-sort-order/ddl-sort-or
     DDLSerde,
     DDLPartitions,
     DdlSeekType,
-    KafkafTable,
+    KafkafTableDirective,
     PageWrapper,
     FormsModule,
     CommonModule,
@@ -32,7 +30,6 @@ import { DDLSortOrder } from '../../features/messages/ddl-sort-order/ddl-sort-or
     TruncatePipe,
   ],
   templateUrl: './topic-messages.html',
-  styleUrl: './topic-messages.scss',
 })
 export class TopicMessages {
   searchMessagesOptions = { ...defaultSearchMessagesOptions };

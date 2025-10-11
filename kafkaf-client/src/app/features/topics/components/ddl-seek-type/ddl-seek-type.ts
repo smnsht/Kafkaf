@@ -1,6 +1,6 @@
 import { Component, inject, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LoggerService } from '../../services/logger.service';
+import { LoggerService } from '@app/shared';
 
 export type SeekType = 'Offset' | 'Timestamp';
 

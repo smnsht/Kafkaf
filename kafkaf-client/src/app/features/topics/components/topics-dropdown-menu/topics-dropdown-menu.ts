@@ -1,5 +1,6 @@
 import { Component, input } from '@angular/core';
-import { DropdownMenu, DropdownMenuCommand } from '../../shared/components/dropdown-menu/dropdown-menu';
+import { DropdownMenu, DropdownMenuCommand } from '@app/shared';
+
 
 @Component({
   selector: 'topics-dropdown-menu',

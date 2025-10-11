@@ -1,20 +1,22 @@
 import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import {
+  ConfirmationService,
+  CreateTopicModel,
+  DropdownMenuEvent,
+  KafkafTableDirective,
+  PageWrapper,
+} from '@app/shared';
 import { concatMap, filter, map, Observable } from 'rxjs';
-import { KafkafTable } from '../../directives/kafkaf-table';
-import { TopicsDropdownMenu, PageWrapper } from '../../components/index';
-import { TopicsListViewModel } from '../../shared/models/response.models';
-import { TopicsStore } from '../../shared/store/topics-store';
-import { DropdownMenuEvent } from '../../shared/components/dropdown-menu/dropdown-menu';
-import { CreateTopicModel } from '../../shared/store/request.models';
-import { ConfirmationService } from '../../services/confirmation-service';
+import { TopicsListViewModel } from '../../models/topics-list-view-model';
+import { TopicsStore } from '../../store/topics/topics';
+import { TopicsDropdownMenu } from '../topics-dropdown-menu/topics-dropdown-menu';
 
 @Component({
   selector: 'app-topics-list',
-  imports: [FormsModule, KafkafTable, PageWrapper, RouterLink, TopicsDropdownMenu],
+  imports: [FormsModule, KafkafTableDirective, PageWrapper, RouterLink, TopicsDropdownMenu],
   templateUrl: './topics-list.html',
-  styleUrl: './topics-list.scss',
 })
 export class TopicsList {
   search = signal('');
@@ -43,7 +45,7 @@ export class TopicsList {
     public readonly store: TopicsStore,
     private readonly router: Router,
     private readonly confirmationService: ConfirmationService,
-    route: ActivatedRoute
+    route: ActivatedRoute,
   ) {
     route.paramMap.subscribe((params) => {
       const clusterIdx = parseInt(params.get('cluster')!);
@@ -65,7 +67,7 @@ export class TopicsList {
       .confirm('Confirm Deletion', 'Are you sure you want to delete the selected topics?')
       .pipe(
         filter((confirmed) => confirmed),
-        concatMap(() => this.store.deleteTopics(this.selectedTopics))
+        concatMap(() => this.store.deleteTopics(this.selectedTopics)),
       )
       .subscribe(() => {
         this.selectedTopics = [];
@@ -90,11 +92,11 @@ export class TopicsList {
     this.confirmationService
       .confirm(
         'Purge Messages',
-        'This will permanently delete all messages from the selected topics. This action cannot be undone. Do you want to continue?'
+        'This will permanently delete all messages from the selected topics. This action cannot be undone. Do you want to continue?',
       )
       .pipe(
         filter((confirmed) => confirmed),
-        concatMap(() => this.store.purgeMessages(this.selectedTopics))
+        concatMap(() => this.store.purgeMessages(this.selectedTopics)),
       )
       .subscribe(() => {
         this.selectedTopics = [];
@@ -159,7 +161,7 @@ export class TopicsList {
         });
 
         return queryParams;
-      })
+      }),
     );
   }
 }

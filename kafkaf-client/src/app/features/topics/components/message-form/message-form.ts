@@ -1,9 +1,8 @@
 import { Component, effect } from '@angular/core';
-import { TopicDetailsStore } from '../../services/topic-details-store';
-import { DDLSerde, SerdeTypes } from '../../../components/ddl-serde/ddl-serde';
 import { FormsModule } from '@angular/forms';
-import { JsonValidatorDirective } from '../../directives/json-validator-directive';
-import { LoggerService } from '../../services/logger.service';
+import { JsonValidatorDirective, LoggerService } from '@app/shared';
+import { TopicDetailsStore } from '../../store/topic-detais/topic-details';
+import { SerdeTypes, DDLSerde } from '../ddl-serde/ddl-serde';
 
 interface CreateMessage {
   partition: number;
@@ -26,7 +25,6 @@ const defaultPayload: CreateMessage = {
   selector: 'message-form',
   imports: [DDLSerde, FormsModule, JsonValidatorDirective],
   templateUrl: './message-form.html',
-  styleUrl: './message-form.scss',
 })
 export class MessageForm {
   payload: CreateMessage;

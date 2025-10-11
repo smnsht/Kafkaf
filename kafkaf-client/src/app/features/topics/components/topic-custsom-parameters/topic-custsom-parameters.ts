@@ -9,9 +9,10 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { BulmaField } from '../../shared/components/bulma-field/bulma-field';
+
 import { CommonModule } from '@angular/common';
-import { TopicConfigRow } from '../../shared/models/response.models';
+import { BulmaField } from '@app/shared';
+import { TopicConfigRow } from '../../models/topic-config-row';
 
 function usedKeyValidator(setFn: () => Set<string>): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {

@@ -1,14 +1,12 @@
 import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { KafkafTable } from '../../directives/kafkaf-table';
-import { TopicDetailsStore } from '../../services/topic-details-store';
-import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
+import { KafkafTableDirective, PageWrapper } from '@app/shared';
+import { TopicDetailsStore } from '../..';
 
 @Component({
   selector: 'app-topic-consumers',
-  imports: [FormsModule, KafkafTable, PageWrapper],
+  imports: [FormsModule, KafkafTableDirective, PageWrapper],
   templateUrl: './topic-consumers.html',
-  // styleUrl: './topic-consumers.scss'
 })
 export class TopicConsumers {
   search = signal('');

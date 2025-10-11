@@ -1,15 +1,12 @@
 import { Component, effect } from '@angular/core';
-import { StatsCard, StatsCardItem } from '../../shared/components/stats-card/stats-card';
-import { KafkafTable } from '../../directives/kafkaf-table';
-import { TopicDetailsStore } from '../../services/topic-details-store';
-import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-import { PartitionInfo } from '../../shared/models/response.models';
+import { PartitionInfo } from '@app/features/consumers';
+import { KafkafTableDirective, PageWrapper, StatsCard, StatsCardItem } from '@app/shared';
+import { TopicDetailsStore } from '../../store/topic-detais/topic-details';
 
 @Component({
   selector: 'app-topic-overview',
-  imports: [StatsCard, KafkafTable, PageWrapper],
+  imports: [StatsCard, KafkafTableDirective, PageWrapper],
   templateUrl: './topic-overview.html',
-  // styleUrl: './topic-overview.scss'
 })
 export class TopicOverview {
   cardItems: StatsCardItem[] = [];

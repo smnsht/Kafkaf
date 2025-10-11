@@ -1,7 +1,7 @@
 import { Component, computed, effect, input, model, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PartitionInfo } from '../../shared/models/response.models';
-import { ClickOutsideDirective } from '../../directives/click-outside';
+import { PartitionInfo } from '@app/features/consumers';
+import { ClickOutsideDirective } from '@app/shared';
 
 @Component({
   selector: 'ddl-partitions',

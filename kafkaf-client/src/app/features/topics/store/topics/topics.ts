@@ -1,11 +1,11 @@
 import { Injectable, signal } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { finalize, Observable, tap } from 'rxjs';
-import { TopicConfigRow, TopicSettingRow, TopicsListViewModel } from '../models/response.models';
-import { BaseStore } from './base-store';
-import { CreateTopicModel, RecreateTopicModel } from './request.models';
 import { HttpErrorResponse } from '@angular/common/http';
-
+import { BaseStore, CreateTopicModel, RecreateTopicModel } from '@app/shared';
+import { environment } from 'environments/environment';
+import { TopicConfigRow } from '../../models/topic-config-row';
+import { TopicSettingRow } from '../../models/topic-setting-row';
+import { TopicsListViewModel } from '../../models/topics-list-view-model';
 
 @Injectable({
   providedIn: 'root',
@@ -53,7 +53,7 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
           this.setError(err.message);
           this.setPageState({ error: err.message, loading: false });
         },
-      })
+      }),
     );
   }
 
@@ -78,7 +78,7 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
           }));
         },
         error: this.handleError.bind(this),
-      })
+      }),
     );
   }
 
@@ -103,7 +103,7 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
           }));
         },
         error: this.handleError.bind(this),
-      })
+      }),
     );
   }
 
@@ -122,9 +122,9 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
       tap((res) => {
         this.setNotice(
           'Successfully purged messages from ' +
-            (res.length === 1 ? `${topicNames[0]} topic.` : `${res.length} topics.`)
+            (res.length === 1 ? `${topicNames[0]} topic.` : `${res.length} topics.`),
         );
-      })
+      }),
     );
   }
 
@@ -137,7 +137,7 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
         .get<TopicConfigRow[]>(url)
         .pipe(
           tap(() => this.loadingConfigRows.set(true)),
-          finalize(() => this.loadingConfigRows.set(false))
+          finalize(() => this.loadingConfigRows.set(false)),
         )
         .subscribe({
           next: (configs) => {

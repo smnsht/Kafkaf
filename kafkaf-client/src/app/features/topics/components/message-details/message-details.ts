@@ -1,11 +1,13 @@
 import { Component, computed, DestroyRef, input, signal } from '@angular/core';
-import { MessageRow } from '../../../shared/models/response.models';
-import { TimestampPipe } from '../../pipes/timestamp-pipe';
+
 import { Subject, switchMap, tap, timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { LoggerService } from '../../services/logger.service';
+import { TimestampPipe } from '../../pipes/timestamp';
+import { MessageRow } from '../../models/message-row';
+import { LoggerService } from '@app/shared';
 
 type tMessageTab = 'Key' | 'Value' | 'Headers';
+
 @Component({
   selector: 'message-details',
   imports: [TimestampPipe],
@@ -45,12 +47,15 @@ export class MessageDetails {
     return JSON.stringify(msgCopy, null, 2);
   });
 
-  constructor(destroyRef: DestroyRef, private readonly logger: LoggerService) {
+  constructor(
+    destroyRef: DestroyRef,
+    private readonly logger: LoggerService,
+  ) {
     this.hideCopiedSuccessfullySubject.pipe(
       takeUntilDestroyed(destroyRef),
       switchMap(() => {
         return timer(2000).pipe(tap(() => (this.showCopiedSuccessfully = false)));
-      })
+      }),
     );
   }
 

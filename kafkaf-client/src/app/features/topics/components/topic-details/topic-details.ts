@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
-import { TopicDetailsStore } from '../../services/topic-details-store';
-import { MessageForm } from '../../features/topics/message-form/message-form';
+
 import { TopicsDropdownMenu } from '../../components/topics-dropdown-menu/topics-dropdown-menu';
-import { DropdownMenuEvent } from '../../shared/components/dropdown-menu/dropdown-menu';
-import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-import { TopicsStore } from '../../shared/store/topics-store';
 import { concatMap, timer } from 'rxjs';
+import { PageWrapper, DropdownMenuEvent } from '@app/shared';
+import { TopicDetailsStore } from '../../store/topic-detais/topic-details';
+import { TopicsStore } from '../../store/topics/topics';
+import { MessageForm } from '../message-form/message-form';
 
 type TopicTabs =
   | 'TopicOverview'
@@ -48,7 +48,7 @@ export class TopicDetails {
     public readonly topicsStore: TopicsStore,
     private readonly router: Router,
     readonly store: TopicDetailsStore,
-    readonly route: ActivatedRoute
+    readonly route: ActivatedRoute,
   ) {
     store.loadTopicDetails();
 

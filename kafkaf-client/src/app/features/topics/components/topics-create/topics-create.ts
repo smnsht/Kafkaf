@@ -12,9 +12,8 @@ import {
 } from '@angular/forms';
 import { TopicCustsomParameters } from '../../components/topic-custsom-parameters/topic-custsom-parameters';
 import { TopicForm } from '../../components/topic-form/topic-form';
-import { CreateTopicModel } from '../../shared/store/request.models';
-import { TopicsStore } from '../../shared/store/topics-store';
-import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
+import { PageWrapper, CreateTopicModel } from '@app/shared';
+import { TopicsStore } from '../../store/topics/topics';
 
 @Component({
   selector: 'app-topics-create',
@@ -32,7 +31,11 @@ export class TopicsCreate {
   topicForm!: FormGroup;
   topicNames = new Set<string>();
 
-  constructor(private fb: FormBuilder, public store: TopicsStore, route: ActivatedRoute) {
+  constructor(
+    private fb: FormBuilder,
+    public store: TopicsStore,
+    route: ActivatedRoute,
+  ) {
     const query = route.snapshot.queryParamMap;
 
     this.topicForm = this.fb.group({
