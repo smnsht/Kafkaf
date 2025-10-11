@@ -1,15 +1,12 @@
 import { JsonPipe } from '@angular/common';
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import {
-  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
-  ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { CreateTopicModel, PageWrapper } from '@app/shared';
+import { PageWrapper } from '@app/shared';
 import { TopicDetailsStore } from '../../store/topic-detais/topic-details';
 import { TopicsStore } from '../../store/topics/topics';
 import { TopicCustsomParameters } from '../topic-custsom-parameters/topic-custsom-parameters';
@@ -23,121 +20,121 @@ const skipSettings = new Set<string>([
   'retention.bytes',
 ]);
 
-class TopicFormmmm {
-  topicForm!: FormGroup;
-  topicNames = new Set<string>();
+// class TopicFormmmm {
+//   topicForm!: FormGroup;
+//   topicNames = new Set<string>();
 
-  protected fb = inject(FormBuilder);
+//   protected fb = inject(FormBuilder);
 
-  topicsStore = inject(TopicsStore);
-  route = inject(ActivatedRoute);
+//   topicsStore = inject(TopicsStore);
+//   route = inject(ActivatedRoute);
 
-  protected setFormValues(query: Map<string, any>): void {
-    this.topicForm = this.fb.group({
-      name: [
-        query.get('name'),
-        [
-          Validators.required,
-          Validators.maxLength(255),
-          Validators.pattern(/^[a-zA-Z0-9._-]+$/),
-          (control: AbstractControl): ValidationErrors | null => {
-            if (this.topicNames.has(control.value)) {
-              return { custom: { value: `Topic name ${control.value} already exists.` } };
-            }
-            return null;
-          },
-        ],
-      ],
-      numPartitions: [query.get('numPartitions'), Validators.required],
-      cleanupPolicy: [query.get('cleanupPolicy'), Validators.required],
-      minInSyncReplicas: [query.get('minInSyncReplicas')],
-      replicationFactor: [query.get('replicationFactor')],
-      timeToRetain: [query.get('timeToRetain')],
-      maxMessageBytes: [query.get('maxMessageBytes')],
-      retentionBytes: [''],
-      customParameters: this.fb.array([]),
-    });
-  }
+//   protected setFormValues(query: Map<string, any>): void {
+//     this.topicForm = this.fb.group({
+//       name: [
+//         query.get('name'),
+//         [
+//           Validators.required,
+//           Validators.maxLength(255),
+//           Validators.pattern(/^[a-zA-Z0-9._-]+$/),
+//           (control: AbstractControl): ValidationErrors | null => {
+//             if (this.topicNames.has(control.value)) {
+//               return { custom: { value: `Topic name ${control.value} already exists.` } };
+//             }
+//             return null;
+//           },
+//         ],
+//       ],
+//       numPartitions: [query.get('numPartitions'), Validators.required],
+//       cleanupPolicy: [query.get('cleanupPolicy'), Validators.required],
+//       minInSyncReplicas: [query.get('minInSyncReplicas')],
+//       replicationFactor: [query.get('replicationFactor')],
+//       timeToRetain: [query.get('timeToRetain')],
+//       maxMessageBytes: [query.get('maxMessageBytes')],
+//       retentionBytes: [''],
+//       customParameters: this.fb.array([]),
+//     });
+//   }
 
-  constructor() {
-    const query = this.route.snapshot.queryParamMap;
+//   constructor() {
+//     const query = this.route.snapshot.queryParamMap;
 
-    this.topicForm = this.fb.group({});
-    // this.topicForm = this.fb.group({
-    //   name: [
-    //     query.get('name'),
-    //     [
-    //       Validators.required,
-    //       Validators.maxLength(255),
-    //       Validators.pattern(/^[a-zA-Z0-9._-]+$/),
-    //       (control: AbstractControl): ValidationErrors | null => {
-    //         if (this.topicNames.has(control.value)) {
-    //           return { custom: { value: `Topic name ${control.value} already exists.` } };
-    //         }
-    //         return null;
-    //       },
-    //     ],
-    //   ],
-    //   numPartitions: [query.get('numPartitions'), Validators.required],
-    //   cleanupPolicy: [query.get('cleanupPolicy'), Validators.required],
-    //   minInSyncReplicas: [query.get('minInSyncReplicas')],
-    //   replicationFactor: [query.get('replicationFactor')],
-    //   timeToRetain: [query.get('timeToRetain')],
-    //   maxMessageBytes: [query.get('maxMessageBytes')],
-    //   retentionBytes: [''],
-    //   customParameters: this.fb.array([]),
-    // });
+//     this.topicForm = this.fb.group({});
+//     // this.topicForm = this.fb.group({
+//     //   name: [
+//     //     query.get('name'),
+//     //     [
+//     //       Validators.required,
+//     //       Validators.maxLength(255),
+//     //       Validators.pattern(/^[a-zA-Z0-9._-]+$/),
+//     //       (control: AbstractControl): ValidationErrors | null => {
+//     //         if (this.topicNames.has(control.value)) {
+//     //           return { custom: { value: `Topic name ${control.value} already exists.` } };
+//     //         }
+//     //         return null;
+//     //       },
+//     //     ],
+//     //   ],
+//     //   numPartitions: [query.get('numPartitions'), Validators.required],
+//     //   cleanupPolicy: [query.get('cleanupPolicy'), Validators.required],
+//     //   minInSyncReplicas: [query.get('minInSyncReplicas')],
+//     //   replicationFactor: [query.get('replicationFactor')],
+//     //   timeToRetain: [query.get('timeToRetain')],
+//     //   maxMessageBytes: [query.get('maxMessageBytes')],
+//     //   retentionBytes: [''],
+//     //   customParameters: this.fb.array([]),
+//     // });
 
-    this.route.paramMap.subscribe((params) => {
-      const cluster = parseInt(params.get('cluster')!);
-      this.topicsStore.selectCluster(cluster);
-      //store.loadTopicConfigRows();
-    });
+//     this.route.paramMap.subscribe((params) => {
+//       const cluster = parseInt(params.get('cluster')!);
+//       this.topicsStore.selectCluster(cluster);
+//       //store.loadTopicConfigRows();
+//     });
 
-    // effect(() => {
-    //   const topicNames = store.currentItems()?.map((topic) => topic.topicName);
-    //   this.topicNames = new Set<string>(topicNames);
-    // });
-  }
+//     // effect(() => {
+//     //   const topicNames = store.currentItems()?.map((topic) => topic.topicName);
+//     //   this.topicNames = new Set<string>(topicNames);
+//     // });
+//   }
 
-  get customParameters(): FormArray {
-    return this.topicForm?.get('customParameters') as FormArray;
-  }
+//   get customParameters(): FormArray {
+//     return this.topicForm?.get('customParameters') as FormArray;
+//   }
 
-  buildSaveRequest(): CreateTopicModel {
-    const payload = { ...this.topicForm.value };
+//   buildSaveRequest(): CreateTopicModel {
+//     const payload = { ...this.topicForm.value };
 
-    const saveRequest: CreateTopicModel = {
-      name: payload.name,
-      numPartitions: payload.numPartitions,
-      cleanupPolicy: payload.cleanupPolicy,
-      customParameters: this.customParameters.value,
-    };
+//     const saveRequest: CreateTopicModel = {
+//       name: payload.name,
+//       numPartitions: payload.numPartitions,
+//       cleanupPolicy: payload.cleanupPolicy,
+//       customParameters: this.customParameters.value,
+//     };
 
-    [
-      'minInSyncReplicas',
-      'replicationFactor',
-      'timeToRetain',
-      'maxMessageBytes',
-      'retentionBytes',
-    ].forEach((key) => {
-      const numericValue = parseInt(payload[key]);
-      if (!isNaN(numericValue)) {
-        (<any>saveRequest)[key] = numericValue;
-      }
-    });
+//     [
+//       'minInSyncReplicas',
+//       'replicationFactor',
+//       'timeToRetain',
+//       'maxMessageBytes',
+//       'retentionBytes',
+//     ].forEach((key) => {
+//       const numericValue = parseInt(payload[key]);
+//       if (!isNaN(numericValue)) {
+//         (<any>saveRequest)[key] = numericValue;
+//       }
+//     });
 
-    console.log(saveRequest);
-    return saveRequest;
+//     console.log(saveRequest);
+//     return saveRequest;
 
-    // this.store.createTopic(createRequest).subscribe(() => {
-    //   this.topicForm.reset();
-    //   this.customParameters.clear();
+//     // this.store.createTopic(createRequest).subscribe(() => {
+//     //   this.topicForm.reset();
+//     //   this.customParameters.clear();
 
-    //   this.store.clearCurrentCluster();
-    // });
-  }
-}
+//     //   this.store.clearCurrentCluster();
+//     // });
+//   }
+// }
 
 @Component({
   selector: 'app-topic-edit',
@@ -161,7 +158,11 @@ export class TopicEdit {
   //   });
   // });
 
-  constructor(readonly topicDetailsStore: TopicDetailsStore, readonly topicsStore: TopicsStore, private readonly fb: FormBuilder) {
+  constructor(
+    readonly topicDetailsStore: TopicDetailsStore,
+    readonly topicsStore: TopicsStore,
+    private readonly fb: FormBuilder,
+  ) {
     topicDetailsStore.loadTopicDetails();
     topicDetailsStore.loadSettings();
     topicsStore.loadTopicConfigRows();
@@ -174,7 +175,7 @@ export class TopicEdit {
         console.log(settings);
 
         this.topicForm = this.fb.group({
-          name: [{value: topic.name, disabled: true}],
+          name: [{ value: topic.name, disabled: true }],
           numPartitions: [topic.partitionCount, Validators.required],
           replicationFactor: [topic.replicationFactor],
           // fill from settings
@@ -209,7 +210,7 @@ export class TopicEdit {
                   value: [setting.value, Validators.required],
                 });
                 return pair;
-              })
+              }),
           ),
         });
       }

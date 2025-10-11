@@ -7,13 +7,17 @@
     <div class="field">
       <label class="label">&nbsp;</label>
       <div class="control">
-        @switch (searchMessagesOptions.seekType) { @case ('Offset') {
-        <input class="input" type="number" placeholder="Offset" />
-        } @case ('Timestamp') {
-        <input class="input" type="datetime-local" />
-        } @default {
-        <i>?</i>
-        } }
+        @switch (searchMessagesOptions.seekType) {
+          @case ('Offset') {
+            <input class="input" type="number" placeholder="Offset" />
+          }
+          @case ('Timestamp') {
+            <input class="input" type="datetime-local" />
+          }
+          @default {
+            <i>?</i>
+          }
+        }
       </div>
     </div>
   </div>
@@ -30,7 +34,7 @@
     <ddl-sort-order [(sortOrder)]="searchMessagesOptions.sortOrder" />
   </div>
 </div>
-<pre>partitions {{ searchMessagesOptions.partitions.length }}</pre>
+
 <!-- Search input & filters -->
 <div class="columns">
   <div class="column is-one-third">
@@ -84,35 +88,36 @@
       </tr>
     </thead>
     <tbody>
-      @for (msg of messages(); track $index) { @let expanded = expandedRows.get($index);
-      <tr class="main-row">
-        <td>
-          <span
-            class="icon has-text-info"
-            (click)="onToggleRowClick($index)"
-            (keydown.escape)="onToggleRowClick($index)"
-          >
-            <i
-              class="fas fa-plus-square"
-              [ngClass]="{
-                fas: true,
-                'fa-plus-square': !expanded,
-                'fa-minus-square': expanded
-              }"
-            ></i>
-          </span>
-        </td>
-        <td>{{ msg.offset }}</td>
-        <td>{{ msg.partition }}</td>
-        <td>{{ msg.timestamp | timestamp : 'datetime' }}</td>
-        <td>{{ msg.key | truncate : 30 }}</td>
-        <td>{{ msg.value | truncate : 30 }}</td>
-      </tr>
-      <tr class="details-row" [class.is-hidden]="!expanded">
-        <td colspan="6" style="border: 1px solid black">
-          <message-details [message]="msg" />
-        </td>
-      </tr>
+      @for (msg of messages(); track $index) {
+        @let expanded = expandedRows.get($index);
+        <tr class="main-row">
+          <td>
+            <span
+              class="icon has-text-info"
+              (click)="onToggleRowClick($index)"
+              (keydown.escape)="onToggleRowClick($index)"
+            >
+              <i
+                class="fas fa-plus-square"
+                [ngClass]="{
+                  fas: true,
+                  'fa-plus-square': !expanded,
+                  'fa-minus-square': expanded,
+                }"
+              ></i>
+            </span>
+          </td>
+          <td>{{ msg.offset }}</td>
+          <td>{{ msg.partition }}</td>
+          <td>{{ msg.timestamp | timestamp: 'datetime' }}</td>
+          <td>{{ msg.key | truncate: 30 }}</td>
+          <td>{{ msg.value | truncate: 30 }}</td>
+        </tr>
+        <tr class="details-row" [class.is-hidden]="!expanded">
+          <td colspan="6" style="border: 1px solid black">
+            <message-details [message]="msg" />
+          </td>
+        </tr>
       }
     </tbody>
   </table>
