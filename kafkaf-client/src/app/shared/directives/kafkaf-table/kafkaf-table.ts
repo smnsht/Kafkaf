@@ -1,5 +1,5 @@
 import { Directive, ElementRef, Renderer2 } from '@angular/core';
-import { LoggerService } from '../../services/logger/logger';
+import { LoggerService } from '@app/shared';
 
 @Directive({
   selector: '[appKafkafTable]',

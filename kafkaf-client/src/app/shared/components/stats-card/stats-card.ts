@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { StatsCardItem } from '../../models/stats-cardI-iem';
+import { StatsCardItem } from '@app/shared/models/stats-cardI-iem';
 
 @Component({
   selector: 'app-stats-card',

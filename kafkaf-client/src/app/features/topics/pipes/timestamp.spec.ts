@@ -1,4 +1,4 @@
-import { TimestampPipe } from './timestamp';
+import { TimestampPipe } from '@app/shared';
 
 describe('TimestampPipe', () => {
   it('create an instance', () => {

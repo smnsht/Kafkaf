@@ -1,10 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, signal, WritableSignal } from '@angular/core';
+
 import { forkJoin, Observable, tap } from 'rxjs';
-import { ProblemDetails } from '../models';
-import { LoggerService } from '../services/logger/logger';
-import { BaseState } from '../models/base-state';
-import { PageState } from '../models/page-state';
+
+import { ProblemDetails, LoggerService, BaseState, PageState } from '@shared/index';
 
 export function getErrorMessage(err: HttpErrorResponse): string {
   let errorMessage = 'An unexpected error occurred';

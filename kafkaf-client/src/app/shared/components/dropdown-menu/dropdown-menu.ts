@@ -2,11 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, output } from '@angular/core';
 
 import { of } from 'rxjs';
-import { ClickOutsideDirective } from '../../directives/click-outside/click-outside';
-import { ConfirmationService } from '../../services/confirmation/confirmation';
-import { LoggerService } from '../../services/logger/logger';
-import { DropdownMenuCommand, DropdownMenuEvent } from '../../models/dropdown-menu-event';
 
+import {
+  ClickOutsideDirective,
+  ConfirmationService,
+  DropdownMenuCommand,
+  DropdownMenuEvent,
+  LoggerService,
+} from '@app/shared';
 
 @Component({
   selector: 'dropdown-menu',

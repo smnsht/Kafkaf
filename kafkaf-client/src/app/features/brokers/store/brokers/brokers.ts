@@ -1,15 +1,8 @@
 import { computed, Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
-import { ItemIdPK } from './models';
-import { BaseStore } from './base-store';
 
-
-export interface BrokerInfoRow {
-  brokerID: number;
-  port: number;
-  host: string;
-  controller: number;
-}
+import { BaseStore, ItemIdPK } from 'app/shared/store/base-store';
+import { environment } from 'environments/environment';
+import { BrokerInfoRow } from '@features/brokers/models/broker-info-row';
 
 @Injectable({
   providedIn: 'root',

@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { formatDate } from '@angular/common';
-import { KafkaTimestamp, TimestampType } from '../../features/topics/models/kafka-timestamp';
+import { KafkaTimestamp, TimestampType } from '@app/features/topics/models/kafka-timestamp';
 
 export type TimestampDisplayMode = 'type' | 'unix' | 'datetime';
 

@@ -1,13 +1,6 @@
 import { Injectable } from '@angular/core';
+import { ConfirmationRequest } from '@app/shared';
 import { Observable, Subject } from 'rxjs';
-
-export interface ConfirmationRequest {
-  title: string;
-  body: string;
-  confirmText?: string;
-  cancelText?: string;
-  response$: Subject<boolean>;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +16,7 @@ export class ConfirmationService {
     title: string,
     body: string,
     confirmText = 'Confirm',
-    cancelText = 'Cancel'
+    cancelText = 'Cancel',
   ): Observable<boolean> {
     const response$ = new Subject<boolean>();
     this.requests.next({ title, body, confirmText, cancelText, response$ });

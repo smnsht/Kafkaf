@@ -6,10 +6,12 @@ import {
 import { provideRouter, TitleStrategy } from '@angular/router';
 
 import { routes } from './app.routes';
-import { KafkafTitleStrategy } from './services/kafkaf-title-strategy';
+
 import { provideHttpClient } from '@angular/common/http';
-import { LoggerService } from './services/logger.service';
+
 import { environment } from '../environments/environment';
+import { KafkafTitleStrategy } from './shared/services/kafkaf-title-strategy/kafkaf-title-strategy';
+import { LoggerService } from './shared/services/logger/logger';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,6 +20,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(),
     { provide: TitleStrategy, useClass: KafkafTitleStrategy },
-    { provide: LoggerService, useFactory: () => new LoggerService(environment.logLevel) }
+    { provide: LoggerService, useFactory: () => new LoggerService(environment.logLevel) },
   ],
 };

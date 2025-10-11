@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationRequest, ConfirmationService } from '../../services/confirmation/confirmation';
+import { ConfirmationRequest, ConfirmationService } from '@app/shared';
 
 @Component({
   selector: 'app-confirmation-modal',
