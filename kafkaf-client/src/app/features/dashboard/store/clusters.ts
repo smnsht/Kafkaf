@@ -1,23 +1,11 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { DestroyRef, effect, Injectable, signal } from '@angular/core';
-import { environment } from '../../environments/environment';
+
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
-export interface ClusterInfo {
-  alias: string;
-  version: string;
-  brokerCount: number;
-  onlinePartitionCount: number;
-  topicCount: number;
-  originatingBrokerName?: string;
-  originatingBrokerId: number;
-  isOffline: boolean;
-  error?: string;
-}
-
-export type tKafkaSection = 'brokers' | 'topics' | 'consumers' | null;
+import { ClusterInfo, tKafkaSection } from '../models/cluster-info';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -29,31 +17,34 @@ export class ClustersStore {
   clusterIndex = signal<number>(NaN);
   kafkaSection = signal<tKafkaSection>(null);
 
-  constructor(private http: HttpClient, private readonly router: Router, destroyRef: DestroyRef) {
+  constructor(
+    private http: HttpClient,
+    private readonly router: Router,
+    destroyRef: DestroyRef,
+  ) {
     effect(() => {
       if (this.loading()) {
         this.fetchClusters();
       }
     });
 
-    this.router.events.pipe(
-      filter(e => e instanceof NavigationEnd),
-      takeUntilDestroyed(destroyRef)
-    ).subscribe(event => {
-      const pathParts = event.urlAfterRedirects.split('/').filter(Boolean);
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationEnd),
+        takeUntilDestroyed(destroyRef),
+      )
+      .subscribe((event) => {
+        const pathParts = event.urlAfterRedirects.split('/').filter(Boolean);
 
-      const cluster =
-        pathParts[0] === 'clusters' && !isNaN(+pathParts[1]) ? +pathParts[1] : NaN;
+        const cluster = pathParts[0] === 'clusters' && !isNaN(+pathParts[1]) ? +pathParts[1] : NaN;
 
-      const section = pathParts[2];
-      const validSection: tKafkaSection | null =
-        section === 'brokers' || section === 'topics' || section === 'consumers'
-          ? section
-          : null;
+        const section = pathParts[2];
+        const validSection: tKafkaSection | null =
+          section === 'brokers' || section === 'topics' || section === 'consumers' ? section : null;
 
-      this.clusterIndex.set(cluster);
-      this.kafkaSection.set(validSection);
-    });
+        this.clusterIndex.set(cluster);
+        this.kafkaSection.set(validSection);
+      });
   }
 
   public loadClustersInfo() {

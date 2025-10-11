@@ -1,16 +1,14 @@
 import { Component, computed, model, OnInit, Signal } from '@angular/core';
-import { StatsCard, StatsCardItem } from '../../shared/components/stats-card/stats-card';
+
 import { FormsModule } from '@angular/forms';
-import { KafkafTable } from '../../directives/kafkaf-table';
-import { ClusterInfo, ClustersStore } from '../../services/clusters-store';
-import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
+import { KafkafTableDirective, PageWrapper, StatsCard, StatsCardItem } from '@app/shared';
+import { ClusterInfo, ClustersStore } from '../../store/clusters';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [StatsCard, FormsModule, KafkafTable, PageWrapper],
+  imports: [StatsCard, FormsModule, KafkafTableDirective, PageWrapper],
   templateUrl: './dashboard.html',
-  // styleUrl: './dashboard.scss',
 })
 export class Dashboard implements OnInit {
   private clusters: Signal<ClusterInfo[]>;
@@ -29,14 +27,14 @@ export class Dashboard implements OnInit {
         }
         return acc;
       },
-      { online: 0, offline: 0 }
+      { online: 0, offline: 0 },
     );
 
     const retval: StatsCardItem[] = [
       {
         label: 'Online',
         value: stats.online == 1 ? '1 cluster' : `${stats.online} clusters`,
-        icon: stats.online == 0 ? 'warning' : 'success'
+        icon: stats.online == 0 ? 'warning' : 'success',
       },
       {
         label: 'Offline',
