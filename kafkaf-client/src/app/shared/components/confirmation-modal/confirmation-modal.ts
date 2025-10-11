@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationRequest, ConfirmationService } from '../../services/confirmation-service';
+import { ConfirmationRequest, ConfirmationService } from '../../services/confirmation/confirmation';
 
 @Component({
   selector: 'app-confirmation-modal',
   imports: [],
   templateUrl: './confirmation-modal.html',
-  styleUrl: './confirmation-modal.scss',
 })
 export class ConfirmationModal implements OnInit {
   active = false;

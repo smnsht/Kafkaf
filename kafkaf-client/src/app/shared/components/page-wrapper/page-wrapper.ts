@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { PageState } from '../../shared/store/models';
+import { PageState } from '../../models/page-state';
 
 type SpinnerFontSize = 1 | 2 | 3 | 4;
 
@@ -8,7 +8,6 @@ type SpinnerFontSize = 1 | 2 | 3 | 4;
   selector: 'app-page-wrapper',
   imports: [CommonModule],
   templateUrl: './page-wrapper.html',
-  // styleUrl: './page-wrapper.scss'
 })
 export class PageWrapper {
   @Input() spinnerFontSize: SpinnerFontSize = 1;

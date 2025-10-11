@@ -1,20 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, output } from '@angular/core';
-import { ClickOutsideDirective } from '../../directives/click-outside';
-import { ConfirmationService } from '../../services/confirmation-service';
-import { LoggerService } from '../../services/logger.service';
+
 import { of } from 'rxjs';
+import { ClickOutsideDirective } from '../../directives/click-outside/click-outside';
+import { ConfirmationService } from '../../services/confirmation/confirmation';
+import { LoggerService } from '../../services/logger/logger';
+import { DropdownMenuCommand, DropdownMenuEvent } from '../../models/dropdown-menu-event';
 
-export type DropdownMenuCommand =
-  | 'ClearMessages'
-  | 'RecreateTopic'
-  | 'RemoveTopic'
-  | 'EditSettings';
-
-export interface DropdownMenuEvent {
-  command: DropdownMenuCommand;
-  confirmed: boolean;
-}
 
 @Component({
   selector: 'dropdown-menu',

@@ -1,4 +1,4 @@
-import { TruncatePipe } from './truncate-pipe';
+import { TruncatePipe } from './truncate';
 
 describe('TruncatePipe', () => {
   it('create an instance', () => {

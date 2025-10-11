@@ -1,4 +1,4 @@
-import { TimestampPipe } from './timestamp-pipe';
+import { TimestampPipe } from './timestamp';
 
 describe('TimestampPipe', () => {
   it('create an instance', () => {

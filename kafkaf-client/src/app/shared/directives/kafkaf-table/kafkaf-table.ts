@@ -1,14 +1,14 @@
 import { Directive, ElementRef, Renderer2 } from '@angular/core';
-import { LoggerService } from '../services/logger.service';
+import { LoggerService } from '../../services/logger/logger';
 
 @Directive({
   selector: '[appKafkafTable]',
 })
-export class KafkafTable {
+export class KafkafTableDirective {
   constructor(
     private el: ElementRef,
     private renderer: Renderer2,
-    private readonly logger: LoggerService
+    private readonly logger: LoggerService,
   ) {
     const nativeEl = this.el.nativeElement;
 

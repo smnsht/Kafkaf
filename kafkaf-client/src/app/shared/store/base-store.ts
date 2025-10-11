@@ -1,8 +1,10 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, signal, WritableSignal } from '@angular/core';
 import { forkJoin, Observable, tap } from 'rxjs';
-import { ProblemDetails } from '../models/response.models';
-import { LoggerService } from '../services/logger.service';
+import { ProblemDetails } from '../models';
+import { LoggerService } from '../services/logger/logger';
+import { BaseState } from '../models/base-state';
+import { PageState } from '../models/page-state';
 
 export function getErrorMessage(err: HttpErrorResponse): string {
   let errorMessage = 'An unexpected error occurred';
@@ -16,20 +18,6 @@ export function getErrorMessage(err: HttpErrorResponse): string {
   }
 
   return errorMessage;
-}
-
-export interface BaseState<T> {
-  itemsMap: Map<number, T[]>;
-  clusterIdx: number;
-  loading?: boolean | null;
-  error?: string | null;
-  notice?: string | null;
-}
-
-export interface PageState {
-  loading?: boolean | null;
-  error?: string | null;
-  notice?: string | null;
 }
 
 export type ItemIdPK = string | number;
@@ -197,7 +185,7 @@ export abstract class BaseStore<T> {
     clusterIdx: number,
     itemId: string | number,
     reload = false,
-    successNotice: string = 'Item deleted successfully'
+    successNotice: string = 'Item deleted successfully',
   ): Observable<void> {
     const url = this.resourceItemUrl(clusterIdx, itemId);
 
@@ -235,7 +223,7 @@ export abstract class BaseStore<T> {
             error: err.message,
           });
         },
-      })
+      }),
     );
   }
 
@@ -243,10 +231,10 @@ export abstract class BaseStore<T> {
     clusterIdx: number,
     itemIds: ItemIdPK[],
     reload = false,
-    successNotice = 'Items deleted successfully.'
+    successNotice = 'Items deleted successfully.',
   ): Observable<void[]> {
     const requests = itemIds.map((id) =>
-      this.http.delete<void>(this.resourceItemUrl(clusterIdx, id))
+      this.http.delete<void>(this.resourceItemUrl(clusterIdx, id)),
     );
 
     return forkJoin(requests).pipe(
@@ -269,8 +257,8 @@ export abstract class BaseStore<T> {
             });
           }
         },
-        error: this.handleError.bind(this)
-      })
+        error: this.handleError.bind(this),
+      }),
     );
   }
 
