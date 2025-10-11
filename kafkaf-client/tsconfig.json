@@ -18,7 +18,8 @@
     "paths": {
       "@app/*": ["app/*"],
       "@shared/*": ["app/shared/*"],
-      "@features/*": ["app/features/*"]
+      "@features/*": ["app/features/*"],
+      "@brokers/*": ["app/features/brokers/*"]
     }
   },
   "angularCompilerOptions": {

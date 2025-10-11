@@ -1,14 +1,12 @@
 import { Component } from '@angular/core';
-import { KafkafTable } from '../../directives/kafkaf-table';
-import { BrokerDetailsStore } from '../../services/broker-details-store';
+import { KafkafTableDirective } from '@app/shared';
+import { BrokerDetailsStore } from '../../store/broker-details/broker-details';
 
 @Component({
   selector: 'app-broker-log-directories',
-  imports: [KafkafTable],
+  imports: [KafkafTableDirective],
   templateUrl: './broker-log-directories.html',
-  // styleUrl: './broker-log-directories.scss'
 })
 export class BrokerLogDirectories {
-
-  constructor(public store: BrokerDetailsStore){}
+  constructor(public store: BrokerDetailsStore) {}
 }

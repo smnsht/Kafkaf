@@ -1,9 +1,8 @@
 import { Component, computed } from '@angular/core';
-import { StatsCard, StatsCardItem } from '../../shared/components/stats-card/stats-card';
 import { ActivatedRoute, Router } from '@angular/router';
-import { KafkafTable } from '../../directives/kafkaf-table';
-import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-import { BrokersStore } from '../../shared/store/brokers-store';
+
+import { KafkafTableDirective, PageWrapper, StatsCard, StatsCardItem } from '@app/shared';
+import { BrokersStore } from '@brokers/store/brokers/brokers';
 
 const defaultCardItems: ReadonlyArray<StatsCardItem> = [
   { label: 'Broker Count', value: 0, icon: 'danger' },
@@ -18,9 +17,8 @@ const defaultCardItems: ReadonlyArray<StatsCardItem> = [
 @Component({
   selector: 'app-brokers-list',
   standalone: true,
-  imports: [StatsCard, KafkafTable, PageWrapper],
+  imports: [StatsCard, PageWrapper, KafkafTableDirective],
   templateUrl: './brokers-list.html',
-  styleUrl: './brokers-list.scss',
 })
 export class BrokersList {
   cardItems = computed(() => {
@@ -48,7 +46,7 @@ export class BrokersList {
   constructor(
     private readonly router: Router,
     readonly store: BrokersStore,
-    route: ActivatedRoute
+    route: ActivatedRoute,
   ) {
     route.paramMap.subscribe((params) => {
       const cluster = parseInt(params.get('cluster')!);

@@ -1,9 +1,7 @@
 import { Component, OnInit, Signal } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
-import { StatsCard, StatsCardItem } from '../../shared/components/stats-card/stats-card';
-import { BrokerDetailsStore } from '../../services/broker-details-store';
-import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-import { PageState } from '../../shared/store/models';
+import { PageState, PageWrapper, StatsCard, StatsCardItem } from '@app/shared';
+import { BrokerDetailsStore } from '../../store/broker-details/broker-details';
 
 type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
 
@@ -11,7 +9,6 @@ type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
   selector: 'app-broker-details',
   imports: [RouterLink, StatsCard, RouterOutlet, PageWrapper],
   templateUrl: './broker-details.html',
-  styleUrl: './broker-details.scss',
 })
 export class BrokerDetails implements OnInit {
   cardItems: StatsCardItem[] = [];
@@ -19,12 +16,12 @@ export class BrokerDetails implements OnInit {
   broker = NaN;
   currentTab?: BrokerTabs;
 
-  pageState : Signal<PageState>;
+  pageState: Signal<PageState>;
 
   constructor(route: ActivatedRoute, store: BrokerDetailsStore) {
     this.pageState = store.pageState;
 
-    route.paramMap.subscribe(paramMap => {
+    route.paramMap.subscribe((paramMap) => {
       this.cluster = parseInt(paramMap.get('cluster')!);
       this.broker = parseInt(paramMap.get('broker')!);
 

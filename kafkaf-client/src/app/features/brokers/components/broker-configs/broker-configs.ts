@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { BrokerDetailsStore } from '../../store/broker-details/broker-details';
-import { KafkafTableDirective } from '@app/shared/directives/kafkaf-table/kafkaf-table';
+import { KafkafTableDirective } from '@shared/index';
+import { BrokerDetailsStore } from '@brokers/store/broker-details/broker-details';
 
 @Component({
   selector: 'app-broker-configs',

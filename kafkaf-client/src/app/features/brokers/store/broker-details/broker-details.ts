@@ -1,21 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { environment } from '../../environments/environment';
-import { PageState } from '../store/models';
-
-export interface BrokerConfigRow {
-  isDefault: boolean;
-  isReadOnly: boolean;
-  isSensitive: boolean;
-  name: string;
-  value: string;
-  source: string;
-}
-
-export interface ClusterBroker {
-  clusterIdx: number;
-  brokerId: number;
-}
+import { BrokerConfigRow } from '../../models/broker-config-row';
+import { ClusterBroker } from '../../models/cluster-broker';
+import { PageState } from '@app/shared';
+import { environment } from 'environments/environment';
 
 interface BrokerDetailsState {
   configs: Map<string, BrokerConfigRow[]>;
