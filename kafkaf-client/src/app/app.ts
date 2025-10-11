@@ -1,9 +1,8 @@
 import { Component, Signal, signal } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import { Navbar } from './features/dashboard/navbar/navbar';
-
-import { ClusterInfo, tKafkaSection, ClustersStore } from './shared/services/clusters-store';
-import { ClusterSideMenu, ConfirmationModal } from './components';
+import { ConfirmationModal } from './shared';
+import { ClusterInfo, ClusterSideMenu, Navbar, tKafkaSection } from './features/dashboard';
+import { ClustersStore } from './features/dashboard/store/clusters';
 
 @Component({
   selector: 'app-root',

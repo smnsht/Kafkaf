@@ -1,24 +1,25 @@
 import { Routes } from '@angular/router';
 import { clusterBrokerGuardFn, clusterGuardFn } from './app.guards';
-
 import {
-  BrokerConfigs,
+  BrokersList,
   BrokerDetails,
   BrokerLogDirectories,
+  BrokerConfigs,
   BrokerMetrics,
-  BrokersList,
-  Consumers,
-  Dashboard,
-  TopicConsumers,
-  TopicDetails,
-  TopicMessages,
-  TopicOverview,
-  TopicsCreate,
-  TopicSettings,
+} from './features/brokers';
+import { Consumers } from './features/consumers';
+import { Dashboard } from './features/dashboard';
+import {
   TopicsList,
+  TopicsCreate,
+  TopicDetails,
+  TopicOverview,
+  TopicMessages,
+  TopicConsumers,
+  TopicSettings,
+  TopicEdit,
   TopicStatistics,
-} from './pages';
-import { TopicEdit } from './pages/topic-edit/topic-edit';
+} from './features/topics';
 
 export const routes: Routes = [
   { path: '', component: Dashboard },

@@ -2,7 +2,8 @@ import { Component, computed, model, OnInit, Signal } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { KafkafTableDirective, PageWrapper, StatsCard, StatsCardItem } from '@app/shared';
-import { ClusterInfo, ClustersStore } from '../../store/clusters';
+import {  ClustersStore } from '../../store/clusters';
+import { ClusterInfo } from '../../models/cluster-info';
 
 @Component({
   selector: 'app-dashboard',
