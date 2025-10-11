@@ -1,0 +1,24 @@
+@if (!store.loading()) {
+  <!-- TODO: search element -->
+  <input type="search" />
+
+  <table appKafkafTable>
+    <thead>
+      <tr>
+        <th>Key</th>
+        <th>Value</th>
+        <th>Source</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (cfg of store.configs(); track $index) {
+        <tr>
+          <td>{{ cfg.name }}</td>
+          <td>{{ cfg.value }}</td>
+          <td>{{ cfg.source }}</td>
+          <!-- <td><button type="button" class="btn btn-primary" disabled>Edit</button> @t.Item3</td> -->
+        </tr>
+      }
+    </tbody>
+  </table>
+}

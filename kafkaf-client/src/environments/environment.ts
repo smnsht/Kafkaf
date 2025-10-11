@@ -1,4 +1,7 @@
+import { LogLevel } from '@app/shared';
+
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:5175/api'
+  logLevel: LogLevel.Warn,
+  apiUrl: 'http://localhost:5175/api',
 };

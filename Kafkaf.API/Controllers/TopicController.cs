@@ -1,4 +1,6 @@
-﻿using Confluent.Kafka.Admin;
+﻿using Confluent.Kafka;
+using Confluent.Kafka.Admin;
+using Kafkaf.API.Models;
 using Kafkaf.API.Services;
 using Kafkaf.API.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +9,7 @@ namespace Kafkaf.API.Controllers;
 
 [Route("api/clusters/{clusterIdx:clusterIndex}/topics/{topicName:topicName}")]
 [ApiController]
-public class TopicController : ControllerBase
+public partial class TopicController : ControllerBase
 {
 	private readonly TopicsService _topicsService;
 	private readonly WatermarkOffsetsService _consumerService;
@@ -33,50 +35,72 @@ public class TopicController : ControllerBase
 		string topicName
 	)
 	{
-		DescribeTopicsResult topicResult = default!;
 		try
 		{
 			// Will throw DescribeTopicsException when topic not found
-			topicResult = await _topicsService.DescribeTopicsAsync(clusterIdx, topicName);
+			var topicResult = await _topicsService.DescribeTopicsAsync(clusterIdx, topicName);
+
+			var desc =
+				topicResult.TopicDescriptions.FirstOrDefault()
+				?? throw new InvalidOperationException(
+					$"Topic '{topicName}' was not found in cluster {clusterIdx}."
+				);
+
+			var partitionOffsets = _consumerService.GetWatermarkOffsets(
+				clusterIdx,
+				topicName,
+				desc.Partitions.Select(p => p.Partition).ToArray()
+			);
+
+			var topicDetails = new TopicDetailsViewModel(desc, partitionOffsets);
+
+			return Ok(topicDetails);
 		}
 		catch (DescribeTopicsException dte)
 		{
 			return NotFound(dte.Message);
 		}
-
-		var desc =
-			topicResult.TopicDescriptions.FirstOrDefault()
-			?? throw new InvalidOperationException(
-				$"Topic '{topicName}' was not found in cluster {clusterIdx}."
-			);
-
-		var partitionOffsets = _consumerService.GetWatermarkOffsets(
-			clusterIdx,
-			topicName,
-			desc.Partitions.Select(p => p.Partition).ToArray()
-		);
-
-		var topicDetails = new TopicDetailsViewModel(desc, partitionOffsets);
-
-		return Ok(topicDetails);
+		catch (KafkaException kte)
+		{
+			return Problem(kte.Error.Reason);
+		}
 	}
 
+	/// <summary>
+	/// GET api/clusters/{clusterIdx}/topics/{topicName}/settings
+	/// </summary>
+	/// <param name="clusterIdx"></param>
+	/// <param name="topicName"></param>
+	/// <returns></returns>
 	[HttpGet("settings")]
 	public async Task<ActionResult<TopicSettingRow[]>> GetTopicSettingsAsync(
 		int clusterIdx,
 		string topicName
 	)
 	{
-		var topicConfig = await _topicsService.DescribeTopicConfigsAsync(clusterIdx, topicName);
-
-		if (topicConfig is DescribeConfigsResult configs)
+		try
 		{
-			return Ok(TopicSettingRow.FromResult(configs));
+			var topicConfig = await _topicsService.DescribeTopicConfigsAsync(clusterIdx, topicName);
+
+			if (topicConfig is DescribeConfigsResult configs)
+			{
+				return Ok(TopicSettingRow.FromResult(configs));
+			}
+		}
+		catch (KafkaException ex)
+		{
+			return Problem(ex.Error.Reason);
 		}
 
 		return NotFound($"Can't get configs for topic");
 	}
 
+	/// <summary>
+	/// GET api/clusters/{clusterIdx}/topics/{topicName}/consumers
+	/// </summary>
+	/// <param name="clusterIdx"></param>
+	/// <param name="topicName"></param>
+	/// <returns></returns>
 	[HttpGet("consumers")]
 	public async Task<ActionResult<ConsumerGroupListing[]>> GetTopicConsumersAsync(
 		int clusterIdx,
@@ -109,5 +133,38 @@ public class TopicController : ControllerBase
 		{
 			return Problem(e.Message);
 		}
+	}
+
+	[HttpPost("recreate")]
+	public async Task<ActionResult> RecreateTopicAsync(
+		int clusterIdx,
+		string topicName,
+		[FromBody] RecreateTopicModel req
+	)
+	{
+		var topicConfig = await _topicsService.DescribeTopicConfigsAsync(clusterIdx, topicName);
+
+		if (topicConfig is DescribeConfigsResult describeConfigsResult)
+		{
+			await _topicsService.DeleteTopicAsync(clusterIdx, topicName);
+
+			var configs = describeConfigsResult
+				.Entries.Where(e => e.Value != null && !e.Value.IsDefault)
+				.ToDictionary(e => e.Key, e => e.Value.Value);
+
+			var topicSpec = new TopicSpecification()
+			{
+				Name = topicName,
+				NumPartitions = req.numPartitions,
+				ReplicationFactor = req.replicationFactor,
+				Configs = configs,
+			};
+
+			await _topicsService.CreateTopicsAsync(clusterIdx, topicSpec);
+
+			return Ok();
+		}
+
+		return NotFound($"Can't get configs for topic");
 	}
 }

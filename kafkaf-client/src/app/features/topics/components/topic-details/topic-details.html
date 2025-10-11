@@ -1,0 +1,66 @@
+<div class="columns">
+  <!-- Breadcrumbs-->
+  <div class="column">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li>
+          <a [routerLink]="['/clusters', store.clusterIdx(), 'topics']">Topics</a>
+        </li>
+        <li class="is-active">
+          <a href="#" aria-current="page" class="has-text-black">Topic #{{ store.topic() }}</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <!-- Button -->
+  <div class="column is-flex is-justify-content-flex-end is-align-items-center">
+    <button
+      class="button is-primary ml-2"
+      (click)="store.setShowMessageForm(true)"
+      [class.is-loading]="topicsStore.loading()"
+    >
+      <span class="icon is-small">
+        <i class="fas fa-envelope"></i>
+      </span>
+      <span>Produce Message</span>
+    </button>
+    <topics-dropdown-menu
+      [showEditSettings]="!isEditSettings"
+      [topicName]="store.topic()"
+      [disabled]="!!topicsStore.loading()"
+      (commandSelected)="onCommandSelected($event)"
+    ></topics-dropdown-menu>
+  </div>
+</div>
+
+<app-page-wrapper [state]="topicsStore.pageState()">
+  <!-- Tabs -->
+  <div class="tabs">
+    <ul>
+      <li [class.is-active]="currentTab == 'TopicOverview'">
+        <a [routerLink]="[{ outlets: { topic: [] } }]">Overview</a>
+      </li>
+      <li [class.is-active]="currentTab == 'TopicMessages'">
+        <a [routerLink]="[{ outlets: { topic: ['messages'] } }]">Messages</a>
+      </li>
+      <li [class.is-active]="currentTab == 'TopicConsumers'">
+        <a [routerLink]="[{ outlets: { topic: ['consumers'] } }]">Consumers</a>
+      </li>
+      <li [class.is-active]="currentTab == 'TopicSettings'">
+        <a [routerLink]="[{ outlets: { topic: ['settings'] } }]">Settings</a>
+      </li>
+      <li [class.is-active]="currentTab == 'TopicStatistics'">
+        <a [routerLink]="[{ outlets: { topic: ['statistics'] } }]">Statistics</a>
+      </li>
+    </ul>
+  </div>
+
+  <router-outlet
+    name="topic"
+    (activate)="onTopicActivate($event)"
+    (deactivate)="onTopicDeactivate($event)"
+  ></router-outlet>
+
+  <message-form />
+
+</app-page-wrapper>

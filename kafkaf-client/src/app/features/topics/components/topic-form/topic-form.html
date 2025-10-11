@@ -1,0 +1,162 @@
+@if (topicForm()) { @let form = topicForm()!;
+
+<form [formGroup]="form">
+  <!-- topic name  -->
+  <div class="columns">
+    <div class="column is-half">
+      <bulma-field
+        label="Topic Name"
+        for="topicName"
+        [control]="form.get('name')"
+        patternMessage="Only letters, numbers, `.`, `_`, and `-` are allowed. It cannot start with `.` or `-`."
+      >
+        <input
+          class="input"
+          type="text"
+          id="topicName"
+          maxlength="255"
+          formControlName="name"
+          placeholder="Topic Name"
+        />
+      </bulma-field>
+    </div>
+  </div>
+
+  <div class="columns">
+    <!-- Number of partitions-->
+    <div class="column is-one-fifth">
+      <bulma-field
+        label="Number of Partitions"
+        for="numPartitions"
+        [control]="form.get('numPartitions')"
+      >
+        <input
+          class="input"
+          type="number"
+          id="numPartitions"
+          min="1"
+          formControlName="numPartitions"
+          placeholder="Number of Partitions"
+        />
+      </bulma-field>
+    </div>
+
+    <!-- Cleanup policy -->
+    <div class="column is-one-fifth">
+      <bulma-field label="Cleanup policy" for="cleanupPolicy" [control]="form.get('cleanupPolicy')">
+        <div class="select">
+          <select id="cleanupPolicy" formControlName="cleanupPolicy">
+            <option value="delete">Delete</option>
+            <option value="compact">Compact</option>
+            <option value="compact,delete">Compact,Delete</option>
+          </select>
+        </div>
+      </bulma-field>
+    </div>
+  </div>
+
+  <div class="columns">
+    <!-- Min In Sync Replicas -->
+    <div class="column is-one-fifth">
+      <bulma-field
+        label="Min In Sync Replicas"
+        for="minInSyncReplicas"
+        [control]="form.get('minInSyncReplicas')"
+      >
+        <input
+          class="input"
+          type="number"
+          id="minInSyncReplicas"
+          min="1"
+          formControlName="minInSyncReplicas"
+          placeholder="Min In Sync Replicas"
+        />
+      </bulma-field>
+    </div>
+
+    <!-- Replication Factor -->
+    <div class="column is-one-fifth">
+      <bulma-field
+        label="Replication Factor"
+        for="replicationFactor"
+        [control]="form.get('replicationFactor')"
+      >
+        <input
+          class="input"
+          type="number"
+          id="replicationFactor"
+          min="1"
+          formControlName="replicationFactor"
+          placeholder="Replication Factor"
+        />
+      </bulma-field>
+    </div>
+  </div>
+
+  <div class="columns">
+    <!-- Time to retain data (in ms) -->
+    <div class="column is-one-third">
+      <bulma-field
+        label="Time to retain data (in ms)"
+        for="timeToRetain"
+        [control]="form.get('timeToRetain')"
+      >
+        <input
+          class="input"
+          type="number"
+          id="timeToRetain"
+          formControlName="timeToRetain"
+          placeholder="Time to retain data (in ms)"
+        />
+
+        <div class="buttons are-small is-justify-content-space-around pt-2">
+          <button class="button is-light" (click)="addTimeToRetain(0.5)">12 hours</button>
+          <button class="button is-light" (click)="addTimeToRetain(1)">1 day</button>
+          <button class="button is-light" (click)="addTimeToRetain(2)">2 days</button>
+          <button class="button is-light" (click)="addTimeToRetain(7)">7 days</button>
+          <button class="button is-light" (click)="addTimeToRetain(28)">4 weeks</button>
+        </div>
+      </bulma-field>
+    </div>
+  </div>
+
+  <div class="columns">
+    <!-- Max size on disk in GB -->
+    <div class="column is-one-fifth">
+      <bulma-field
+        label="Max size on disk in GB"
+        for="retentionBytes"
+        [control]="form.get('retentionBytes')"
+      >
+        <div class="select is-fullwidth">
+          <select id="retentionBytes" formControlName="retentionBytes">
+            <option value="-1" selected>Not Set</option>
+            <option value="1">1 GB</option>
+            <option value="10">10 GB</option>
+            <option value="20">20 GB</option>
+            <option value="50">50 GB</option>
+          </select>
+        </div>
+      </bulma-field>
+    </div>
+
+    <!-- Maximum message size in bytes -->
+    <div class="column is-one-quarter">
+      <bulma-field
+        label="Max message size in bytes"
+        for="maxMessageBytes"
+        [control]="form.get('maxMessageBytes')"
+      >
+        <input
+          class="input"
+          type="number"
+          id="maxMessageBytes"
+          formControlName="maxMessageBytes"
+          placeholder="Maximum message size in bytes"
+        />
+      </bulma-field>
+    </div>
+  </div>
+</form>
+
+}

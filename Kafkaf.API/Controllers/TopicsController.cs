@@ -1,4 +1,5 @@
-﻿using Kafkaf.API.Models;
+﻿using Confluent.Kafka.Admin;
+using Kafkaf.API.Models;
 using Kafkaf.API.Services;
 using Kafkaf.API.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -27,24 +28,31 @@ public class TopicsController : ControllerBase
 		return metadata.Topics.Select(topicMeta => new TopicsListViewModel(topicMeta));
 	}
 
+	[HttpGet("configs")]
+	public TopicConfigRow[] GetConfigs() => TopicConfigRow.FromDefault();
+
 	[HttpPost]
 	public async Task<ActionResult> CreateAsync(int clusterIdx, CreateTopicModel req)
 	{
-		await _topicsService.CreateTopicsAsync(clusterIdx, req.ToTopicSpecification());
-		return Created();
+		try
+		{
+			await _topicsService.CreateTopicsAsync(clusterIdx, req.ToTopicSpecification());
+			return Created();
+		}
+		catch (CreateTopicsException ex)
+		{
+			return Problem(ex.Results[0].Error.Reason);
+		}
 	}
 
-	//[HttpDelete]
-	//public async Task<BatchActionResult> DeleteAsync(
-	//	int clusterIdx,
-	//	[FromQuery] DeleteTopicsRequest req
-	//)
-	//{
-	//	//var deleteResult = await _topicsService.DeleteTopicsAsync(clusterIdx, req.names);
+	[HttpDelete]
+	public async Task<BatchActionResult> DeleteAsync(
+		int clusterIdx,
+		[FromQuery] DeleteTopicsRequest req
+	)
+	{
+		var deleteResult = await _topicsService.DeleteTopicsAsync(clusterIdx, req.names);
 
-	//	//return new BatchActionResult(deleteResult, null);
-	//	await Task.Delay(10);
-	//	var foo = req.names.Select(name => new BatchItemResult(name, true));
-	//	return new BatchActionResult(foo, "asdfasd");
-	//}	
+		return new BatchActionResult(deleteResult, null);
+	}
 }

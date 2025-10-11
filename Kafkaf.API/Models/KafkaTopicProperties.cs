@@ -2,6 +2,10 @@
 
 public static class KafkaTopicProperties
 {
+	/// <summary>
+	/// From Kafka: https://docs.confluent.io/platform/current/installation/configuration/topic-configs.html
+	/// </summary>
+	/// 
 	public static readonly Dictionary<string, (string Type, string DefaultValue)> TopicConfigs = new Dictionary<string, (string Type, string DefaultValue)>
 	{
         // Cleanup and Retention
@@ -11,6 +15,10 @@ public static class KafkaTopicProperties
         { "delete.retention.ms", ("long", "86400000") }, // 1 day
         { "min.cleanable.dirty.ratio", ("double", "0.5") },
 		{ "file.delete.delay.ms", ("long", "60000") },
+		{ "local.retention.ms", ("long", "-2") },
+		{ "local.retention.bytes", ("long", "-2") },
+		{ "preallocate", ("boolean", "false") },
+		{ "unclean.leader.election.enable", ("boolean", "false") },
 
         // Compression
         { "compression.type", ("string", "producer") },
@@ -40,10 +48,17 @@ public static class KafkaTopicProperties
         { "message.downconversion.enable", ("boolean", "true") },
 		{ "message.timestamp.type", ("string", "CreateTime") },
 		{ "message.timestamp.difference.max.ms", ("long", "9223372036854775807") }, // Long.MaxValue
+		{ "message.timestamp.after.max.ms", ("long", "3600000") },
+		{ "message.timestamp.before.max.ms", ("long", "9223372036854775807") },
 
         // Compaction (for logs with cleanup.policy = compact)
         { "max.compaction.lag.ms", ("long", "9223372036854775807") }, // Long.MaxValue
-        { "min.compaction.lag.ms", ("long", "0") }
+        { "min.compaction.lag.ms", ("long", "0") },
+
+		// Remote
+		{ "remote.log.delete.on.disable", ("boolean", "false") },
+		{ "remote.log.copy.disable", ("boolean", "false") },
+		{ "remote.storage.enable", ("boolean", "false") },
 	};
 
 	public static string[] GetKeys() => TopicConfigs.Keys.ToArray();

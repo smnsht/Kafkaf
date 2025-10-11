@@ -1,0 +1,16 @@
+<app-page-wrapper [loading]="topicDetailsStore.loadingDetails() || topicDetailsStore.loadingSettings()">
+  <topic-form [topicForm]="topicForm" />
+
+  <topic-custsom-parameters
+    [topicForm]="topicForm"
+    [customParameters]="customParameters"
+    [configs]="topicsStore.topicConfigRows()"
+    [loadingConfigRows]="topicsStore.loadingConfigRows()"
+  />
+
+  <hr />
+
+  @if (topicForm) {
+  <pre>{{ topicForm.value | json }}</pre>
+  }
+</app-page-wrapper>
