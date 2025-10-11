@@ -1,16 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { finalize, Observable, tap } from 'rxjs';
-import { TopicSettingRow, TopicsListViewModel } from '../response.models';
+import { TopicConfigRow, TopicSettingRow, TopicsListViewModel } from '../response.models';
 import { BaseStore } from './base-store';
 import { CreateTopicModel, RecreateTopicModel } from './request.models';
 import { HttpErrorResponse } from '@angular/common/http';
 
-export interface TopicConfigRow {
-  key: string;
-  type: string;
-  defaultValue: string;
-}
 
 @Injectable({
   providedIn: 'root',

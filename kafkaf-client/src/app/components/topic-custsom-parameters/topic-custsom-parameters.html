@@ -4,6 +4,7 @@
 <form [formGroup]="topicForm()!">
   <ng-container formArrayName="customParameters">
     @for (pair of customParameters()?.controls; track $index; let i = $index) {
+      <small>{{ pair.get('key')?.value}}</small>
     <div class="columns" [formGroupName]="i">
       <div class="column is-one-fifth">
         <bulma-field

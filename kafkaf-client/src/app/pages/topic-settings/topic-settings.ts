@@ -7,7 +7,6 @@ import { PageWrapper } from "../../components/page-wrapper/page-wrapper";
   selector: 'app-topic-settings',
   imports: [KafkafTable, PageWrapper],
   templateUrl: './topic-settings.html',
-  // styleUrl: './topic-settings.scss'
 })
 export class TopicSettings {
   constructor(readonly store: TopicDetailsStore){

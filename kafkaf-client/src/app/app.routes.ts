@@ -18,6 +18,7 @@ import {
   TopicsList,
   TopicStatistics,
 } from './pages';
+import { TopicEdit } from './pages/topic-edit/topic-edit';
 
 export const routes: Routes = [
   { path: '', component: Dashboard },
@@ -95,6 +96,12 @@ export const routes: Routes = [
         path: 'settings',
         component: TopicSettings,
         title: 'Cluster %cluster% > Topic %topic% > Settings',
+        outlet: 'topic',
+      },
+      {
+        path: 'edit',
+        component: TopicEdit,
+        title: 'Cluster %cluster% > Topic %topic% > Edit',
         outlet: 'topic',
       },
       {

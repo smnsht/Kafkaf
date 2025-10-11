@@ -56,7 +56,7 @@ export class TopicsCreate {
       replicationFactor: [query.get('replicationFactor')],
       timeToRetain: [query.get('timeToRetain')],
       maxMessageBytes: [query.get('maxMessageBytes')],
-      retentionBytes: [''],
+      retentionBytes: [-1],
       customParameters: this.fb.array([]),
     });
 

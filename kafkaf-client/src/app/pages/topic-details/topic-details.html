@@ -25,7 +25,7 @@
       <span>Produce Message</span>
     </button>
     <topics-dropdown-menu
-      [showEditSettings]="true"
+      [showEditSettings]="!isEditSettings"
       [topicName]="store.topic()"
       [disabled]="!!topicsStore.loading()"
       (commandSelected)="onCommandSelected($event)"

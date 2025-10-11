@@ -35,7 +35,12 @@ export class DropdownMenu {
 
     const confirmed$ = showConfirmationModal
       ? this.confirmationService.confirm(this.confirmationTitle, this.getConfirmationBody(command))
-      : of(true);
+      : (() => {
+          // trigger "click outside" event and close the menu
+          const nav = document.getElementsByTagName('nav')[0];
+          nav.click();
+          return of(true);
+        })();
 
     confirmed$.subscribe((confirmed) => {
       this.commandSelected.emit({ command, confirmed });
@@ -51,6 +56,10 @@ export class DropdownMenu {
 
   handleKeyDown(event: KeyboardEvent) {
     this.logger.debug('[DropdownMenu]: ', event);
+  }
+
+  toggleisActive(): void {
+    this.isActive = !this.isActive;
   }
 
   protected getConfirmationBody(_: DropdownMenuCommand): string {

@@ -13,7 +13,8 @@ type TopicTabs =
   | 'TopicMessages'
   | 'TopicConsumers'
   | 'TopicSettings'
-  | 'TopicStatistics';
+  | 'TopicStatistics'
+  | 'TopicEdit';
 
 function getRequiredParams(route: ActivatedRoute) {
   const { paramMap } = route.snapshot;
@@ -41,6 +42,7 @@ function getRequiredParams(route: ActivatedRoute) {
 })
 export class TopicDetails {
   currentTab: TopicTabs = 'TopicOverview';
+  isEditSettings = false;
 
   constructor(
     public readonly topicsStore: TopicsStore,
@@ -58,6 +60,9 @@ export class TopicDetails {
   onTopicActivate(componentRef: any) {
     let timeoutID = setTimeout(() => {
       this.currentTab = componentRef.constructor.name as TopicTabs;
+
+      this.isEditSettings = this.currentTab == 'TopicEdit';
+
       clearTimeout(timeoutID);
     }, 100);
   }
@@ -72,7 +77,14 @@ export class TopicDetails {
     if (event.confirmed && topic) {
       switch (event.command) {
         case 'EditSettings':
-          console.log('EditSettings', topic);
+          this.router.navigate([
+            'clusters',
+            this.store.clusterIdx(),
+            'topics',
+            this.store.topic(),
+            { outlets: { topic: ['edit'] } },
+          ]);
+
           break;
 
         case 'ClearMessages':
@@ -89,11 +101,12 @@ export class TopicDetails {
           break;
 
         case 'RemoveTopic':
-          this.topicsStore.deleteTopic(topic.name).pipe(
-            concatMap(() => timer(2000))
-          ).subscribe(() => {
-            this.router.navigate(['../'], { relativeTo: this.route });
-          });
+          this.topicsStore
+            .deleteTopic(topic.name)
+            .pipe(concatMap(() => timer(2000)))
+            .subscribe(() => {
+              this.router.navigate(['../'], { relativeTo: this.route });
+            });
           break;
       }
     }

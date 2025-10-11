@@ -10,8 +10,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { BulmaField } from '../bulma-field/bulma-field';
-import { TopicConfigRow } from '../../store/topics-store';
 import { CommonModule } from '@angular/common';
+import { TopicConfigRow } from '../../response.models';
 
 function usedKeyValidator(setFn: () => Set<string>): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {

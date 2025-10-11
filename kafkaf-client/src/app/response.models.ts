@@ -60,6 +60,12 @@ export interface TopicSettingRow {
   defaultValue?: string | null;
 }
 
+export interface TopicConfigRow {
+  key: string;
+  type: string;
+  defaultValue: string;
+}
+
 export interface ConsumerGroupRow {
   groupId: string;
   activeConsumers: number;
