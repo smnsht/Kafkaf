@@ -48,18 +48,16 @@ export class TopicsList {
     route: ActivatedRoute,
   ) {
     route.paramMap.subscribe((params) => {
-      const clusterIdx = parseInt(params.get('cluster')!);
+      const clusterIdx = Number.parseInt(params.get('cluster')!);
       store.selectCluster(clusterIdx);
       store.loadTopics();
     });
   }
 
   onCheckboxChange(value: string, isChecked: boolean) {
-    if (isChecked) {
-      this.selectedTopics.push(value);
-    } else {
-      this.selectedTopics = this.selectedTopics.filter((item) => item !== value);
-    }
+    this.selectedTopics = isChecked
+      ? [...this.selectedTopics, value]
+      : this.selectedTopics.filter((topicName) => topicName !== value);
   }
 
   onDeleteTopicsClick(): void {
@@ -147,15 +145,15 @@ export class TopicsList {
               break;
 
             case 'min.insync.replicas':
-              queryParams.minInSyncReplicas = parseInt(setting.value);
+              queryParams.minInSyncReplicas = Number.parseInt(setting.value);
               break;
 
             case 'retention.ms':
-              queryParams.timeToRetain = parseInt(setting.value);
+              queryParams.timeToRetain = Number.parseInt(setting.value);
               break;
 
             case 'max.message.bytes':
-              queryParams.maxMessageBytes = parseInt(setting.value);
+              queryParams.maxMessageBytes = Number.parseInt(setting.value);
               break;
           }
         });

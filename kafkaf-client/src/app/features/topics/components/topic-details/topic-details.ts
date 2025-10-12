@@ -18,7 +18,7 @@ type TopicTabs =
 
 function getRequiredParams(route: ActivatedRoute) {
   const { paramMap } = route.snapshot;
-  const cluster = parseInt(paramMap.get('cluster')!);
+  const cluster = Number.parseInt(paramMap.get('cluster')!);
   const topic = paramMap.get('topic')!;
 
   return { cluster, topic };

@@ -18,10 +18,23 @@ export type SerdeType = (typeof SerdeTypes)[number];
 @Component({
   selector: 'ddl-serde',
   imports: [FormsModule],
-  templateUrl: './ddl-serde.html'
+  template: `
+    <div class="field">
+      <div class="label">{{ label() }}</div>
+      <div class="control">
+        <div class="select is-fullwidth">
+          <select [ngModel]="serde()" (ngModelChange)="serde.set($event)">
+            @for (serde of options; track $index) {
+              <option [value]="serde">{{ serde }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  `,
 })
 export class DDLSerde {
-label = input<string>('Serde');
+  label = input<string>('Serde');
   options = [...SerdeTypes];
   serde = model<SerdeType>('String');
 }

@@ -49,7 +49,7 @@ export class BrokersList {
     route: ActivatedRoute,
   ) {
     route.paramMap.subscribe((params) => {
-      const cluster = parseInt(params.get('cluster')!);
+      const cluster = Number.parseInt(params.get('cluster')!);
       store.selectCluster(cluster);
       store.loadCollection();
     });

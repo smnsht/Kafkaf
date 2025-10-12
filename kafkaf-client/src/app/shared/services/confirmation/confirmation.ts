@@ -6,7 +6,7 @@ import { Observable, Subject } from 'rxjs';
   providedIn: 'root',
 })
 export class ConfirmationService {
-  private requests = new Subject<ConfirmationRequest>();
+  private readonly requests = new Subject<ConfirmationRequest>();
 
   get requests$(): Observable<ConfirmationRequest> {
     return this.requests.asObservable();

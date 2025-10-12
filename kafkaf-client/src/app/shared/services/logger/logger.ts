@@ -8,7 +8,7 @@ export enum LogLevel {
 }
 
 export class LoggerService {
-  constructor(private logLevel: LogLevel = LogLevel.Info) {}
+  constructor(private readonly logLevel: LogLevel = LogLevel.Info) {}
 
   log(level: LogLevel, message: string, ...optionalParams: any[]) {
     if (level <= this.logLevel) {

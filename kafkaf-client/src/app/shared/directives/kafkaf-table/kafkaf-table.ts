@@ -6,8 +6,8 @@ import { LoggerService } from '@app/shared';
 })
 export class KafkafTableDirective {
   constructor(
-    private el: ElementRef,
-    private renderer: Renderer2,
+    private readonly el: ElementRef,
+    private readonly renderer: Renderer2,
     private readonly logger: LoggerService,
   ) {
     const nativeEl = this.el.nativeElement;

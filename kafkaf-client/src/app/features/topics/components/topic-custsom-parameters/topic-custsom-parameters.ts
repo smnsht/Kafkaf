@@ -31,15 +31,15 @@ export type TopicConfigType = 'number' | 'boolean' | 'text' | 'list';
   templateUrl: './topic-custsom-parameters.html',
 })
 export class TopicCustsomParameters {
-  private configTypes = new Map<string, string>();
-  private usedKeys = signal<Set<string>>(new Set<string>());
+  private readonly configTypes = new Map<string, string>();
+  private readonly usedKeys = signal<Set<string>>(new Set<string>());
 
   topicForm = input<FormGroup>();
   customParameters = input<FormArray>();
   configs = input<TopicConfigRow[]>();
   loadingConfigRows = input(false);
 
-  constructor(private fb: FormBuilder) {
+  constructor(private readonly fb: FormBuilder) {
     effect(() => {
       const configs = this.configs();
       if (configs && configs.length > 0) {

@@ -21,28 +21,28 @@
     </thead>
     <tbody>
       @for (cluster of clustersForDisplay(); track $index) {
-      <tr>
-        <td>{{ cluster.alias }}</td>
-        <td>{{ cluster.originatingBrokerName }}</td>
-        <td>{{ cluster.brokerCount }}</td>
-        <td>{{ cluster.onlinePartitionCount }}</td>
-        <td>{{ cluster.topicCount }}</td>
-        <td>
-          <label class="icon-text has-text-grey-light is-size-7">
-            @if (cluster.isOffline) {
-            <span>Offline</span>
-            <span class="icon has-text-warning">
-              <i class="fas fa-exclamation-triangle"></i>
-            </span>
-            } @else {
-            <span>Online</span>
-            <span class="icon has-text-success">
-              <i class="fas fa-check-square"></i>
-            </span>
-            }
-          </label>
-        </td>
-      </tr>
+        <tr>
+          <td>{{ cluster.alias }}</td>
+          <td>{{ cluster.originatingBrokerName }}</td>
+          <td>{{ cluster.brokerCount }}</td>
+          <td>{{ cluster.onlinePartitionCount }}</td>
+          <td>{{ cluster.topicCount }}</td>
+          <td>
+            <div class="icon-text has-text-grey-light is-size-7">
+              @if (cluster.isOffline) {
+                <span>Offline</span>
+                <span class="icon has-text-warning">
+                  <i class="fas fa-exclamation-triangle"></i>
+                </span>
+              } @else {
+                <span>Online</span>
+                <span class="icon has-text-success">
+                  <i class="fas fa-check-square"></i>
+                </span>
+              }
+            </div>
+          </td>
+        </tr>
       }
     </tbody>
   </table>

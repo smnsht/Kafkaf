@@ -12,7 +12,7 @@ import { ClusterInfo } from '../../models/cluster-info';
   templateUrl: './dashboard.html',
 })
 export class Dashboard implements OnInit {
-  private clusters: Signal<ClusterInfo[]>;
+  private readonly clusters: Signal<ClusterInfo[]>;
 
   public onlyOfflineClusters = model(false);
   public loading: Signal<boolean>;

@@ -1,19 +1,19 @@
 <div class="field">
   <!-- upper label -->
-  <label class="label">
+  <div class="label">
     <span class="icon-text">
       <span>Partitions</span>
       @if (selectedNotEmpty()) {
-      <span class="icon has-text-success">
-        <i class="fas fa-check"></i>
-      </span>
+        <span class="icon has-text-success">
+          <i class="fas fa-check"></i>
+        </span>
       } @else {
-      <span class="icon has-text-warning">
-        <i class="fas fa-exclamation-triangle"></i>
-      </span>
+        <span class="icon has-text-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+        </span>
       }
     </span>
-  </label>
+  </div>
 
   <!-- dropdown -->
   <div class="control" (clickOutside)="onClickedOutside()">
@@ -27,8 +27,10 @@
         >
           <span>
             @if (selectedNotEmpty()) {
-            {{ partitionsCommaSeparted() }}
-            } @else { Select... }
+              {{ partitionsCommaSeparted() }}
+            } @else {
+              Select...
+            }
           </span>
           <span class="icon is-small">
             <i class="fas fa-angle-down" aria-hidden="true"></i>
@@ -58,19 +60,20 @@
 
             <!-- checkboxes for partitions-->
             @for (p of partitionsFiltered(); track $index) {
-            <li>
-              @if(p.messagesCount == 0) { Partition #{{ p.partition }}
-              <i class="is-pulled-right">empty</i>
-              } @else {
-              <input
-                type="checkbox"
-                [checked]="selectedSet().has(p.partition)"
-                (change)="onCheckboxChange(p)"
-              />
-              Partition #{{ p.partition }} {{ selectedSet().has(p.partition) }}
-              <i class="is-pulled-right badge has-messages pl-1 pr-1">{{ p.messagesCount }}</i>
-              }
-            </li>
+              <li>
+                @if (p.messagesCount == 0) {
+                  Partition #{{ p.partition }}
+                  <i class="is-pulled-right">empty</i>
+                } @else {
+                  <input
+                    type="checkbox"
+                    [checked]="selectedSet().has(p.partition)"
+                    (change)="onCheckboxChange(p)"
+                  />
+                  Partition #{{ p.partition }} {{ selectedSet().has(p.partition) }}
+                  <i class="is-pulled-right badge has-messages pl-1 pr-1">{{ p.messagesCount }}</i>
+                }
+              </li>
             }
           </ul>
         </div>

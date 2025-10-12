@@ -14,7 +14,7 @@ type tMessageTab = 'Key' | 'Value' | 'Headers';
   templateUrl: './message-details.html',
 })
 export class MessageDetails {
-  private hideCopiedSuccessfullySubject = new Subject<void>();
+  private readonly hideCopiedSuccessfullySubject = new Subject<void>();
 
   message = input<MessageRow>();
   selectedTab = signal<tMessageTab>('Value');

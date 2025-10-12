@@ -18,11 +18,12 @@ export class BulmaField {
 
   isRequired = computed(() => {
     const ctrl = this.control();
-    if (!ctrl || !ctrl.validator) {
-      return false;
+
+    if (ctrl?.validator) {
+      const validator = ctrl.validator({} as any);
+      return validator?.['required'];
     }
 
-    const validator = ctrl.validator({} as any);
-    return validator && validator['required'];
+    return false;
   });
 }
