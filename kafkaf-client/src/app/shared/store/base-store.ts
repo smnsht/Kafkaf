@@ -30,7 +30,7 @@ export abstract class BaseStore<T> {
   constructor(initialState?: Partial<BaseState<T>>) {
     this.state = signal<BaseState<T>>({
       itemsMap: new Map<number, T[]>(),
-      clusterIdx: NaN,
+      clusterIdx: Number.NaN,
       loading: false,
       error: undefined,
       notice: undefined,

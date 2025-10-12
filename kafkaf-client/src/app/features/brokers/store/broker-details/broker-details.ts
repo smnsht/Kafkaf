@@ -15,8 +15,8 @@ interface BrokerDetailsState {
 
 const defaultState: BrokerDetailsState = {
   configs: new Map<string, BrokerConfigRow[]>(),
-  currentClusterId: NaN,
-  currentBrokerId: NaN,
+  currentClusterId: Number.NaN,
+  currentBrokerId: Number.NaN,
 };
 
 function makeKey(val: ClusterBroker): string {
@@ -26,8 +26,8 @@ function makeKey(val: ClusterBroker): string {
 function parseConfigRowKey(str: string): ClusterBroker {
   const [cluster, broker] = str.split(',', 2);
   return {
-    clusterIdx: parseInt(cluster),
-    brokerId: parseInt(broker),
+    clusterIdx: Number.parseInt(cluster),
+    brokerId: Number.parseInt(broker),
   };
 }
 
@@ -43,7 +43,7 @@ export class BrokerDetailsStore {
 
   readonly configs = computed(() => {
     const { configs, currentClusterId, currentBrokerId } = this.state();
-    if (!isNaN(currentClusterId) && !isNaN(currentBrokerId)) {
+    if (!Number.isNaN(currentClusterId) && !Number.isNaN(currentBrokerId)) {
       const key = makeKey({
         clusterIdx: currentClusterId,
         brokerId: currentBrokerId,

@@ -81,8 +81,8 @@
           <input
             type="checkbox"
             [ngModel]="selectedTopics.includes(topic.topicName)"
-            (ngModelChange)="onCheckboxChange(topic.topicName, $event)"
             [disabled]="topic.isInternal"
+            (ngModelChange)="onCheckboxChange(topic.topicName, $event)"
           />
         </td>
         <td>

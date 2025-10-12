@@ -2,7 +2,7 @@
   <div class="columns">
     @for (item of cardItems(); track $index) {
     <div class="column not-empty">
-      <label class="icon-text has-text-grey-light is-size-7">
+      <div class="icon-text has-text-grey-light is-size-7">
         <span>{{ item.label }}</span>
         @switch (item.icon) {
           @case ('info') {
@@ -26,7 +26,7 @@
             </span>
           }
         }
-      </label>
+      </div>
 
       <div>{{ item.value }}</div>
     </div>

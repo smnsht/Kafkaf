@@ -8,13 +8,26 @@ export const SortOrderOptions = Object.freeze(
     ['FORWARD', 'Oldest First'],
     ['BACKWARD', 'Newest First'],
     ['TAILING', 'Live Mode'],
-  ])
+  ]),
 );
 
 @Component({
   selector: 'ddl-sort-order',
   imports: [FormsModule],
-  templateUrl: './ddl-sort-order.html'
+  template: `
+    <div class="field">
+      <div class="label">Sort</div>
+      <div class="control">
+        <div class="select is-fullwidth">
+          <select [ngModel]="sortOrder()" (ngModelChange)="sortOrder.set($event)">
+            @for (item of options; track $index) {
+              <option [value]="item[0]">{{ item[1] }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  `,
 })
 export class DDLSortOrder {
   options = new Map(SortOrderOptions);

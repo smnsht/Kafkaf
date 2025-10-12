@@ -32,7 +32,7 @@ export class TopicsCreate {
   topicNames = new Set<string>();
 
   constructor(
-    private fb: FormBuilder,
+    private readonly fb: FormBuilder,
     public store: TopicsStore,
     route: ActivatedRoute,
   ) {
@@ -64,7 +64,7 @@ export class TopicsCreate {
     });
 
     route.paramMap.subscribe((params) => {
-      const cluster = parseInt(params.get('cluster')!);
+      const cluster = Number.parseInt(params.get('cluster')!);
       store.selectCluster(cluster);
       store.loadTopicConfigRows();
     });
@@ -96,8 +96,8 @@ export class TopicsCreate {
       'maxMessageBytes',
       'retentionBytes',
     ].forEach((key) => {
-      const numericValue = parseInt(payload[key]);
-      if (!isNaN(numericValue)) {
+      const numericValue = Number.parseInt(payload[key]);
+      if (!Number.isNaN(numericValue)) {
         (<any>createRequest)[key] = numericValue;
       }
     });

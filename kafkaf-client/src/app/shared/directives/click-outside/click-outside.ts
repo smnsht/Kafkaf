@@ -14,9 +14,9 @@ import { filter } from 'rxjs/operators';
 export class ClickOutsideDirective implements OnDestroy {
   @Output() clickOutside = new EventEmitter<void>();
 
-  private documentClickSubscription: Subscription;
+  private readonly documentClickSubscription: Subscription;
 
-  constructor(private elementRef: ElementRef) {
+  constructor(private readonly elementRef: ElementRef) {
     // Listen for clicks on the entire document
     this.documentClickSubscription = fromEvent(document, 'click')
       .pipe(

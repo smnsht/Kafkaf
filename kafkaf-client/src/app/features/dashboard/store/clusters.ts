@@ -14,11 +14,11 @@ export class ClustersStore {
   clusters = signal<ClusterInfo[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
-  clusterIndex = signal<number>(NaN);
+  clusterIndex = signal<number>(Number.NaN);
   kafkaSection = signal<tKafkaSection>(null);
 
   constructor(
-    private http: HttpClient,
+    private readonly http: HttpClient,
     private readonly router: Router,
     destroyRef: DestroyRef,
   ) {
@@ -36,7 +36,8 @@ export class ClustersStore {
       .subscribe((event) => {
         const pathParts = event.urlAfterRedirects.split('/').filter(Boolean);
 
-        const cluster = pathParts[0] === 'clusters' && !isNaN(+pathParts[1]) ? +pathParts[1] : NaN;
+        const cluster =
+          pathParts[0] === 'clusters' && !Number.isNaN(+pathParts[1]) ? +pathParts[1] : Number.NaN;
 
         const section = pathParts[2];
         const validSection: tKafkaSection | null =

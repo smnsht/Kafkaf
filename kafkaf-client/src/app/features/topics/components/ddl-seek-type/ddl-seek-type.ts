@@ -7,10 +7,23 @@ export type SeekType = 'Offset' | 'Timestamp';
 @Component({
   selector: 'ddl-seek-type',
   imports: [FormsModule],
-  templateUrl: './ddl-seek-type.html',
+  template: `
+    <div class="field">
+      <div class="label">Seek Type</div>
+      <div class="control">
+        <div class="select is-fullwidth">
+          <select [ngModel]="seekType()" (ngModelChange)="onModelChange($event)">
+            @for (option of options; track $index) {
+              <option [value]="option">{{ option }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  `,
 })
 export class DdlSeekType {
-  private logger = inject(LoggerService);
+  private readonly logger = inject(LoggerService);
 
   options: SeekType[] = ['Offset', 'Timestamp'];
   seekType = model<SeekType>('Timestamp');

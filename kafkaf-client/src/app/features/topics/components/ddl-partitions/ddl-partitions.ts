@@ -33,9 +33,9 @@ export class DDLPartitions {
 
   partitionsFiltered = computed(() => {
     const all = this.src();
-    const searchTopic = parseInt(this.search());
+    const searchTopic = Number.parseInt(this.search());
 
-    if (isNaN(searchTopic)) {
+    if (Number.isNaN(searchTopic)) {
       return all;
     }
 

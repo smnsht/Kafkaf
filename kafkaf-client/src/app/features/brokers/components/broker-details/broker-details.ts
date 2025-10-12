@@ -12,8 +12,8 @@ type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
 })
 export class BrokerDetails implements OnInit {
   cardItems: StatsCardItem[] = [];
-  cluster = NaN;
-  broker = NaN;
+  cluster = Number.NaN;
+  broker = Number.NaN;
   currentTab?: BrokerTabs;
 
   pageState: Signal<PageState>;
@@ -22,8 +22,8 @@ export class BrokerDetails implements OnInit {
     this.pageState = store.pageState;
 
     route.paramMap.subscribe((paramMap) => {
-      this.cluster = parseInt(paramMap.get('cluster')!);
-      this.broker = parseInt(paramMap.get('broker')!);
+      this.cluster = Number.parseInt(paramMap.get('cluster')!);
+      this.broker = Number.parseInt(paramMap.get('broker')!);
 
       store.loadConfigs({
         clusterIdx: this.cluster,
