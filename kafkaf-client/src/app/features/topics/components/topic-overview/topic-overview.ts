@@ -30,6 +30,8 @@ export class TopicOverview {
         ];
 
         this.partitions = topicDetails.partitions;
+      } else {
+        this.store.loadTopicDetails();
       }
     });
   }

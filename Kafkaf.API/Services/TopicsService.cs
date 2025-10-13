@@ -1,6 +1,7 @@
 ﻿using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using Kafkaf.API.ClientPools;
+using Kafkaf.API.Models;
 using Kafkaf.API.ViewModels;
 
 namespace Kafkaf.API.Services;
@@ -35,13 +36,15 @@ public class TopicsService
 		return config[0];
 	}
 
-
-	public async Task<ConsumerGroupListing[]> GetTopicConsumersAsync(int clusterIdx, string topicName)
+	public async Task<ConsumerGroupListing[]> GetTopicConsumersAsync(
+		int clusterIdx,
+		string topicName
+	)
 	{
 		var adminClient = _clientPool.GetClient(clusterIdx);
 		var consumerGroups = await adminClient.ListConsumerGroupsAsync();
 
-		return consumerGroups.Valid.ToArray();		
+		return consumerGroups.Valid.ToArray();
 	}
 
 	public async Task CreateTopicsAsync(
@@ -60,6 +63,70 @@ public class TopicsService
 				//OperationTimeout = timeout
 			}
 		);
+	}
+
+	public async Task UpdateTopicAsync(int clusterIdx, string topicName, UpdateTopicModel model)
+	{
+		var adminClient = _clientPool.GetClient(clusterIdx);
+		var newConfigs = new List<ConfigEntry>();
+
+		if (model.TimeToRetain.HasValue)
+		{
+			newConfigs.Add(
+				new ConfigEntry()
+				{
+					Name = "retention.ms",
+					Value = model.TimeToRetain.Value.ToString(),
+				}
+			);
+		}
+
+		if (model.MinInSyncReplicas.HasValue)
+		{
+			newConfigs.Add(
+				new ConfigEntry()
+				{
+					Name = "min.insync.replicas",
+					Value = model.MinInSyncReplicas.Value.ToString(),
+				}
+			);
+		}
+
+		if (!string.IsNullOrWhiteSpace(model.CleaupPolicy))
+		{
+			newConfigs.Add(
+				new ConfigEntry() { Name = "cleanup.policy", Value = model.CleaupPolicy }
+			);
+		}
+
+		if (newConfigs.Count > 0)
+		{
+			// 1. Alter topic configs
+			var resource = new ConfigResource { Type = ResourceType.Topic, Name = topicName };
+
+			var configs = new Dictionary<ConfigResource, List<ConfigEntry>>
+			{
+				{ resource, newConfigs },
+			};
+
+			await adminClient.AlterConfigsAsync(configs);
+		}
+
+		if (model.NumPartitions.HasValue)
+		{
+			// 2. Increase partitions
+			await adminClient.CreatePartitionsAsync(
+				new List<PartitionsSpecification>
+				{
+					new PartitionsSpecification
+					{
+						Topic = topicName,
+						// must be greater than current partition count
+						IncreaseTo = model.NumPartitions.Value,
+					},
+				}
+			);
+		}
 	}
 
 	public async Task<List<BatchItemResult>> DeleteTopicsAsync(

@@ -10,10 +10,9 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import { TopicCustsomParameters } from '../../components/topic-custsom-parameters/topic-custsom-parameters';
-import { TopicForm } from '../../components/topic-form/topic-form';
 import { PageWrapper, CreateTopicModel } from '@app/shared';
-import { TopicsStore } from '../../store/topics/topics';
+import { TopicsStore, TopicCustsomParameters, TopicForm } from '@topics/index';
+import { uniqueKeysValidator } from '../../base/topic-form-validators';
 
 @Component({
   selector: 'app-topics-create',
@@ -60,7 +59,7 @@ export class TopicsCreate {
       timeToRetain: [query.get('timeToRetain')],
       maxMessageBytes: [query.get('maxMessageBytes')],
       retentionBytes: [-1],
-      customParameters: this.fb.array([]),
+      customParameters: this.fb.array([], uniqueKeysValidator())
     });
 
     route.paramMap.subscribe((params) => {

@@ -7,7 +7,7 @@ import { MessageRow } from '../../models/message-row';
 import { SearchMessagesOptions } from '../../models/search-messages-options';
 import { TopicDetailsViewModel } from '../../models/topic-details-view-model';
 import { TopicSettingRow } from '../../models/topic-setting-row';
-
+import { UpdateTopicModel } from '@app/shared/models/update-topic';
 
 export const defaultSearchMessagesOptions: SearchMessagesOptions = {
   seekType: 'Offset',
@@ -35,6 +35,8 @@ interface TopicDetailsState {
   errorSettings?: string;
   errorConsumers?: string;
   errorMessages?: string;
+  // notice
+  noticeDetails?: string
 }
 
 export class TopicDetailsStore {
@@ -72,6 +74,9 @@ export class TopicDetailsStore {
   readonly errorSettings = computed(() => this.state().errorSettings);
   readonly errorConsumers = computed(() => this.state().errorConsumers);
   readonly errorMessages = computed(() => this.state().errorMessages);
+
+  // notice
+  readonly noticeDetails = computed(() => this.state().noticeDetails);
 
   setShowMessageForm(showMessageForm: boolean): void {
     this.state.update((state) => ({ ...state, showMessageForm }));
@@ -127,8 +132,35 @@ export class TopicDetailsStore {
         seekDirection: options.sortOrder,
         keySerde: options.keySerde,
         valueSerde: options.valueSerde,
-      })
+      }),
     );
+  }
+
+  updateTopic(model: UpdateTopicModel) {
+    this.state.update((state) => ({
+      ...state,
+      loadingDetails: true,
+      errorDetails: undefined,
+    }));
+
+    this.http.put<void>(this.url, model).subscribe({
+      next: () => {
+        this.state.update((state) => ({
+          ...state,
+          details: undefined,
+          settings: undefined,
+          loadingDetails: false,
+          noticeDetails: `Topic ${this.topic()} updated.`
+        }));
+      },
+      error: (err: HttpErrorResponse) => {
+        this.state.update((state) => ({
+          ...state,
+          loadingDetails: false,
+          errorDetails: getErrorMessage(err),
+        }));
+      },
+    });
   }
 
   private fetchTopicDetails() {

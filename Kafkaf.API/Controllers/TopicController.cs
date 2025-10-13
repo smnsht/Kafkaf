@@ -136,7 +136,7 @@ public partial class TopicController : ControllerBase
 	}
 
 	[HttpPost("recreate")]
-	public async Task<ActionResult> RecreateTopicAsync(
+	public async Task<ActionResult> RecreateAsync(
 		int clusterIdx,
 		string topicName,
 		[FromBody] RecreateTopicModel req
@@ -166,5 +166,31 @@ public partial class TopicController : ControllerBase
 		}
 
 		return NotFound($"Can't get configs for topic");
+	}
+
+	[HttpPut]
+	public async Task<ActionResult> UpdateAsync(int clusterIdx, string topicName, UpdateTopicModel req)
+	{
+		
+		// Will throw DescribeTopicsException when topic not found
+		var topicResult = await _topicsService.DescribeTopicsAsync(clusterIdx, topicName);
+
+		var desc =
+			topicResult.TopicDescriptions.FirstOrDefault()
+			?? throw new InvalidOperationException(
+				$"Topic '{topicName}' was not found in cluster {clusterIdx}."
+			);
+
+		if (req.NumPartitions.HasValue && req.NumPartitions.Value <= desc.Partitions.Count)
+		{
+			ModelState.AddModelError(nameof(req.NumPartitions),
+				"NumPartitions must be greater than current partition count.");
+
+			return ValidationProblem(ModelState);
+		}		
+
+		await _topicsService.UpdateTopicAsync(clusterIdx, topicName, req);
+		
+		return Ok();		
 	}
 }

@@ -24,7 +24,7 @@ public static class KafkaTopicProperties
         { "compression.type", ("string", "producer") },
 		{ "compression.gzip.level", ("int", "-1") },
 		{ "compression.lz4.level", ("int", "0") },
-		{ "compression.snappy.level", ("int", "0") },
+		//{ "compression.snappy.level", ("int", "0") },
 		{ "compression.zstd.level", ("int", "0") },
 
         // Segmenting and Indexing
@@ -39,15 +39,15 @@ public static class KafkaTopicProperties
         { "flush.ms", ("long", "9223372036854775807") }, // Long.MaxValue
 
         // Replication
-        { "min.insync.replicas", ("int", "1") },
-		{ "follower.replication.throttled.replicas", ("list", "[]") },
-		{ "leader.replication.throttled.replicas", ("list", "[]") },
+        //{ "min.insync.replicas", ("int", "1") },
+		//{ "follower.replication.throttled.replicas", ("list", "[]") },
+		//{ "leader.replication.throttled.replicas", ("list", "[]") },
 
         // Message Size and Timestamps
         //{ "max.message.bytes", ("int", "1048588") }, // 1 MB
-        { "message.downconversion.enable", ("boolean", "true") },
+        //{ "message.downconversion.enable", ("boolean", "true") },
 		{ "message.timestamp.type", ("string", "CreateTime") },
-		{ "message.timestamp.difference.max.ms", ("long", "9223372036854775807") }, // Long.MaxValue
+		//{ "message.timestamp.difference.max.ms", ("long", "9223372036854775807") }, // Long.MaxValue
 		{ "message.timestamp.after.max.ms", ("long", "3600000") },
 		{ "message.timestamp.before.max.ms", ("long", "9223372036854775807") },
 

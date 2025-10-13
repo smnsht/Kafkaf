@@ -19,7 +19,8 @@
       "@app/*": ["app/*"],
       "@shared/*": ["app/shared/*"],
       "@features/*": ["app/features/*"],
-      "@brokers/*": ["app/features/brokers/*"]
+      "@brokers/*": ["app/features/brokers/*"],
+      "@topics/*": ["app/features/topics/*"]
     }
   },
   "angularCompilerOptions": {
