@@ -8,6 +8,7 @@ import { SearchMessagesOptions } from '../../models/search-messages-options';
 import { TopicDetailsViewModel } from '../../models/topic-details-view-model';
 import { TopicSettingRow } from '../../models/topic-setting-row';
 import { UpdateTopicModel } from '@app/shared/models/update-topic';
+import { Observable, tap } from 'rxjs';
 
 export const defaultSearchMessagesOptions: SearchMessagesOptions = {
   seekType: 'Offset',
@@ -36,7 +37,8 @@ interface TopicDetailsState {
   errorConsumers?: string;
   errorMessages?: string;
   // notice
-  noticeDetails?: string
+  noticeDetails?: string;
+  noticeSettings?: string;
 }
 
 export class TopicDetailsStore {
@@ -77,6 +79,7 @@ export class TopicDetailsStore {
 
   // notice
   readonly noticeDetails = computed(() => this.state().noticeDetails);
+  readonly noticeSettings = computed(() => this.state().noticeSettings);
 
   setShowMessageForm(showMessageForm: boolean): void {
     this.state.update((state) => ({ ...state, showMessageForm }));
@@ -150,7 +153,7 @@ export class TopicDetailsStore {
           details: undefined,
           settings: undefined,
           loadingDetails: false,
-          noticeDetails: `Topic ${this.topic()} updated.`
+          noticeDetails: `Topic ${this.topic()} updated.`,
         }));
       },
       error: (err: HttpErrorResponse) => {
@@ -161,6 +164,32 @@ export class TopicDetailsStore {
         }));
       },
     });
+  }
+
+  updateSetting(model: { name: string; value: string }) {
+    this.state.update((state) => ({
+      ...state,
+      loadingSettings: true,
+      errorSettings: undefined,
+    }));
+
+    return this.http.patch<TopicSettingRow[]>(this.url, model).pipe(tap({
+      next: (settings) => {
+        this.state.update(state => ({
+          ...state,
+          settings,
+          loadingSettings: false,
+          noticeSettings: `Setting ${model.name} updated.`
+        }))
+      },
+      error: (err: HttpErrorResponse) => {
+        this.state.update(state => ({
+          ...state,
+          loadingSettings: false,
+          errorSettings: getErrorMessage(err)
+        }));
+      }
+    }));
   }
 
   private fetchTopicDetails() {

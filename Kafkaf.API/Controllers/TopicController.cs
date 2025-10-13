@@ -95,6 +95,25 @@ public partial class TopicController : ControllerBase
 		return NotFound($"Can't get configs for topic");
 	}
 
+	[HttpPatch]
+	public async Task<ActionResult<TopicSettingRow[]>> UpdateTopicSettingAsync(
+		int clusterIdx,
+		string topicName,
+		UpdateTopicSettingModel req
+	)
+	{
+		await _topicsService.AlterConfigsAsync(clusterIdx, topicName, req);
+
+		var topicConfig = await _topicsService.DescribeTopicConfigsAsync(clusterIdx, topicName);
+
+		if (topicConfig is DescribeConfigsResult configs)
+		{
+			return Ok(TopicSettingRow.FromResult(configs));
+		}
+
+		return Problem("Can't get configs for topic");
+	}
+
 	/// <summary>
 	/// GET api/clusters/{clusterIdx}/topics/{topicName}/consumers
 	/// </summary>
@@ -169,9 +188,12 @@ public partial class TopicController : ControllerBase
 	}
 
 	[HttpPut]
-	public async Task<ActionResult> UpdateAsync(int clusterIdx, string topicName, UpdateTopicModel req)
+	public async Task<ActionResult> UpdateAsync(
+		int clusterIdx,
+		string topicName,
+		UpdateTopicModel req
+	)
 	{
-		
 		// Will throw DescribeTopicsException when topic not found
 		var topicResult = await _topicsService.DescribeTopicsAsync(clusterIdx, topicName);
 
@@ -183,14 +205,16 @@ public partial class TopicController : ControllerBase
 
 		if (req.NumPartitions.HasValue && req.NumPartitions.Value <= desc.Partitions.Count)
 		{
-			ModelState.AddModelError(nameof(req.NumPartitions),
-				"NumPartitions must be greater than current partition count.");
+			ModelState.AddModelError(
+				nameof(req.NumPartitions),
+				"NumPartitions must be greater than current partition count."
+			);
 
 			return ValidationProblem(ModelState);
-		}		
+		}
 
 		await _topicsService.UpdateTopicAsync(clusterIdx, topicName, req);
-		
-		return Ok();		
+
+		return Ok();
 	}
 }
