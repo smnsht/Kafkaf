@@ -1,8 +1,6 @@
 import { Component, effect } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import {
-  FormBuilder,
-  FormGroup,
   Validators,
   FormsModule,
   ReactiveFormsModule,
@@ -11,8 +9,9 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 import { PageWrapper, CreateTopicModel } from '@app/shared';
-import { TopicsStore, TopicCustsomParameters, TopicForm } from '@topics/index';
+import { TopicCustsomParameters, TopicForm } from '@topics/index';
 import { uniqueKeysValidator } from '../../base/topic-form-validators';
+import { TopicFormBase } from '../../base/topic-form-base';
 
 @Component({
   selector: 'app-topics-create',
@@ -26,16 +25,13 @@ import { uniqueKeysValidator } from '../../base/topic-form-validators';
   ],
   templateUrl: './topics-create.html',
 })
-export class TopicsCreate {
-  topicForm!: FormGroup;
+export class TopicsCreate extends TopicFormBase {
   topicNames = new Set<string>();
 
-  constructor(
-    private readonly fb: FormBuilder,
-    public store: TopicsStore,
-    route: ActivatedRoute,
-  ) {
-    const query = route.snapshot.queryParamMap;
+  constructor() {
+    super();
+
+    const query = this.route.snapshot.queryParamMap;
 
     this.topicForm = this.fb.group({
       name: [
@@ -59,23 +55,17 @@ export class TopicsCreate {
       timeToRetain: [query.get('timeToRetain')],
       maxMessageBytes: [query.get('maxMessageBytes')],
       retentionBytes: [-1],
-      customParameters: this.fb.array([], uniqueKeysValidator())
-    });
-
-    route.paramMap.subscribe((params) => {
-      const cluster = Number.parseInt(params.get('cluster')!);
-      store.selectCluster(cluster);
-      store.loadTopicConfigRows();
+      customParameters: this.fb.array([], uniqueKeysValidator()),
     });
 
     effect(() => {
-      const topicNames = store.currentItems()?.map((topic) => topic.topicName);
+      const topicNames = this.topicsStore.currentItems()?.map((topic) => topic.topicName);
       this.topicNames = new Set<string>(topicNames);
     });
   }
 
-  get customParameters(): FormArray {
-    return this.topicForm?.get('customParameters') as FormArray;
+  override get customParameters(): FormArray {
+    return this.customParameters as FormArray;
   }
 
   onCreateTopicClick(): void {
@@ -85,7 +75,7 @@ export class TopicsCreate {
       name: payload.name,
       numPartitions: payload.numPartitions,
       cleanupPolicy: payload.cleanupPolicy,
-      customParameters: this.customParameters.value,
+      customParameters: this.customParameters?.value,
     };
 
     [
@@ -101,11 +91,11 @@ export class TopicsCreate {
       }
     });
 
-    this.store.createTopic(createRequest).subscribe(() => {
+    this.topicsStore.createTopic(createRequest).subscribe(() => {
       this.topicForm.reset();
-      this.customParameters.clear();
+      this.customParameters?.clear();
 
-      this.store.clearCurrentCluster();
+      this.topicsStore.clearCurrentCluster();
     });
   }
 }

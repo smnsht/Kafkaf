@@ -1,7 +1,7 @@
 export interface UpdateTopicModel
 {
 	timeToRetain?: number;
-	cleaupPolicy?: string;
+	cleanupPolicy?: string;
 	minInSyncReplicas?: number;
 	numPartitions?: number;
 }

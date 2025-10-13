@@ -4,7 +4,7 @@ public class UpdateTopicModel
 {
 	public long? TimeToRetain { get; set; }
 	
-	public string? CleaupPolicy { get; set; }
+	public string? CleanupPolicy { get; set; }
 
 	public int? MinInSyncReplicas { get; set; }
 

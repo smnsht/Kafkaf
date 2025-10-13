@@ -92,10 +92,10 @@ public class TopicsService
 			);
 		}
 
-		if (!string.IsNullOrWhiteSpace(model.CleaupPolicy))
+		if (!string.IsNullOrWhiteSpace(model.CleanupPolicy))
 		{
 			newConfigs.Add(
-				new ConfigEntry() { Name = "cleanup.policy", Value = model.CleaupPolicy }
+				new ConfigEntry() { Name = "cleanup.policy", Value = model.CleanupPolicy }
 			);
 		}
 

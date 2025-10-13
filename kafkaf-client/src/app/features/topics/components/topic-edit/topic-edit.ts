@@ -53,40 +53,24 @@ export class TopicEdit extends TopicFormBase {
   }
 
   onUpdatePartitionsClick(): void {
-    const payload = super.buildModel();
-
-    const updateModel: UpdateTopicModel = {
-      numPartitions: payload.numPartitions,
-    };
-
-    this.topicDetailsStore.updateTopic(updateModel);
+    this.update('numPartitions');
   }
 
   onUpdateTimeToRetain(): void {
-    const payload = super.buildModel();
-
-    const updateModel: UpdateTopicModel = {
-      timeToRetain: payload.timeToRetain,
-    };
-
-    this.topicDetailsStore.updateTopic(updateModel);
+    this.update('timeToRetain');
   }
 
   onUpdateCleanupPolicy(): void {
-    const payload = super.buildModel();
-
-    const updateModel: UpdateTopicModel = {
-      cleaupPolicy: payload.cleanupPolicy,
-    };
-
-    this.topicDetailsStore.updateTopic(updateModel);
+    this.update('cleanupPolicy');
   }
 
   onUpateMinInSyncReplicas(): void {
-    const payload = super.buildModel();
+    this.update('minInSyncReplicas');
+  }
 
+  private update(key: keyof UpdateTopicModel): void {
     const updateModel: UpdateTopicModel = {
-      minInSyncReplicas: payload.minInSyncReplicas,
+      [key]: this.topicForm.get(key)?.value,
     };
 
     this.topicDetailsStore.updateTopic(updateModel);
