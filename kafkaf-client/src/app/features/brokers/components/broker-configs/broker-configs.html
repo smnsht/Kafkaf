@@ -1,6 +1,5 @@
 @if (!store.loading()) {
-  <!-- TODO: search element -->
-  <input type="search" />
+  <app-search placeholder="Search by config key" [search]="search" />
 
   <table appKafkafTable>
     <thead>
@@ -12,7 +11,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (cfg of store.configs(); track $index) {
+      @for (cfg of configs(); track $index) {
         <tr>
           <td>{{ cfg.name }}</td>
           <td>{{ cfg.value }}</td>

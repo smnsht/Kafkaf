@@ -21,12 +21,15 @@ namespace Kafkaf.API
 			// Add services to the container.
 			builder.Services.AddSingleton<AdminClientPool>();
 			builder.Services.AddSingleton<WatermarkOffsetsClientPool>();
+			builder.Services.AddSingleton<ProducersPool>();
 
 			builder.Services.AddSingleton<ClusterService>();
 			builder.Services.AddSingleton<BrokersService>();
 			builder.Services.AddSingleton<TopicsService>();
 			builder.Services.AddSingleton<WatermarkOffsetsService>();
-			builder.Services.AddSingleton<MessagesReaderService>();			
+			builder.Services.AddSingleton<MessagesReaderService>();
+			builder.Services.AddSingleton<SettingsService>();
+			builder.Services.AddSingleton<ConsumersService>();
 
 			// Register custom constraint
 			builder.Services.Configure<RouteOptions>(options =>

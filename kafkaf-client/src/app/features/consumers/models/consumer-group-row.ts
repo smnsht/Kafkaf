@@ -1,6 +1,7 @@
 export interface ConsumerGroupRow {
     groupId: string;
-    activeConsumers: number;
+    numberOfMembers: number;
+    numberOfTopics: number;
     consumerLag: number;
     coordinator: number;
     state: string;

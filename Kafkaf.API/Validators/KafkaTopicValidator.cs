@@ -2,7 +2,7 @@
 
 namespace Kafkaf.API.Validators;
 
-public class KafkaTopicValidator
+public static class KafkaTopicValidator
 {
 	// Regex: only letters, digits, dot, underscore, hyphen
 	private static readonly Regex TopicNameRegex = new Regex(

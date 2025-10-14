@@ -1,13 +1,15 @@
 import { computed, inject, signal, WritableSignal } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { ConsumerGroupRow } from '@app/features/consumers';
 import { getErrorMessage } from '@app/shared';
 import { environment } from 'environments/environment';
 import { MessageRow } from '../../models/message-row';
 import { SearchMessagesOptions } from '../../models/search-messages-options';
 import { TopicDetailsViewModel } from '../../models/topic-details-view-model';
 import { TopicSettingRow } from '../../models/topic-setting-row';
-
+import { UpdateTopicModel } from '@app/shared/models/update-topic';
+import { Observable, tap } from 'rxjs';
+import { TopicConsumersRow } from '../../models/topic-consumers-row';
+import { CreateMessage } from '../../models/create-message';
 
 export const defaultSearchMessagesOptions: SearchMessagesOptions = {
   seekType: 'Offset',
@@ -23,7 +25,7 @@ interface TopicDetailsState {
   showMessageForm: boolean;
   details?: TopicDetailsViewModel;
   settings?: TopicSettingRow[];
-  consumers?: ConsumerGroupRow[];
+  consumers?: TopicConsumersRow[];
   messages?: MessageRow[];
   // loading...
   loadingDetails?: boolean;
@@ -35,6 +37,10 @@ interface TopicDetailsState {
   errorSettings?: string;
   errorConsumers?: string;
   errorMessages?: string;
+  // notice
+  noticeDetails?: string;
+  noticeSettings?: string;
+  noticeMessages?: string;
 }
 
 export class TopicDetailsStore {
@@ -72,6 +78,11 @@ export class TopicDetailsStore {
   readonly errorSettings = computed(() => this.state().errorSettings);
   readonly errorConsumers = computed(() => this.state().errorConsumers);
   readonly errorMessages = computed(() => this.state().errorMessages);
+
+  // notice
+  readonly noticeDetails = computed(() => this.state().noticeDetails);
+  readonly noticeSettings = computed(() => this.state().noticeSettings);
+  readonly noticeMessages = computed(() => this.state().noticeMessages);
 
   setShowMessageForm(showMessageForm: boolean): void {
     this.state.update((state) => ({ ...state, showMessageForm }));
@@ -127,7 +138,91 @@ export class TopicDetailsStore {
         seekDirection: options.sortOrder,
         keySerde: options.keySerde,
         valueSerde: options.valueSerde,
-      })
+      }),
+    );
+  }
+
+  produceMessage(msg: CreateMessage): Observable<object> {
+    this.state.update((state) => ({
+      ...state,
+      loadingMessages: true,
+      errorMessages: undefined,
+    }));
+
+    return this.http.post<object>(`${this.url}/messages`, msg).pipe(
+      tap({
+        next: () => {
+          this.state.update((state) => ({
+            ...state,
+            loadingMessages: false,
+            noticeMessages: 'Message created.',
+          }));
+        },
+        error: (err) =>
+          this.state.update((state) => ({
+            ...state,
+            loadingMessages: false,
+            errorDetails: getErrorMessage(err),
+          })),
+      }),
+    );
+  }
+
+  updateTopic(model: UpdateTopicModel) {
+    this.state.update((state) => ({
+      ...state,
+      loadingDetails: true,
+      errorDetails: undefined,
+    }));
+
+    this.http.put<void>(this.url, model).subscribe({
+      next: () => {
+        this.state.update((state) => ({
+          ...state,
+          details: undefined,
+          settings: undefined,
+          loadingDetails: false,
+          noticeDetails: `Topic ${this.topic()} updated.`,
+        }));
+      },
+      error: (err: HttpErrorResponse) => {
+        this.state.update((state) => ({
+          ...state,
+          loadingDetails: false,
+          errorDetails: getErrorMessage(err),
+        }));
+      },
+    });
+  }
+
+  patchSetting(model: { name: string; value: string }) {
+    this.state.update((state) => ({
+      ...state,
+      loadingSettings: true,
+      errorSettings: undefined,
+      noticeSettings: undefined,
+    }));
+
+    return this.http.patch<void>(`${this.url}/settings/${model.name}`, model).pipe(
+      tap({
+        next: () => {
+          this.state.update((state) => ({
+            ...state,
+            settings: undefined,
+            loadingSettings: false,
+            noticeSettings: `Setting ${model.name} updated.`,
+          }));
+
+          this.fetchSettings();
+        },
+        error: (err: HttpErrorResponse) => {
+          this.state.update((state) => ({
+            ...state,
+            loadingSettings: false,
+            errorSettings: getErrorMessage(err),
+          }));
+        },
+      }),
     );
   }
 
@@ -163,7 +258,7 @@ export class TopicDetailsStore {
   }
 
   private fetchConsumers(): void {
-    this.http.get<ConsumerGroupRow[]>(`${this.url}/consumers`).subscribe({
+    this.http.get<TopicConsumersRow[]>(`${this.url}/consumers`).subscribe({
       next: (consumers) =>
         this.state.update((state) => ({
           ...state,

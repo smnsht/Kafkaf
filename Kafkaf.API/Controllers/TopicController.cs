@@ -67,51 +67,6 @@ public partial class TopicController : ControllerBase
 	}
 
 	/// <summary>
-	/// GET api/clusters/{clusterIdx}/topics/{topicName}/settings
-	/// </summary>
-	/// <param name="clusterIdx"></param>
-	/// <param name="topicName"></param>
-	/// <returns></returns>
-	[HttpGet("settings")]
-	public async Task<ActionResult<TopicSettingRow[]>> GetTopicSettingsAsync(
-		int clusterIdx,
-		string topicName
-	)
-	{
-		try
-		{
-			var topicConfig = await _topicsService.DescribeTopicConfigsAsync(clusterIdx, topicName);
-
-			if (topicConfig is DescribeConfigsResult configs)
-			{
-				return Ok(TopicSettingRow.FromResult(configs));
-			}
-		}
-		catch (KafkaException ex)
-		{
-			return Problem(ex.Error.Reason);
-		}
-
-		return NotFound($"Can't get configs for topic");
-	}
-
-	/// <summary>
-	/// GET api/clusters/{clusterIdx}/topics/{topicName}/consumers
-	/// </summary>
-	/// <param name="clusterIdx"></param>
-	/// <param name="topicName"></param>
-	/// <returns></returns>
-	[HttpGet("consumers")]
-	public async Task<ActionResult<ConsumerGroupListing[]>> GetTopicConsumersAsync(
-		int clusterIdx,
-		string topicName
-	)
-	{
-		var consumerGroups = await _topicsService.GetTopicConsumersAsync(clusterIdx, topicName);
-		return Ok(consumerGroups.Select(ConsumerGroupRow.FromConsumerGroupListing));
-	}
-
-	/// <summary>
 	/// DELETE api/clusters/{clusterIdx}/topics/{topicName}
 	/// </summary>
 	/// <param name="clusterIdx"></param>
@@ -136,7 +91,7 @@ public partial class TopicController : ControllerBase
 	}
 
 	[HttpPost("recreate")]
-	public async Task<ActionResult> RecreateTopicAsync(
+	public async Task<ActionResult> RecreateAsync(
 		int clusterIdx,
 		string topicName,
 		[FromBody] RecreateTopicModel req
@@ -166,5 +121,36 @@ public partial class TopicController : ControllerBase
 		}
 
 		return NotFound($"Can't get configs for topic");
+	}
+
+	[HttpPut]
+	public async Task<ActionResult> UpdateAsync(
+		int clusterIdx,
+		string topicName,
+		UpdateTopicModel req
+	)
+	{
+		// Will throw DescribeTopicsException when topic not found
+		var topicResult = await _topicsService.DescribeTopicsAsync(clusterIdx, topicName);
+
+		var desc =
+			topicResult.TopicDescriptions.FirstOrDefault()
+			?? throw new InvalidOperationException(
+				$"Topic '{topicName}' was not found in cluster {clusterIdx}."
+			);
+
+		if (req.NumPartitions.HasValue && req.NumPartitions.Value <= desc.Partitions.Count)
+		{
+			ModelState.AddModelError(
+				nameof(req.NumPartitions),
+				"NumPartitions must be greater than current partition count."
+			);
+
+			return ValidationProblem(ModelState);
+		}
+
+		await _topicsService.UpdateTopicAsync(clusterIdx, topicName, req);
+
+		return Ok();
 	}
 }

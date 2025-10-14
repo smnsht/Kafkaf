@@ -1,0 +1,30 @@
+<app-page-wrapper [state]="store.pageState()">
+  <h1 class="title is-size-4">Consumers</h1>
+
+  <app-search placeholder="Search by Consumer Group ID" [search]="search" />
+
+  <table appKafkafTable>
+    <thead>
+      <tr>
+        <th>Group ID</th>
+        <th>Num Of Members</th>
+        <th>Num Of Topics</th>
+        <th>Consumer Lag</th>
+        <th>Coordinator</th>
+        <th>State</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of consumers(); track $index) {
+        <tr>
+          <td>{{ row.groupId }}</td>
+          <td>{{ row.numberOfMembers }}</td>
+          <td>{{ row.numberOfTopics }}</td>
+          <td>TODO</td>
+          <td>{{ row.numberOfTopics }}</td>
+          <td>{{ row.state }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-page-wrapper>

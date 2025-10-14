@@ -1,53 +1,44 @@
-import { JsonPipe } from '@angular/common';
-import { Component, effect } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { PageWrapper } from '@app/shared';
-import { TopicDetailsStore } from '../../store/topic-detais/topic-details';
-import { TopicsStore } from '../../store/topics/topics';
-import { TopicCustsomParameters } from '../topic-custsom-parameters/topic-custsom-parameters';
-import { TopicForm } from '../topic-form/topic-form';
+import { Component, effect, inject } from '@angular/core';
+import { BulmaField, PageWrapper } from '@app/shared';
 
-const skipSettings = new Set<string>([
-  'cleanup.policy',
-  'min.insync.replicas',
-  'retention.ms',
-  'max.message.bytes',
-  'retention.bytes',
-]);
+import { TopicFormBase } from '../../base/topic-form-base';
+import { TopicDetailsStore } from '../../store/topic-detais/topic-details';
+import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { UpdateTopicModel } from '@app/shared/models/update-topic';
 
 @Component({
   selector: 'app-topic-edit',
-  imports: [JsonPipe, PageWrapper, TopicForm, TopicCustsomParameters],
+  imports: [PageWrapper, ReactiveFormsModule, BulmaField],
   templateUrl: './topic-edit.html',
 })
-export class TopicEdit {
-  topicForm!: FormGroup;
+export class TopicEdit extends TopicFormBase {
+  readonly topicDetailsStore = inject(TopicDetailsStore);
 
-  get customParameters(): FormArray {
-    return this.topicForm?.get('customParameters') as FormArray;
-  }
-
-  constructor(
-    readonly topicDetailsStore: TopicDetailsStore,
-    readonly topicsStore: TopicsStore,
-    private readonly fb: FormBuilder,
-  ) {
-    topicDetailsStore.loadTopicDetails();
-    topicDetailsStore.loadSettings();
-    topicsStore.loadTopicConfigRows();
+  constructor() {
+    super();
 
     effect(() => {
-      const topic = topicDetailsStore.details();
-      const settings = topicDetailsStore.settings();
+      const topic = this.topicDetailsStore.details();
+      const settings = this.topicDetailsStore.settings();
+
+      if (!topic) {
+        this.topicDetailsStore.loadTopicDetails();
+      }
+
+      if (!settings) {
+        this.topicDetailsStore.loadSettings();
+      }
 
       if (topic && settings) {
-        console.log(settings);
-
         this.topicForm = this.fb.group({
-          name: [{ value: topic.name, disabled: true }],
-          numPartitions: [topic.partitionCount, Validators.required],
-          replicationFactor: [topic.replicationFactor],
-          // fill from settings
+          numPartitions: [
+            topic.partitionCount,
+            [Validators.required, Validators.min(topic.partitionCount + 1)],
+          ],
+          timeToRetain: [
+            settings.find((s) => s.name == 'retention.ms')?.value,
+            Validators.required,
+          ],
           cleanupPolicy: [
             settings.find((s) => s.name == 'cleanup.policy')?.value,
             Validators.required,
@@ -56,33 +47,32 @@ export class TopicEdit {
             settings.find((s) => s.name == 'min.insync.replicas')?.value,
             Validators.required,
           ],
-          timeToRetain: [
-            settings.find((s) => s.name == 'retention.ms')?.value,
-            Validators.required,
-          ],
-          maxMessageBytes: [
-            settings.find((s) => s.name == 'max.message.bytes')?.value,
-            Validators.required,
-          ],
-          retentionBytes: [
-            settings.find((s) => s.name == 'retention.bytes')?.value,
-            Validators.required,
-          ],
-          // from settings - except
-          customParameters: this.fb.array(
-            settings
-              .filter((setting) => setting.value != null)
-              .filter((setting) => !skipSettings.has(setting.name))
-              .map((setting) => {
-                const pair = this.fb.group({
-                  key: [setting.name, Validators.required],
-                  value: [setting.value, Validators.required],
-                });
-                return pair;
-              }),
-          ),
         });
       }
     });
+  }
+
+  onUpdatePartitionsClick(): void {
+    this.update('numPartitions');
+  }
+
+  onUpdateTimeToRetain(): void {
+    this.update('timeToRetain');
+  }
+
+  onUpdateCleanupPolicy(): void {
+    this.update('cleanupPolicy');
+  }
+
+  onUpateMinInSyncReplicas(): void {
+    this.update('minInSyncReplicas');
+  }
+
+  private update(key: keyof UpdateTopicModel): void {
+    const updateModel: UpdateTopicModel = {
+      [key]: this.topicForm.get(key)?.value,
+    };
+
+    this.topicDetailsStore.updateTopic(updateModel);
   }
 }

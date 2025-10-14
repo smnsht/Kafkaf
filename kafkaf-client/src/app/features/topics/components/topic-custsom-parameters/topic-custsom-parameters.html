@@ -4,12 +4,13 @@
   <form [formGroup]="topicForm()!">
     <ng-container formArrayName="customParameters">
       @for (pair of customParameters()?.controls; track $index; let i = $index) {
+        @let keyCtrl = pair.get('key');
         <div class="columns" [formGroupName]="i">
           <div class="column is-one-fifth">
             <bulma-field
               label="Custom Parameter"
               [for]="idForSelect($index)"
-              [control]="pair.get('key')"
+              [control]="keyCtrl"
             >
               <div class="select is-fullwidth">
                 <select
@@ -23,6 +24,9 @@
                 </select>
               </div>
             </bulma-field>
+            @if (keyCtrl?.hasError('duplicate')) {
+              <p class="help is-danger">This key is already used.</p>
+            }
           </div>
 
           <div class="column is-one-fifth">

@@ -7,7 +7,7 @@ import {
   BrokerConfigs,
   BrokerMetrics,
 } from './features/brokers';
-import { Consumers } from './features/consumers';
+import { ConsumersList } from './features/consumers';
 import { Dashboard } from './features/dashboard';
 import {
   TopicsList,
@@ -116,7 +116,7 @@ export const routes: Routes = [
 
   {
     path: 'clusters/:cluster/consumers',
-    component: Consumers,
+    component: ConsumersList,
     canMatch: [clusterGuardFn],
     title: 'Cluster %cluster% > Consumers',
   },

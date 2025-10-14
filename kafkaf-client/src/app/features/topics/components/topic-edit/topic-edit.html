@@ -1,16 +1,148 @@
-<app-page-wrapper [loading]="topicDetailsStore.loadingDetails() || topicDetailsStore.loadingSettings()">
-  <topic-form [topicForm]="topicForm" />
+<app-page-wrapper
+  [loading]="topicDetailsStore.loadingDetails() || topicDetailsStore.loadingSettings()"
+  [error]="topicDetailsStore.errorDetails()"
+  [notice]="topicDetailsStore.noticeDetails()"
+>
+  @if (topicForm && topicDetailsStore.details()) {
+    @let topic = topicDetailsStore.details();
 
-  <topic-custsom-parameters
-    [topicForm]="topicForm"
-    [customParameters]="customParameters"
-    [configs]="topicsStore.topicConfigRows()"
-    [loadingConfigRows]="topicsStore.loadingConfigRows()"
-  />
+    <form [formGroup]="topicForm">
+      <!-- topic name read-only -->
+      <div class="column">
+        <div class="label">Topic name:</div>
+        <input class="input" type="text" [value]="topic?.name" [disabled]="true" />
+      </div>
 
-  <hr />
+      <!-- Number of partitions-->
+      <div class="column is-one-third">
+        <bulma-field
+          label="Number of Partitions"
+          for="numPartitions"
+          [control]="topicForm.get('numPartitions')"
+        >
+          <div class="field has-addons">
+            <div class="control">
+              <input
+                class="input"
+                type="number"
+                id="numPartitions"
+                [min]="topic!.partitionCount"
+                formControlName="numPartitions"
+                placeholder="Number of Partitions"
+              />
+            </div>
+            <div class="control">
+              <button
+                class="button"
+                [class.is-success]="topicForm.get('numPartitions')?.valid"
+                [disabled]="topicForm.get('numPartitions')?.invalid"
+                (click)="onUpdatePartitionsClick()"
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </bulma-field>
+        @if (topicForm.get('numPartitions')?.errors?.['min']) {
+          <p class="help">
+            Must be greater than current partition count: <b>{{ topic?.partitionCount }}</b>
+          </p>
+        }
+      </div>
 
-  @if (topicForm) {
-  <pre>{{ topicForm.value | json }}</pre>
+      <!-- Time to retain data -->
+      <div class="column is-one-third">
+        <bulma-field
+          label="Time to retain data (in ms)"
+          for="timeToRetain"
+          [control]="topicForm.get('timeToRetain')"
+        >
+          <div class="field has-addons">
+            <div class="control">
+              <input
+                class="input"
+                type="number"
+                id="timeToRetain"
+                formControlName="timeToRetain"
+                placeholder="Time to retain data (in ms)"
+              />
+            </div>
+            <div class="control">
+              <button
+                class="button"
+                [class.is-success]="topicForm.get('timeToRetain')?.valid"
+                [disabled]="topicForm.get('timeToRetain')?.invalid"
+                (click)="onUpdateTimeToRetain()"
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </bulma-field>
+      </div>
+
+      <!-- Cleanup policy -->
+      <div class="column is-one-third">
+        <bulma-field
+          label="Cleanup policy"
+          for="cleanupPolicy"
+          [control]="topicForm.get('cleanupPolicy')"
+        >
+          <div class="field has-addons">
+            <div class="control">
+              <div class="select">
+                <select id="cleanupPolicy" formControlName="cleanupPolicy">
+                  <option value="delete">Delete</option>
+                  <option value="compact">Compact</option>
+                  <option value="compact,delete">Compact,Delete</option>
+                </select>
+              </div>
+            </div>
+            <div class="control">
+              <button
+                class="button"
+                [class.is-success]="topicForm.get('cleanupPolicy')?.valid"
+                [disabled]="topicForm.get('cleanupPolicy')?.invalid"
+                (click)="onUpdateCleanupPolicy()"
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </bulma-field>
+      </div>
+
+      <!-- Min In Sync Replicas -->
+      <div class="column is-one-third">
+        <bulma-field
+          label="Min In Sync Replicas"
+          for="minInSyncReplicas"
+          [control]="topicForm.get('minInSyncReplicas')"
+        >
+          <div class="field has-addons">
+            <div class="control">
+              <input
+                class="input"
+                type="number"
+                id="minInSyncReplicas"
+                min="1"
+                formControlName="minInSyncReplicas"
+                placeholder="Min In Sync Replicas"
+              />
+            </div>
+            <div class="control">
+              <button
+                class="button"
+                [class.is-success]="topicForm.get('cleanupPolicy')?.valid"
+                [disabled]="topicForm.get('cleanupPolicy')?.invalid"
+                (click)="onUpateMinInSyncReplicas()"
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </bulma-field>
+      </div>
+    </form>
   }
 </app-page-wrapper>

@@ -1,21 +1,5 @@
 <app-page-wrapper [error]="store.errorConsumers()" [loading]="store.loadingConsumers()">
-  <div class="columns is-vcentered">
-    <!-- Search input-->
-    <div class="column is-one-third">
-      <div class="control has-icons-left">
-        <input
-          class="input"
-          type="search"
-          [(ngModel)]="search"
-          placeholder="Search by Consumer Name"
-        />
-        <span class="icon is-small is-left">
-          <i class="fas fa-search"></i>
-        </span>
-      </div>
-    </div>
-    <div class="column">&nbsp;</div>
-  </div>
+  <app-search placeholder="Search by Consumer Name" [search]="search" />
 
   <table appKafkafTable>
     <thead>
@@ -29,13 +13,13 @@
     </thead>
     <tbody>
       @for (consumer of consumers(); track $index) {
-      <tr>
-        <td>{{ consumer.groupId }}</td>
-        <td>TODO</td>
-        <td>TODO</td>
-        <td>TODO</td>
-        <td>{{ consumer.state }} State</td>
-      </tr>
+        <tr>
+          <td>{{ consumer.groupId }}</td>
+          <td>{{ consumer.activeConsumers }}</td>
+          <td>TODO</td>
+          <td>{{ consumer.coordinator }}</td>
+          <td>{{ consumer.state }}</td>
+        </tr>
       }
     </tbody>
   </table>
