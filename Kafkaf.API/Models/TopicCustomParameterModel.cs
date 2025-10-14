@@ -26,7 +26,7 @@ public class TopicCustomParameterModel : IValidatableObject, ICloneable
 		}
 
 		// Unknown property check
-		if (!KafkaTopicProperties.TopicConfigs.TryGetValue(k, out var topicConfig))
+		if (!KafkaTopicProperties.TOPIC_CONFIGS.TryGetValue(k, out var topicConfig))
 		{
 			yield return new ValidationResult("Unknown or blank custom property name.");
 			yield break;

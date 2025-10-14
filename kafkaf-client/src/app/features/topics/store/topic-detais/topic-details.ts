@@ -8,7 +8,7 @@ import { SearchMessagesOptions } from '../../models/search-messages-options';
 import { TopicDetailsViewModel } from '../../models/topic-details-view-model';
 import { TopicSettingRow } from '../../models/topic-setting-row';
 import { UpdateTopicModel } from '@app/shared/models/update-topic';
-import { Observable, tap } from 'rxjs';
+import { tap } from 'rxjs';
 
 export const defaultSearchMessagesOptions: SearchMessagesOptions = {
   seekType: 'Offset',
@@ -166,30 +166,35 @@ export class TopicDetailsStore {
     });
   }
 
-  updateSetting(model: { name: string; value: string }) {
+  patchSetting(model: { name: string; value: string }) {
     this.state.update((state) => ({
       ...state,
       loadingSettings: true,
       errorSettings: undefined,
+      noticeSettings: undefined
     }));
 
-    return this.http.patch<TopicSettingRow[]>(this.url, model).pipe(tap({
-      next: (settings) => {
-        this.state.update(state => ({
-          ...state,
-          settings,
-          loadingSettings: false,
-          noticeSettings: `Setting ${model.name} updated.`
-        }))
-      },
-      error: (err: HttpErrorResponse) => {
-        this.state.update(state => ({
-          ...state,
-          loadingSettings: false,
-          errorSettings: getErrorMessage(err)
-        }));
-      }
-    }));
+    return this.http.patch<void>(`${this.url}/settings/${model.name}`, model).pipe(
+      tap({
+        next: () => {
+          this.state.update((state) => ({
+            ...state,
+            settings: undefined,
+            loadingSettings: false,
+            noticeSettings: `Setting ${model.name} updated.`,
+          }));
+
+          this.fetchSettings();
+        },
+        error: (err: HttpErrorResponse) => {
+          this.state.update((state) => ({
+            ...state,
+            loadingSettings: false,
+            errorSettings: getErrorMessage(err),
+          }));
+        },
+      }),
+    );
   }
 
   private fetchTopicDetails() {

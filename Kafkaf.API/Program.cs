@@ -26,7 +26,8 @@ namespace Kafkaf.API
 			builder.Services.AddSingleton<BrokersService>();
 			builder.Services.AddSingleton<TopicsService>();
 			builder.Services.AddSingleton<WatermarkOffsetsService>();
-			builder.Services.AddSingleton<MessagesReaderService>();			
+			builder.Services.AddSingleton<MessagesReaderService>();
+			builder.Services.AddSingleton<SettingsService>();
 
 			// Register custom constraint
 			builder.Services.Configure<RouteOptions>(options =>

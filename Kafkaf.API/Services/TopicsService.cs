@@ -6,6 +6,8 @@ using Kafkaf.API.ViewModels;
 
 namespace Kafkaf.API.Services;
 
+public record ClusterTopic(int clusterIdx, string topicName);
+
 public class TopicsService
 {
 	private readonly ILogger<TopicsService> _logger;
@@ -173,27 +175,5 @@ public class TopicsService
 			[topic],
 			new DeleteTopicsOptions() { OperationTimeout = timeout, RequestTimeout = timeout }
 		);
-	}
-
-	public async Task AlterConfigsAsync(
-		int clusterIdx,
-		string topicName,
-		UpdateTopicSettingModel model
-	)
-	{
-		var newConfigs = new List<ConfigEntry>
-		{
-			new ConfigEntry() { Name = model.name, Value = model.value },
-		};
-
-		var resource = new ConfigResource { Type = ResourceType.Topic, Name = topicName };
-
-		var configs = new Dictionary<ConfigResource, List<ConfigEntry>>
-		{
-			{ resource, newConfigs },
-		};
-
-		var adminClient = _clientPool.GetClient(clusterIdx);
-		await adminClient.AlterConfigsAsync(configs);
 	}
 }

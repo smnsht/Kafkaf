@@ -15,7 +15,7 @@ export class TopicSettings {
   }
 
   update(name: string, value: any): void {
-    this.store.updateSetting({ name: name, value: value }).subscribe(() => {
+    this.store.patchSetting({ name: name, value: value }).subscribe(() => {
       this.selectedRowIndex = -1;
     });
   }

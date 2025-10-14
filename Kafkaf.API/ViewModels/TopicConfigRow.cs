@@ -15,5 +15,5 @@ public record TopicConfigRow(string key, string type, string defaultValue)
 			.ToArray();
 
 	public static TopicConfigRow[] FromDefault() =>
-		FromDictionary(KafkaTopicProperties.TopicConfigs);
+		FromDictionary(KafkaTopicProperties.TOPIC_CONFIGS.ToDictionary());
 }

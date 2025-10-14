@@ -67,54 +67,6 @@ public partial class TopicController : ControllerBase
 	}
 
 	/// <summary>
-	/// GET api/clusters/{clusterIdx}/topics/{topicName}/settings
-	/// </summary>
-	/// <param name="clusterIdx"></param>
-	/// <param name="topicName"></param>
-	/// <returns></returns>
-	[HttpGet("settings")]
-	public async Task<ActionResult<TopicSettingRow[]>> GetTopicSettingsAsync(
-		int clusterIdx,
-		string topicName
-	)
-	{
-		try
-		{
-			var topicConfig = await _topicsService.DescribeTopicConfigsAsync(clusterIdx, topicName);
-
-			if (topicConfig is DescribeConfigsResult configs)
-			{
-				return Ok(TopicSettingRow.FromResult(configs));
-			}
-		}
-		catch (KafkaException ex)
-		{
-			return Problem(ex.Error.Reason);
-		}
-
-		return NotFound($"Can't get configs for topic");
-	}
-
-	[HttpPatch]
-	public async Task<ActionResult<TopicSettingRow[]>> UpdateTopicSettingAsync(
-		int clusterIdx,
-		string topicName,
-		UpdateTopicSettingModel req
-	)
-	{
-		await _topicsService.AlterConfigsAsync(clusterIdx, topicName, req);
-
-		var topicConfig = await _topicsService.DescribeTopicConfigsAsync(clusterIdx, topicName);
-
-		if (topicConfig is DescribeConfigsResult configs)
-		{
-			return Ok(TopicSettingRow.FromResult(configs));
-		}
-
-		return Problem("Can't get configs for topic");
-	}
-
-	/// <summary>
 	/// GET api/clusters/{clusterIdx}/topics/{topicName}/consumers
 	/// </summary>
 	/// <param name="clusterIdx"></param>
