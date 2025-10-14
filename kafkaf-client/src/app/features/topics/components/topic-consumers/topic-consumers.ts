@@ -1,11 +1,10 @@
 import { Component, computed, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { KafkafTableDirective, PageWrapper } from '@app/shared';
+import { KafkafTableDirective, PageWrapper, Search } from '@app/shared';
 import { TopicDetailsStore } from '../..';
 
 @Component({
   selector: 'app-topic-consumers',
-  imports: [FormsModule, KafkafTableDirective, PageWrapper],
+  imports: [KafkafTableDirective, PageWrapper, Search],
   templateUrl: './topic-consumers.html',
 })
 export class TopicConsumers {

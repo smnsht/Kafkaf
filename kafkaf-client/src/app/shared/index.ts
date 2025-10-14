@@ -3,6 +3,7 @@ export * from './components/bulma-field/bulma-field';
 export * from './components/confirmation-modal/confirmation-modal';
 export * from './components/dropdown-menu/dropdown-menu';
 export * from './components/page-wrapper/page-wrapper';
+export * from './components/search/search/search';
 export * from './components/stats-card/stats-card';
 
 // directives

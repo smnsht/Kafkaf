@@ -1,16 +1,7 @@
 <app-page-wrapper [state]="store.pageState()">
   <h1 class="title is-size-4">Consumers</h1>
 
-  <div class="columns">
-    <div class="column is-one-third">
-      <div class="control has-icons-left">
-        <input class="input" type="search" [(ngModel)]="search" placeholder="Search by Consumer Group ID" />
-        <span class="icon is-small is-left">
-          <i class="fas fa-search"></i>
-        </span>
-      </div>
-    </div>
-  </div>
+  <app-search placeholder="Search by Consumer Group ID" [search]="search" />
 
   <table appKafkafTable>
     <thead>
