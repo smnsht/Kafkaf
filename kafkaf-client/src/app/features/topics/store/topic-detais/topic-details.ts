@@ -1,6 +1,5 @@
 import { computed, inject, signal, WritableSignal } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { ConsumerGroupRow } from '@app/features/consumers';
 import { getErrorMessage } from '@app/shared';
 import { environment } from 'environments/environment';
 import { MessageRow } from '../../models/message-row';
@@ -9,6 +8,7 @@ import { TopicDetailsViewModel } from '../../models/topic-details-view-model';
 import { TopicSettingRow } from '../../models/topic-setting-row';
 import { UpdateTopicModel } from '@app/shared/models/update-topic';
 import { tap } from 'rxjs';
+import { TopicConsumersRow } from '../../models/topic-consumers-row';
 
 export const defaultSearchMessagesOptions: SearchMessagesOptions = {
   seekType: 'Offset',
@@ -24,7 +24,7 @@ interface TopicDetailsState {
   showMessageForm: boolean;
   details?: TopicDetailsViewModel;
   settings?: TopicSettingRow[];
-  consumers?: ConsumerGroupRow[];
+  consumers?: TopicConsumersRow[];
   messages?: MessageRow[];
   // loading...
   loadingDetails?: boolean;
@@ -171,7 +171,7 @@ export class TopicDetailsStore {
       ...state,
       loadingSettings: true,
       errorSettings: undefined,
-      noticeSettings: undefined
+      noticeSettings: undefined,
     }));
 
     return this.http.patch<void>(`${this.url}/settings/${model.name}`, model).pipe(
@@ -229,7 +229,7 @@ export class TopicDetailsStore {
   }
 
   private fetchConsumers(): void {
-    this.http.get<ConsumerGroupRow[]>(`${this.url}/consumers`).subscribe({
+    this.http.get<TopicConsumersRow[]>(`${this.url}/consumers`).subscribe({
       next: (consumers) =>
         this.state.update((state) => ({
           ...state,

@@ -10,20 +10,18 @@ namespace Kafkaf.API.Controllers;
 [ApiController]
 public class TopicsController : ControllerBase
 {
-	private readonly ClusterService _clusterService;
 	private readonly TopicsService _topicsService;
 
-	public TopicsController(ClusterService clusterService, TopicsService topicsService)
-	{
-		_clusterService = clusterService;
-		_topicsService = topicsService;
-	}
+	public TopicsController(TopicsService topicsService) => _topicsService = topicsService;
 
 	[HttpGet]
-	public IEnumerable<TopicsListViewModel> GetTopics(int clusterNo)
+	public IEnumerable<TopicsListViewModel> GetTopics(
+		[FromRoute] int clusterNo,
+		[FromServices] ClusterService svc
+	)
 	{
 		// Request metadata for all topics in the cluster
-		var metadata = _clusterService.GetMetadata(clusterNo);
+		var metadata = svc.GetMetadata(clusterNo);
 
 		return metadata.Topics.Select(topicMeta => new TopicsListViewModel(topicMeta));
 	}
@@ -32,7 +30,7 @@ public class TopicsController : ControllerBase
 	public TopicConfigRow[] GetConfigs() => TopicConfigRow.FromDefault();
 
 	[HttpPost]
-	public async Task<ActionResult> CreateAsync(int clusterIdx, CreateTopicModel req)
+	public async Task<ActionResult> CreateAsync([FromRoute] int clusterIdx, CreateTopicModel req)
 	{
 		try
 		{
@@ -47,7 +45,7 @@ public class TopicsController : ControllerBase
 
 	[HttpDelete]
 	public async Task<BatchActionResult> DeleteAsync(
-		int clusterIdx,
+		[FromRoute] int clusterIdx,
 		[FromQuery] DeleteTopicsRequest req
 	)
 	{

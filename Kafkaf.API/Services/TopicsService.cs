@@ -38,17 +38,6 @@ public class TopicsService
 		return config[0];
 	}
 
-	public async Task<ConsumerGroupListing[]> GetTopicConsumersAsync(
-		int clusterIdx,
-		string topicName
-	)
-	{
-		var adminClient = _clientPool.GetClient(clusterIdx);
-		var consumerGroups = await adminClient.ListConsumerGroupsAsync();
-
-		return consumerGroups.Valid.ToArray();
-	}
-
 	public async Task CreateTopicsAsync(
 		int clusterIdx,
 		TopicSpecification topic,

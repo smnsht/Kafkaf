@@ -1,5 +1,5 @@
 // components
-export * from './components/consumers/consumers';
+export * from './components/consumers-list/consumers-list';
 
 // models
 export * from './models/consumer-group-row';

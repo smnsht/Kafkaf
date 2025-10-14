@@ -31,10 +31,10 @@
       @for (consumer of consumers(); track $index) {
       <tr>
         <td>{{ consumer.groupId }}</td>
+        <td>{{ consumer.activeConsumers }}</td>
         <td>TODO</td>
-        <td>TODO</td>
-        <td>TODO</td>
-        <td>{{ consumer.state }} State</td>
+        <td>{{ consumer.coordinator }}</td>
+        <td>{{ consumer.state }}</td>
       </tr>
       }
     </tbody>

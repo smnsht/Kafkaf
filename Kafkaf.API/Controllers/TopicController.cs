@@ -67,22 +67,6 @@ public partial class TopicController : ControllerBase
 	}
 
 	/// <summary>
-	/// GET api/clusters/{clusterIdx}/topics/{topicName}/consumers
-	/// </summary>
-	/// <param name="clusterIdx"></param>
-	/// <param name="topicName"></param>
-	/// <returns></returns>
-	[HttpGet("consumers")]
-	public async Task<ActionResult<ConsumerGroupListing[]>> GetTopicConsumersAsync(
-		int clusterIdx,
-		string topicName
-	)
-	{
-		var consumerGroups = await _topicsService.GetTopicConsumersAsync(clusterIdx, topicName);
-		return Ok(consumerGroups.Select(ConsumerGroupRow.FromConsumerGroupListing));
-	}
-
-	/// <summary>
 	/// DELETE api/clusters/{clusterIdx}/topics/{topicName}
 	/// </summary>
 	/// <param name="clusterIdx"></param>

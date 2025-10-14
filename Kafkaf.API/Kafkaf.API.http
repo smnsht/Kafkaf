@@ -21,6 +21,9 @@ Accept: application/json
 
 ### 
 
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/consumers
+Accept: application/json
+
 #
 # Brokers
 #
@@ -90,5 +93,5 @@ Accept: application/json
 
 ###
 
-GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test.3/consumers
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/test-topic/consumers
 Accept: application/json
