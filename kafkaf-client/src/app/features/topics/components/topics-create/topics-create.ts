@@ -1,17 +1,10 @@
-import { Component, effect } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import {
-  Validators,
-  FormsModule,
-  ReactiveFormsModule,
-  FormArray,
-  AbstractControl,
-  ValidationErrors,
-} from '@angular/forms';
+import { Validators, FormsModule, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { PageWrapper, CreateTopicModel } from '@app/shared';
 import { TopicCustsomParameters, TopicForm } from '@topics/index';
-import { uniqueKeysValidator } from '../../base/topic-form-validators';
-import { TopicFormBase } from '../../base/topic-form-base';
+import { uniqueKeysValidator, uniqueTopicNameValidator } from '@topics/base/topic-form-validators';
+import { TopicFormBase } from '@topics/base/topic-form-base';
 
 @Component({
   selector: 'app-topics-create',
@@ -26,12 +19,11 @@ import { TopicFormBase } from '../../base/topic-form-base';
   templateUrl: './topics-create.html',
 })
 export class TopicsCreate extends TopicFormBase {
-  topicNames = new Set<string>();
-
   constructor() {
     super();
 
     const query = this.route.snapshot.queryParamMap;
+    const topicNames = this.topicsStore.currentItems()?.map((topic) => topic.topicName);
 
     this.topicForm = this.fb.group({
       name: [
@@ -40,12 +32,7 @@ export class TopicsCreate extends TopicFormBase {
           Validators.required,
           Validators.maxLength(255),
           Validators.pattern(/^[a-zA-Z0-9._-]+$/),
-          (control: AbstractControl): ValidationErrors | null => {
-            if (this.topicNames.has(control.value)) {
-              return { custom: { value: `Topic name ${control.value} already exists.` } };
-            }
-            return null;
-          },
+          uniqueTopicNameValidator(new Set<string>(topicNames)),
         ],
       ],
       numPartitions: [query.get('numPartitions'), Validators.required],
@@ -57,14 +44,9 @@ export class TopicsCreate extends TopicFormBase {
       retentionBytes: [-1],
       customParameters: this.fb.array([], uniqueKeysValidator()),
     });
-
-    effect(() => {
-      const topicNames = this.topicsStore.currentItems()?.map((topic) => topic.topicName);
-      this.topicNames = new Set<string>(topicNames);
-    });
   }
 
-  override get customParameters(): FormArray {
+  get customParametersAsFormArray(): FormArray {
     return this.customParameters as FormArray;
   }
 
@@ -75,7 +57,10 @@ export class TopicsCreate extends TopicFormBase {
       name: payload.name,
       numPartitions: payload.numPartitions,
       cleanupPolicy: payload.cleanupPolicy,
-      customParameters: this.customParameters?.value,
+      customParameters: this.customParameters?.value.map((pair: { key: string; value: any }) => ({
+        ...pair,
+        value: String(pair.value),
+      })),
     };
 
     [
@@ -93,8 +78,7 @@ export class TopicsCreate extends TopicFormBase {
 
     this.topicsStore.createTopic(createRequest).subscribe(() => {
       this.topicForm.reset();
-      this.customParameters?.clear();
-
+      this.customParametersAsFormArray?.clear();
       this.topicsStore.clearCurrentCluster();
     });
   }

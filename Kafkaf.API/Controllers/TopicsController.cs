@@ -30,7 +30,10 @@ public class TopicsController : ControllerBase
 	public TopicConfigRow[] GetConfigs() => TopicConfigRow.FromDefault();
 
 	[HttpPost]
-	public async Task<ActionResult> CreateAsync([FromRoute] int clusterIdx, CreateTopicModel req)
+	public async Task<ActionResult> CreateAsync(
+		[FromQuery] int clusterIdx,
+		[FromBody] CreateTopicModel req
+	)
 	{
 		try
 		{

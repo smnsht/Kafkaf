@@ -6,9 +6,9 @@ import {
   ValidatorFn,
 } from '@angular/forms';
 
-export function uniqueTopicNameValidator(topicNamesFn: () => Set<string>): ValidatorFn {
+export function uniqueTopicNameValidator(topicNames: Set<string>): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    if (topicNamesFn().has(control.value)) {
+    if (topicNames.has(control.value)) {
       return { custom: { value: `Topic name ${control.value} already exists.` } };
     }
     return null;

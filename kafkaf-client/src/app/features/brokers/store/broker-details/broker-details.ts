@@ -58,7 +58,7 @@ export class BrokerDetailsStore {
   readonly logDirectores = computed(() => {
     const allConfigs = this.configs();
     if (allConfigs) {
-      return allConfigs.filter((cfg) => cfg.name == 'log.dirs');
+      return allConfigs.filter((cfg) => cfg.name == 'log.dir');
     }
 
     return undefined;

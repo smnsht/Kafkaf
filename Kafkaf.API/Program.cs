@@ -21,6 +21,7 @@ namespace Kafkaf.API
 			// Add services to the container.
 			builder.Services.AddSingleton<AdminClientPool>();
 			builder.Services.AddSingleton<WatermarkOffsetsClientPool>();
+			builder.Services.AddSingleton<ProducersPool>();
 
 			builder.Services.AddSingleton<ClusterService>();
 			builder.Services.AddSingleton<BrokersService>();

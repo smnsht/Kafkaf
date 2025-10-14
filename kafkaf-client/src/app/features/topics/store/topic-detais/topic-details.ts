@@ -7,8 +7,9 @@ import { SearchMessagesOptions } from '../../models/search-messages-options';
 import { TopicDetailsViewModel } from '../../models/topic-details-view-model';
 import { TopicSettingRow } from '../../models/topic-setting-row';
 import { UpdateTopicModel } from '@app/shared/models/update-topic';
-import { tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { TopicConsumersRow } from '../../models/topic-consumers-row';
+import { CreateMessage } from '../../models/create-message';
 
 export const defaultSearchMessagesOptions: SearchMessagesOptions = {
   seekType: 'Offset',
@@ -39,6 +40,7 @@ interface TopicDetailsState {
   // notice
   noticeDetails?: string;
   noticeSettings?: string;
+  noticeMessages?: string;
 }
 
 export class TopicDetailsStore {
@@ -80,6 +82,7 @@ export class TopicDetailsStore {
   // notice
   readonly noticeDetails = computed(() => this.state().noticeDetails);
   readonly noticeSettings = computed(() => this.state().noticeSettings);
+  readonly noticeMessages = computed(() => this.state().noticeMessages);
 
   setShowMessageForm(showMessageForm: boolean): void {
     this.state.update((state) => ({ ...state, showMessageForm }));
@@ -135,6 +138,32 @@ export class TopicDetailsStore {
         seekDirection: options.sortOrder,
         keySerde: options.keySerde,
         valueSerde: options.valueSerde,
+      }),
+    );
+  }
+
+  produceMessage(msg: CreateMessage): Observable<object> {
+    this.state.update((state) => ({
+      ...state,
+      loadingMessages: true,
+      errorMessages: undefined,
+    }));
+
+    return this.http.post<object>(`${this.url}/messages`, msg).pipe(
+      tap({
+        next: () => {
+          this.state.update((state) => ({
+            ...state,
+            loadingMessages: false,
+            noticeMessages: 'Message created.',
+          }));
+        },
+        error: (err) =>
+          this.state.update((state) => ({
+            ...state,
+            loadingMessages: false,
+            errorDetails: getErrorMessage(err),
+          })),
       }),
     );
   }

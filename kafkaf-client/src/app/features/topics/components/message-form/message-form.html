@@ -13,7 +13,7 @@
               <label class="Label" for="partition">Partition</label>
               <div class="control">
                 <div class="select is-fullwidth">
-                  <select id="partition" [(ngModel)]="payload.partition" name="partition">
+                  <select id="partition" [(ngModel)]="payload.partition" name="partition" disabled="true">
                     @for (p of store.partitions(); track $index) {
                       <option [value]="p.partition">{{ p.partition }}</option>
                     }
@@ -67,7 +67,7 @@
               id="txt-value"
               rows="4"
               name="value"
-              [(ngModel)]="payload.message"
+              [(ngModel)]="payload.value"
             ></textarea>
           </div>
         </div>
@@ -79,7 +79,7 @@
               class="textarea"
               id="txt-headers"
               rows="2"
-              [(ngModel)]="payload.headers"
+              [(ngModel)]="payload.rawJson"
               name="headers"
               appJsonValidator
               #headers="ngModel"
@@ -95,6 +95,7 @@
       <div class="buttons">
         <button
           class="button is-success"
+          [class.is-loading]="store.loadingMessages()"
           (click)="onProduceMessageClick()"
           [disabled]="form.invalid"
         >

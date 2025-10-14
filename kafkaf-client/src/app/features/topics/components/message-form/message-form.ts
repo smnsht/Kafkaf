@@ -3,20 +3,11 @@ import { FormsModule } from '@angular/forms';
 import { JsonValidatorDirective, LoggerService } from '@app/shared';
 import { TopicDetailsStore } from '../../store/topic-detais/topic-details';
 import { SerdeTypes, DDLSerde } from '../ddl-serde/ddl-serde';
-
-interface CreateMessage {
-  partition: number;
-  keySerde: string;
-  valueSerde: string;
-  keepContents?: boolean;
-  key?: string;
-  message?: string;
-  headers?: string;
-}
+import { CreateMessage } from '../../models/create-message';
 
 const defaultPayload: CreateMessage = {
   partition: 0,
-  headers: '{}',
+  rawJson: '{}',
   keySerde: SerdeTypes[0],
   valueSerde: SerdeTypes[0],
 };
@@ -29,7 +20,10 @@ const defaultPayload: CreateMessage = {
 export class MessageForm {
   payload: CreateMessage;
 
-  constructor(readonly store: TopicDetailsStore, private readonly logger: LoggerService) {
+  constructor(
+    readonly store: TopicDetailsStore,
+    private readonly logger: LoggerService,
+  ) {
     this.payload = { ...defaultPayload };
 
     effect(() => {
@@ -41,7 +35,21 @@ export class MessageForm {
   }
 
   onProduceMessageClick(): void {
-    this.logger.debug('[MessageForm]: ', this.payload);
-    window.alert('not imeplemented yet');
+    try {
+      const obj = JSON.parse(this.payload.rawJson ?? '{}');
+      const map = new Map<string, string>(
+        Object.entries(obj).map(([k, v]) => [k, String(v)]),
+      );
+      this.payload.headers = Object.fromEntries(map);
+    } catch (e) {
+      alert('Error! Invalid JSON in headers.');
+      return;
+    }
+
+    this.store.produceMessage(this.payload).subscribe(() => {
+      this.store.loadTopicDetails();
+      this.store.setShowMessageForm(false);
+      alert('Message created!');
+    });
   }
 }
