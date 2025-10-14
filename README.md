@@ -28,6 +28,23 @@ This project is currently in the early development stages. The immediate goal is
 
 I like this project so much, I named it twice.
 
+## Screenshots
+
+### Messages list
+&nbsp;
+***
+![Messages](./images/screenshots/Screenshot_001_messages.png)
+
+### Create message modal
+&nbsp;
+***
+![Create message](./images/screenshots/Screenshot_002_create_message.png)
+
+### Topics list
+&nbsp;
+***
+![Topics list](./images/screenshots/Screenshot_003_topics_list.png)
+
 ## License
 
-This project is licensed under the Apache 2.0 License. See the [LICENSE.txt](https://www.google.com/search?q=./LICENSE.txt) file for details.
+This project is [licensed](./LICENSE) under the Apache 2.0 License. See the [LICENSE](https://www.google.com/search?q=./LICENSE) file for details.

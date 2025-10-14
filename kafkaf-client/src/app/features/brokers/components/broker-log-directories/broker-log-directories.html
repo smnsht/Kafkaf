@@ -1,5 +1,10 @@
 @if (!store.loading()) {
 <table appKafkafTable>
+  <th>
+    <tr>
+      <th></th>
+    </tr>
+  </th>
   <tbody>
     @for (row of store.logDirectores(); track $index) {
     <tr>
