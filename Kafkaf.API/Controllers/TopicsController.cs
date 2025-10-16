@@ -1,5 +1,4 @@
-﻿using Confluent.Kafka.Admin;
-using Kafkaf.API.Models;
+﻿using Kafkaf.API.Models;
 using Kafkaf.API.Services;
 using Kafkaf.API.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -10,50 +9,62 @@ namespace Kafkaf.API.Controllers;
 [ApiController]
 public class TopicsController : ControllerBase
 {
-	private readonly TopicsService _topicsService;
+    private readonly TopicsService _topicsService;
 
-	public TopicsController(TopicsService topicsService) => _topicsService = topicsService;
+    public TopicsController(TopicsService topicsService) =>
+        _topicsService = topicsService;
 
-	[HttpGet]
-	public IEnumerable<TopicsListViewModel> GetTopics(
-		[FromRoute] int clusterNo,
-		[FromServices] ClusterService svc
-	)
-	{
-		// Request metadata for all topics in the cluster
-		var metadata = svc.GetMetadata(clusterNo);
+    /// <summary>
+    /// GET api/clusters/{cluserIdx}/topics/configs
+    /// TODO: move elsewere, does not belongs to specific cluster
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("configs")]
+    public TopicConfigRow[] GetConfigs() => TopicConfigRow.FromDefault();
 
-		return metadata.Topics.Select(topicMeta => new TopicsListViewModel(topicMeta));
-	}
+    /// <summary>
+    /// GET api/clusters/{cluserIdx}/topics
+    /// </summary>
+    /// <param name="clusterNo"></param>
+    /// <param name="svc"></param>
+    /// <returns></returns>
+    [HttpGet]
+    public IEnumerable<TopicsListViewModel> GetTopics([FromRoute] int clusterNo)
+    {
+        var topics = _topicsService.GetAllTopicsMetadata(clusterNo);
 
-	[HttpGet("configs")]
-	public TopicConfigRow[] GetConfigs() => TopicConfigRow.FromDefault();
+        return TopicsListViewModel.FromMetadata(topics);
+    }
 
-	[HttpPost]
-	public async Task<ActionResult> CreateAsync(
-		[FromQuery] int clusterIdx,
-		[FromBody] CreateTopicModel req
-	)
-	{
-		try
-		{
-			await _topicsService.CreateTopicsAsync(clusterIdx, req.ToTopicSpecification());
-			return Created();
-		}
-		catch (CreateTopicsException ex)
-		{
-			return Problem(ex.Results[0].Error.Reason);
-		}
-	}
+    /// <summary>
+    /// POST api/clusters/{cluserIdx}/topics
+    /// </summary>
+    /// <param name="clusterIdx"></param>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ActionResult> CreateAsync(
+        [FromRoute] int clusterIdx,
+        [FromBody] CreateTopicModel req
+    )
+    {
+        await _topicsService.CreateTopicsAsync(clusterIdx, req.ToTopicSpecification());
+        return Created();
+    }
 
-	[HttpDelete]
-	public async Task<BatchActionResult> DeleteAsync(
-		[FromRoute] int clusterIdx,
-		[FromQuery] DeleteTopicsRequest req
-	)
-	{
-		var deleteResult = await _topicsService.DeleteTopicsAsync(clusterIdx, req.names);
-
-		return new BatchActionResult(deleteResult, null);
-	}
+    /// <summary>
+    /// DELETE api/clusters/{cluserIdx}/topics
+    /// </summary>
+    /// <param name="clusterIdx"></param>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    [HttpDelete]
+    public async Task<BatchActionResult> DeleteAsync(
+        [FromRoute] int clusterIdx,
+        [FromQuery] DeleteTopicsRequest req
+    )
+    {
+        var deleteResult = await _topicsService.DeleteTopicsAsync(clusterIdx, req.names);
+        return new BatchActionResult(deleteResult, null);
+    }
 }

@@ -3,7 +3,7 @@
 namespace Kafkaf.API.Models;
 
 public record ReadMessagesRequest(
-	string Partitions,
+	string []Partitions,
 	SeekType seekType = SeekType.OFFSET,
 	SeekDirection seekDirection = SeekDirection.FORWARD,
 	string? keySerde = null,
@@ -18,5 +18,5 @@ public record ReadMessagesRequest(
 		yield break;
 	}
 
-	public int[] PartitionsAsInt() => Partitions.Split(',').Select(int.Parse).ToArray();
+	public int[] PartitionsAsInt() => Partitions.Select(int.Parse).ToArray();		
 }
