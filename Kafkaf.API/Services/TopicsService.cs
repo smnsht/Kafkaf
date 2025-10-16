@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using Kafkaf.API.ClientPools;
-using Kafkaf.API.Exceptions;
+using Kafkaf.API.Infra;
 using Kafkaf.API.Models;
 using Kafkaf.API.ViewModels;
 

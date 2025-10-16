@@ -1,4 +1,4 @@
-﻿namespace Kafkaf.API.Exceptions;
+﻿namespace Kafkaf.API.Infra;
 
 public class KafkaTopicNotFoundException : Exception
 {

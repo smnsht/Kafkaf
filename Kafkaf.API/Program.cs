@@ -1,11 +1,9 @@
 using System.Text;
 using Kafkaf.API.ClientPools;
 using Kafkaf.API.Config;
-using Kafkaf.API.Exceptions;
-using Kafkaf.API.Filters;
+using Kafkaf.API.Infra;
 using Kafkaf.API.Routing;
 using Kafkaf.API.Services;
-using Microsoft.AspNetCore.Diagnostics;
 
 namespace Kafkaf.API
 {

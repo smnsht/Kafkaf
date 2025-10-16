@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Confluent.Kafka;
-using Kafkaf.API.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Kafkaf.API.Filters;
+namespace Kafkaf.API.Infra;
 
 public class ApiExceptionFilter : IExceptionFilter
 {
@@ -16,9 +15,7 @@ public class ApiExceptionFilter : IExceptionFilter
 	{
 		// Let validation errors pass through unchanged
 		if (context.Exception is ValidationException)
-		{
 			return;
-		}
 
 		_logger.LogError(context.Exception, "Unhandled exception occurred");
 
