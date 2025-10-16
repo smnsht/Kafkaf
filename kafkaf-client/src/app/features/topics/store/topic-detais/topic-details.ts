@@ -3,7 +3,10 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { getErrorMessage } from '@app/shared';
 import { environment } from 'environments/environment';
 import { MessageRow } from '../../models/message-row';
-import { SearchMessagesOptions } from '../../models/search-messages-options';
+import {
+  createHttpParamsFromSearchOptions,
+  SearchMessagesOptions,
+} from '../../models/search-messages-options';
 import { TopicDetailsViewModel } from '../../models/topic-details-view-model';
 import { TopicSettingRow } from '../../models/topic-setting-row';
 import { UpdateTopicModel } from '@app/shared/models/update-topic';
@@ -12,11 +15,11 @@ import { TopicConsumersRow } from '../../models/topic-consumers-row';
 import { CreateMessage } from '../../models/create-message';
 
 export const defaultSearchMessagesOptions: SearchMessagesOptions = {
-  seekType: 'Offset',
   partitions: [],
+  seekType: 'LIMIT',
+  sortOrder: 'FORWARD',
   keySerde: 'String',
   valueSerde: 'String',
-  sortOrder: 'FORWARD',
 };
 
 interface TopicDetailsState {
@@ -88,8 +91,8 @@ export class TopicDetailsStore {
     this.state.update((state) => ({ ...state, showMessageForm }));
   }
 
-  loadTopicDetails(): void {
-    if (!this.details() && !this.loadingDetails()) {
+  loadTopicDetails(reload = false): void {
+    if (reload || (!this.details() && !this.loadingDetails())) {
       this.state.update((state) => ({
         ...state,
         loadingDetails: true,
@@ -131,15 +134,13 @@ export class TopicDetailsStore {
       errorMessages: undefined,
     }));
 
-    this.fetchMessages(
-      new HttpParams().appendAll({
-        partitions: options.partitions,
-        seekType: options.seekType,
-        seekDirection: options.sortOrder,
-        keySerde: options.keySerde,
-        valueSerde: options.valueSerde,
-      }),
-    );
+    const params = createHttpParamsFromSearchOptions(options);
+
+    this.fetchMessages(params);
+  }
+
+  clearMessages(): void {
+    this.state.update((state) => ({ ...state, messages: undefined }));
   }
 
   produceMessage(msg: CreateMessage): Observable<object> {
@@ -286,7 +287,7 @@ export class TopicDetailsStore {
         this.state.update((state) => ({
           ...state,
           loadingMessages: false,
-          errorDetails: getErrorMessage(err),
+          errorMessages: getErrorMessage(err),
         })),
     });
   }

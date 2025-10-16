@@ -6,7 +6,6 @@ import { SerdeTypes, DDLSerde } from '../ddl-serde/ddl-serde';
 import { CreateMessage } from '../../models/create-message';
 
 const defaultPayload: CreateMessage = {
-  partition: 0,
   rawJson: '{}',
   keySerde: SerdeTypes[0],
   valueSerde: SerdeTypes[0],
@@ -37,9 +36,7 @@ export class MessageForm {
   onProduceMessageClick(): void {
     try {
       const obj = JSON.parse(this.payload.rawJson ?? '{}');
-      const map = new Map<string, string>(
-        Object.entries(obj).map(([k, v]) => [k, String(v)]),
-      );
+      const map = new Map<string, string>(Object.entries(obj).map(([k, v]) => [k, String(v)]));
       this.payload.headers = Object.fromEntries(map);
     } catch (e) {
       alert('Error! Invalid JSON in headers.');
@@ -49,6 +46,7 @@ export class MessageForm {
     this.store.produceMessage(this.payload).subscribe(() => {
       this.store.loadTopicDetails();
       this.store.setShowMessageForm(false);
+      this.store.loadTopicDetails(true);
       alert('Message created!');
     });
   }

@@ -1,5 +1,5 @@
 export interface CreateMessage {
-  partition: number;
+  partition?: number;
   keySerde: string;
   valueSerde: string;
   keepContents?: boolean;

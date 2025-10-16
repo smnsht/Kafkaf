@@ -119,11 +119,14 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
     const paths = topicNames.map((topic) => `${topic}/messages`);
 
     return this.removeItems(paths).pipe(
-      tap((res) => {
-        this.setNotice(
-          'Successfully purged messages from ' +
-            (res.length === 1 ? `${topicNames[0]} topic.` : `${res.length} topics.`),
-        );
+      tap({
+        next: (res) => {
+          this.setNotice(
+            'Successfully purged messages from ' +
+              (res.length === 1 ? `${topicNames[0]} topic.` : `${res.length} topics.`),
+          );
+        },
+        error: this.handleError.bind(this),
       }),
     );
   }

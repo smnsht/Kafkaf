@@ -7,34 +7,34 @@ namespace Kafkaf.API.Services;
 
 public class WatermarkOffsetsService
 {
-	private readonly WatermarkOffsetsClientPool _pool;
-	private readonly MessageConsumerOptions _options;
+    private readonly WatermarkOffsetsClientPool _pool;
+    private readonly MessageConsumerOptions _options;
 
-	public WatermarkOffsetsService(
-		IOptions<MessageConsumerOptions> options,
-		WatermarkOffsetsClientPool pool
-	)
-	{
-		_options = options.Value;
-		_pool = pool;
-	}
+    public WatermarkOffsetsService(
+        IOptions<MessageConsumerOptions> options,
+        WatermarkOffsetsClientPool pool
+    )
+    {
+        _options = options.Value;
+        _pool = pool;
+    }
 
-	public Dictionary<int, WatermarkOffsets?> GetWatermarkOffsets(
-		int clusterNo,
-		string topicName,
-		int[] partitions
-	)
-	{
-		var consumer = _pool.GetClient(clusterNo);
+    public Dictionary<int, WatermarkOffsets?> GetWatermarkOffsets(
+        int clusterNo,
+        string topicName,
+        int[] partitions
+    )
+    {
+        var consumer = _pool.GetClient(clusterNo);
 
-		return partitions
-			.Select(partition =>
-			{
-				var tp = new TopicPartition(topicName, partition);
-				var ts = TimeSpan.FromSeconds(_options.TimeoutInSeconds);
-				var offsets = consumer.QueryWatermarkOffsets(tp, ts);
-				return new KeyValuePair<int, WatermarkOffsets?>(partition, offsets);
-			})
-			.ToDictionary(pair => pair.Key, pair => pair.Value);
-	}
+        return partitions
+            .Select(partition =>
+            {
+                var tp = new TopicPartition(topicName, partition);
+                var timeout = TimeSpan.FromSeconds(_options.TimeoutInSeconds);
+                var offsets = consumer.QueryWatermarkOffsets(tp, timeout);
+                return new KeyValuePair<int, WatermarkOffsets?>(partition, offsets);
+            })
+            .ToDictionary(pair => pair.Key, pair => pair.Value);
+    }
 }

@@ -8,11 +8,28 @@
       <div class="label">&nbsp;</div>
       <div class="control">
         @switch (searchMessagesOptions.seekType) {
-          @case ('Offset') {
-            <input class="input" type="number" placeholder="Offset" />
+          @case ('LIMIT') {
+            <input
+              class="input"
+              type="number"
+              [(ngModel)]="searchMessagesOptions.limit"
+              placeholder="Maximum N"
+            />
           }
-          @case ('Timestamp') {
-            <input class="input" type="datetime-local" />
+          @case ('OFFSET') {
+            <input
+              class="input"
+              type="number"
+              placeholder="Offset"
+              [(ngModel)]="searchMessagesOptions.offset"
+            />
+          }
+          @case ('TIMESTAMP') {
+            <input
+              class="input"
+              type="datetime-local"
+              [(ngModel)]="searchMessagesOptions.timestamp"
+            />
           }
           @default {
             <i>?</i>

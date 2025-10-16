@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 
 import { TopicsDropdownMenu } from '../../components/topics-dropdown-menu/topics-dropdown-menu';
-import { concatMap, timer } from 'rxjs';
+import { concatMap, delay, tap, timer } from 'rxjs';
 import { PageWrapper, DropdownMenuEvent } from '@app/shared';
 import { TopicDetailsStore } from '../../store/topic-detais/topic-details';
 import { TopicsStore } from '../../store/topics/topics';
@@ -88,7 +88,15 @@ export class TopicDetails {
           break;
 
         case 'ClearMessages':
-          this.topicsStore.purgeMessages([topic.name]).subscribe();
+          //
+          this.topicsStore
+            .purgeMessages([topic.name])
+            .pipe(delay(2000))
+            .subscribe(() => {
+              this.topicsStore.setNotice(undefined);
+              this.store.clearMessages();
+              this.store.loadTopicDetails(true);
+            });
           break;
 
         case 'RecreateTopic':

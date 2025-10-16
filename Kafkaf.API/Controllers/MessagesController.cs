@@ -1,6 +1,4 @@
-﻿using System.Text;
-using Confluent.Kafka;
-using Kafkaf.API.ClientPools;
+﻿using Confluent.Kafka;
 using Kafkaf.API.Models;
 using Kafkaf.API.Services;
 using Kafkaf.API.ViewModels;
@@ -12,76 +10,104 @@ namespace Kafkaf.API.Controllers;
 [ApiController]
 public class MessagesController : ControllerBase
 {
-	private readonly MessagesReaderService _readerService;
+    /// <summary>
+    /// GET api/clusters/{clusterIdx}/topics/{topicName}/messages
+    /// </summary>
+    /// <param name="clusterIdx"></param>
+    /// <param name="topicName"></param>
+    /// <param name="req"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    [HttpGet]
+    public IEnumerable<MessageRow> GetMessages(
+        [FromRoute] int clusterIdx,
+        [FromRoute] string topicName,
+        [FromQuery] ReadMessagesRequest req,
+        [FromServices] MessagesReaderService readerService,
+        CancellationToken ct
+    )
+    {
+        var args = new MessageReaderArgs(
+            clusterIdx,
+            topicName,
+            req.PartitionsAsInt(),
+            ct,
+            Offset: req.Offset,
+            Limit: req.Limit,
+            Timestamp: req.Timestamp
+        );
+        // csharpier-ignore-start
+		var results = (req.seekType, req.seekDirection) switch
+        {
+            (SeekType.LIMIT, SeekDirection.FORWARD) => readerService.ReadFromBeginning(args),
+            (SeekType.LIMIT, SeekDirection.BACKWARD) => readerService.ReadFromEnd(args),
+            (SeekType.OFFSET, SeekDirection.FORWARD) => readerService.ReadFromOffset(args),
+            (SeekType.OFFSET, SeekDirection.BACKWARD) => readerService.ReadUntilOffset(args),
+            (SeekType.TIMESTAMP, SeekDirection.FORWARD) => readerService.ReadFromTimestamp(args),
+            (SeekType.TIMESTAMP, SeekDirection.BACKWARD) => readerService.ReadUntilTimestamp(args),
+            _ => throw new ArgumentOutOfRangeException(nameof(req)),
+        };
+        // csharpier-ignore-end
 
-	public MessagesController(MessagesReaderService readerService) =>
-		_readerService = readerService;
+        return MessageRow.FromResults(results);
+    }
 
-	[HttpGet]
-	public IEnumerable<MessageRow> GetMessages(
-		[FromRoute] int clusterIdx,
-		[FromRoute] string topicName,
-		[FromQuery] ReadMessagesRequest req,
-		CancellationToken ct
-	)
-	{
-		var results = req.seekDirection switch
-		{
-			SeekDirection.FORWARD => _readerService.ReadMessages(clusterIdx, topicName, req, ct),
-			SeekDirection.BACKWARD => _readerService.ReadMessagesBackwards(
-				clusterIdx,
-				topicName,
-				req,
-				ct
-			),
-			SeekDirection.TAILING => throw new NotImplementedException(),
-			_ => throw new ArgumentOutOfRangeException(nameof(req)),
-		};
+    /// <summary>
+    /// POST api/clusters/{clusterIdx}/topics/{topicName}/messages
+    /// </summary>
+    /// <param name="clusterIdx"></param>
+    /// <param name="topicName"></param>
+    /// <param name="model"></param>
+    /// <param name="pool"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ActionResult> CreateMessageAsync(
+        [FromRoute] int clusterIdx,
+        [FromRoute] string topicName,
+        [FromBody] CreateMessageModel model,
+        [FromServices] MessagesWriterService writerService,
+        CancellationToken cancellationToken
+    )
+    {
+        var dr = await writerService.CreateMessageAsync(
+            clusterIdx,
+            topicName,
+            model,
+            cancellationToken
+        );
 
-		return results.Select(MessageRow.FromResult);
-	}
+        if (dr.Status == PersistenceStatus.NotPersisted)
+        {
+            return Problem("Message not persisted.");
+        }
 
-	[HttpPost]
-	public async Task<ActionResult> CreateMessageAsync(
-		[FromRoute] int clusterIdx,
-		[FromRoute] string topicName,
-		[FromBody] CreateMessageModel model,
-		[FromServices] ProducersPool pool,
-		CancellationToken cancellationToken
-	)
-	{
-		var producer = pool.GetClient(clusterIdx);		
-		
-		var dr = await producer.ProduceAsync(
-			topicName,
-			new Message<byte[]?, byte[]?>
-			{
-				Key = model.KeyBytes,
-				Value = model.ValueBytes,
-				Headers = model.MessageHeaders,
-			},
-			cancellationToken
-		);
-		
-		if (dr.Status == PersistenceStatus.NotPersisted)
-		{
+        return Ok(dr);
+    }
 
-			return Problem("Message not persisted.");
-		}
-
-		return Ok(dr);
-	}
-
+	/// <summary>
+	/// DELETE api/clusters/{clusterIdx}/topics/{topicName}/messages
+	/// </summary>
+	/// <param name="clusterIdx"></param>
+	/// <param name="topicName"></param>
+	/// <param name="topicsService"></param>
+	/// <param name="messagesWriterService"></param>
+	/// <param name="ct"></param>
+	/// <returns></returns>
 	[HttpDelete]
-	public async Task<ActionResult<int>> PurgeMessagesAsync(
-		[FromRoute] int clusterIdx,
-		[FromRoute] string topicName,
-		CancellationToken ct
-	)
-	{
-		// TODO
-		await Task.Delay(10);
-
-		return Ok(0);
-	}
+    public async Task<ActionResult<int>> PurgeMessagesAsync(
+        [FromRoute] int clusterIdx,
+        [FromRoute] string topicName,
+		[FromServices] TopicsService topicsService,
+		[FromServices] MessagesWriterService messagesWriterService        
+    )
+    {
+		var td = await topicsService.DescribeTopicsAsync(clusterIdx, topicName);
+		var results = await messagesWriterService.TruncateMessagesAsync(clusterIdx, td);
+        
+		
+        return Ok(results.Count);
+    }
 }

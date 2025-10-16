@@ -16,7 +16,7 @@ export const SortOrderOptions = Object.freeze(
   imports: [FormsModule],
   template: `
     <div class="field">
-      <div class="label">Sort</div>
+      <div class="label">Seek direction</div>
       <div class="control">
         <div class="select is-fullwidth">
           <select [ngModel]="sortOrder()" (ngModelChange)="sortOrder.set($event)">

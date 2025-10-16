@@ -1,6 +1,7 @@
 using System.Text;
 using Kafkaf.API.ClientPools;
 using Kafkaf.API.Config;
+using Kafkaf.API.Infra;
 using Kafkaf.API.Routing;
 using Kafkaf.API.Services;
 
@@ -22,12 +23,15 @@ namespace Kafkaf.API
 			builder.Services.AddSingleton<AdminClientPool>();
 			builder.Services.AddSingleton<WatermarkOffsetsClientPool>();
 			builder.Services.AddSingleton<ProducersPool>();
+			builder.Services.AddSingleton<MessagesConsumerPool>();
+
 
 			builder.Services.AddSingleton<ClusterService>();
 			builder.Services.AddSingleton<BrokersService>();
 			builder.Services.AddSingleton<TopicsService>();
 			builder.Services.AddSingleton<WatermarkOffsetsService>();
 			builder.Services.AddSingleton<MessagesReaderService>();
+			builder.Services.AddSingleton<MessagesWriterService>();
 			builder.Services.AddSingleton<SettingsService>();
 			builder.Services.AddSingleton<ConsumersService>();
 
@@ -40,15 +44,24 @@ namespace Kafkaf.API
 
 			builder.Services.AddCors(options =>
 			{
-				options.AddPolicy(name: "dev", policy =>
-				{
-					policy.WithOrigins("http://localhost:4200", "https://localhost:4200");
-					policy.AllowAnyHeader();
-					policy.AllowAnyMethod();
-				});
-			});
+				options.AddPolicy(
+					name: "dev",
+					policy =>
+					{
+						policy.WithOrigins("http://localhost:4200", "https://localhost:4200");
+						policy.AllowAnyHeader();
+						policy.AllowAnyMethod();
+					}
+				);
+			});			
+			
 
-			builder.Services.AddControllers();
+			////////////////////////////////////////////////////////////////
+			
+			builder.Services.AddControllers(options =>
+			{
+				options.Filters.Add<ApiExceptionFilter>();
+			});
 
 			var app = builder.Build();
 
@@ -56,26 +69,32 @@ namespace Kafkaf.API
 			if (app.Environment.IsDevelopment())
 			{
 				// Debug endpoint to list all routes
-				app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
-				{
-					var sb = new StringBuilder();
-
-					foreach (var endpoint in endpointSources.SelectMany(es => es.Endpoints))
+				app.MapGet(
+					"/debug/routes",
+					(IEnumerable<EndpointDataSource> endpointSources) =>
 					{
-						if (endpoint is RouteEndpoint routeEndpoint)
+						var sb = new StringBuilder();
+
+						foreach (var endpoint in endpointSources.SelectMany(es => es.Endpoints))
 						{
-							var pattern = routeEndpoint.RoutePattern.RawText;
-							var methods = endpoint.Metadata
-								.OfType<HttpMethodMetadata>()
-								.FirstOrDefault()?.HttpMethods;
+							if (endpoint is RouteEndpoint routeEndpoint)
+							{
+								var pattern = routeEndpoint.RoutePattern.RawText;
+								var methods = endpoint
+									.Metadata.OfType<HttpMethodMetadata>()
+									.FirstOrDefault()
+									?.HttpMethods;
 
-							sb.AppendLine($"{string.Join(",", methods ?? new[] { "ANY" })} {pattern}");
+								sb.AppendLine(
+									$"{string.Join(",", methods ?? new[] { "ANY" })} {pattern}"
+								);
+							}
 						}
-					}
 
-					return sb.ToString();
-				});
-			}
+						return sb.ToString();
+					}
+				);
+			}			
 
 			app.UseCors("dev");
 
