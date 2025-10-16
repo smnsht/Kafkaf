@@ -1,4 +1,5 @@
-﻿using Kafkaf.API.Models;
+﻿using Confluent.Kafka.Admin;
+using Kafkaf.API.Models;
 using Kafkaf.API.Services;
 using Kafkaf.API.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -48,8 +49,8 @@ public class TopicsController : ControllerBase
         [FromBody] CreateTopicModel req
     )
     {
-        await _topicsService.CreateTopicsAsync(clusterIdx, req.ToTopicSpecification());
-        return Created();
+		await _topicsService.CreateTopicsAsync(clusterIdx, req.ToTopicSpecification());
+		return Created();		
     }
 
     /// <summary>

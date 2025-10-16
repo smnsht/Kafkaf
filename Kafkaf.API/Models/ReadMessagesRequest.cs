@@ -3,20 +3,28 @@
 namespace Kafkaf.API.Models;
 
 public record ReadMessagesRequest(
-	string []Partitions,
-	SeekType seekType = SeekType.OFFSET,
-	SeekDirection seekDirection = SeekDirection.FORWARD,
-	string? keySerde = null,
-	string? valueSerde = null,
-	int? Offset = null,
-	DateTime? Timestamp = null
+    string[] Partitions,
+    [EnumDataType(typeof(SeekType))] SeekType seekType = SeekType.OFFSET,
+    [EnumDataType(typeof(SeekDirection))]
+        SeekDirection seekDirection = SeekDirection.FORWARD,
+    [EnumDataType(typeof(SerdeTypes))] string? keySerde = null,
+    [EnumDataType(typeof(SerdeTypes))] string? valueSerde = null,
+    int? Offset = null,
+    DateTime? Timestamp = null
 ) : IValidatableObject
 {
-	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-	{
-		// No validation errors, so return an empty sequence.
-		yield break;
-	}
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (Partitions.Any(p => int.TryParse(p, out var _)))
+        {
+            yield return new ValidationResult(
+                "Invalid numeric array.",
+                [nameof(Partitions)]
+            );
+        }
 
-	public int[] PartitionsAsInt() => Partitions.Select(int.Parse).ToArray();		
+        yield break;
+    }
+
+    public int[] PartitionsAsInt() => Partitions.Select(int.Parse).Distinct().ToArray();
 }
