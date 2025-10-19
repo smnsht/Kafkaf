@@ -4,57 +4,56 @@ namespace Kafkaf.API.Models;
 
 public class TopicCustomParameterModel : IValidatableObject, ICloneable
 {
-	[Required]
-	public string? Key { get; set; }
+    [Required]
+    public string? Key { get; set; }
 
-	[Required]
-	public string? Value { get; set; }
+    [Required]
+    public string? Value { get; set; }
 
-	public object Clone() => new TopicCustomParameterModel
-	{
-		Key = Key,
-		Value = Value
-	};
+    public object Clone() => new TopicCustomParameterModel { Key = Key, Value = Value };
 
-	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-	{
-		// Basic null/empty check for key and value
-		if (Key is not string k || Value is not string v)
-		{
-			yield return new ValidationResult("Custom property key and value must not be blank.");
-			yield break;
-		}
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        // Basic null/empty check for key and value
+        if (Key is not string k || Value is not string v)
+        {
+            yield return new ValidationResult(
+                "Custom property key and value must not be blank."
+            );
+            yield break;
+        }
 
-		// Unknown property check
-		if (!KafkaTopicProperties.TOPIC_CONFIGS.TryGetValue(k, out var topicConfig))
-		{
-			yield return new ValidationResult("Unknown or blank custom property name.");
-			yield break;
-		}		
+        // Unknown property check
+        if (!KafkaTopicProperties.TOPIC_CONFIGS.TryGetValue(k, out var topicConfig))
+        {
+            yield return new ValidationResult("Unknown or blank custom property name.");
+            yield break;
+        }
 
-		// Type-specific validation
-		var valid = topicConfig.Type switch
-		{
-			"string" => true,
-			"long" => long.TryParse(v, out _),
-			"int" => int.TryParse(v, out _),
-			"double" => double.TryParse(v, out _),
-			"boolean" => bool.TryParse(v, out _),
-			_ => throw new ArgumentException(
-							 $"Unknown topic config type '{topicConfig.Type}'!")
-		};
+        // Type-specific validation
+        var valid = topicConfig.Type switch
+        {
+            "string" => true,
+            "long" => long.TryParse(v, out _),
+            "int" => int.TryParse(v, out _),
+            "double" => double.TryParse(v, out _),
+            "boolean" => bool.TryParse(v, out _),
+            _ => throw new ArgumentException(
+                $"Unknown topic config type '{topicConfig.Type}'!"
+            ),
+        };
 
-		if (!valid)
-		{
-			yield return new ValidationResult(
-				$"Value of custom property must be of type '{topicConfig.Type}'.");
-		}
-	}
+        if (!valid)
+        {
+            yield return new ValidationResult(
+                $"Value of custom property must be of type '{topicConfig.Type}'."
+            );
+        }
+    }
 
-	public void Reset()
-	{
-		Key = null;
-		Value = null;
-	}
+    public void Reset()
+    {
+        Key = null;
+        Value = null;
+    }
 }
-

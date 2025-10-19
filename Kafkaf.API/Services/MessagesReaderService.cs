@@ -120,13 +120,13 @@ public class MessagesReaderService
 		return new ConsumerBuilder<byte[]?, byte[]?>(config).Build();
 	}
 
-	internal void _assignTopicPartitions(ReadingContext ctx)
+	internal static void _assignTopicPartitions(ReadingContext ctx)
 	{
 		var topicPartitions = ctx
-			.request.Partitions.Split(',')
-			.Select(sPartition => new TopicPartitionOffset(
+			.request.PartitionsAsInt()
+			.Select(partition => new TopicPartitionOffset(
 				topic: ctx.topicName,
-				partition: int.Parse(sPartition),
+				partition: partition,
 				offset: ctx.request.seekDirection == SeekDirection.BACKWARD
 					? Offset.End
 					: Offset.Beginning

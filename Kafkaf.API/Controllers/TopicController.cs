@@ -1,6 +1,4 @@
-﻿using Confluent.Kafka;
-using Confluent.Kafka.Admin;
-using Kafkaf.API.Models;
+﻿using Kafkaf.API.Models;
 using Kafkaf.API.Services;
 using Kafkaf.API.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -9,148 +7,152 @@ namespace Kafkaf.API.Controllers;
 
 [Route("api/clusters/{clusterIdx:clusterIndex}/topics/{topicName:topicName}")]
 [ApiController]
-public partial class TopicController : ControllerBase
+public class TopicController : ControllerBase
 {
-	private readonly TopicsService _topicsService;
-	private readonly WatermarkOffsetsService _consumerService;
+    [FromRoute(Name = "clusterIdx")]
+    public int ClusterIdx { get; set; }
 
-	public TopicController(
-		TopicsService topicsService,
-		WatermarkOffsetsService watermarkOffsetsService
-	)
-	{
-		_topicsService = topicsService;
-		_consumerService = watermarkOffsetsService;
-	}
+    [FromRoute(Name = "topicName")]
+    public string TopicName { get; set; } = null!;
 
-	/// <summary>
-	/// GET api/clusters/{clusterIdx}/topics/{topicName}
-	/// </summary>
-	/// <param name="clusterIdx"></param>
-	/// <param name="topicName"></param>
-	/// <returns></returns>
-	[HttpGet]
-	public async Task<ActionResult<TopicDetailsViewModel>> GetTopicDetailsAsync(
-		int clusterIdx,
-		string topicName
-	)
-	{
-		try
-		{
-			// Will throw DescribeTopicsException when topic not found
-			var topicResult = await _topicsService.DescribeTopicsAsync(clusterIdx, topicName);
+    /// <summary>
+    /// GET api/clusters/{clusterIdx}/topics/{topicName}
+    /// </summary>
+    /// <param name="offsetsService"></param>
+    /// <param name="topicsService"></param>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<ActionResult<TopicDetailsViewModel>> GetTopicDetailsAsync(
+        [FromServices] WatermarkOffsetsService offsetsService,
+        [FromServices] TopicsService topicsService
+    )
+    {
+        var topicDescription = await topicsService.DescribeTopicsAsync(
+            ClusterIdx,
+            TopicName
+        );
 
-			var desc =
-				topicResult.TopicDescriptions.FirstOrDefault()
-				?? throw new InvalidOperationException(
-					$"Topic '{topicName}' was not found in cluster {clusterIdx}."
-				);
+        var topicDetails = TopicDetailsViewModel.build(
+            topicDescription,
+            topics => offsetsService.GetWatermarkOffsets(ClusterIdx, TopicName, topics)
+        );
 
-			var partitionOffsets = _consumerService.GetWatermarkOffsets(
-				clusterIdx,
-				topicName,
-				desc.Partitions.Select(p => p.Partition).ToArray()
-			);
+        return Ok(topicDetails);
+    }
 
-			var topicDetails = new TopicDetailsViewModel(desc, partitionOffsets);
+    /// <summary>
+    /// DELETE api/clusters/{clusterIdx}/topics/{topicName}
+    /// </summary>
+    /// <param name="topicsService"></param>
+    /// <returns></returns>
+    [HttpDelete]
+    public async Task<ActionResult> DeleteTopicAsync(
+        [FromServices] TopicsService topicsService
+    )
+    {
+        await topicsService.DeleteTopicAsync(ClusterIdx, TopicName);
+        return Ok();
+    }
 
-			return Ok(topicDetails);
-		}
-		catch (DescribeTopicsException dte)
-		{
-			return NotFound(dte.Message);
-		}
-		catch (KafkaException kte)
-		{
-			return Problem(kte.Error.Reason);
-		}
-	}
+    /// <summary>
+    /// PUT api/clusters/{clusterIdx}/topics/{topicName}
+    /// </summary>
+    /// <param name="req"></param>
+    /// <param name="topicsService"></param>
+    /// <returns></returns>
+    [HttpPut]
+    public async Task<ActionResult> UpdateTopicAsync(
+        UpdateTopicModel req,
+        [FromServices] TopicsService topicsService
+    )
+    {
+        var topicDescription = await topicsService.DescribeTopicsAsync(
+            ClusterIdx,
+            TopicName
+        );
 
-	/// <summary>
-	/// DELETE api/clusters/{clusterIdx}/topics/{topicName}
-	/// </summary>
-	/// <param name="clusterIdx"></param>
-	/// <param name="topicName"></param>
-	/// <returns></returns>
-	[HttpDelete]
-	public async Task<ActionResult> DeleteAsync(int clusterIdx, string topicName)
-	{
-		try
-		{
-			await _topicsService.DeleteTopicAsync(clusterIdx, topicName);
-			return Ok();
-		}
-		catch (DeleteTopicsException dte) when (dte.Message.Contains("Unknown topic or partition"))
-		{
-			return NotFound(dte.Message);
-		}
-		catch (Exception e)
-		{
-			return Problem(e.Message);
-		}
-	}
+        if (
+            req.NumPartitions.HasValue
+            && req.NumPartitions.Value <= topicDescription.Partitions.Count
+        )
+        {
+            ModelState.AddModelError(
+                nameof(req.NumPartitions),
+                "NumPartitions must be greater than current partition count."
+            );
 
-	[HttpPost("recreate")]
-	public async Task<ActionResult> RecreateAsync(
-		int clusterIdx,
-		string topicName,
-		[FromBody] RecreateTopicModel req
-	)
-	{
-		var topicConfig = await _topicsService.DescribeTopicConfigsAsync(clusterIdx, topicName);
+            return ValidationProblem(ModelState);
+        }
 
-		if (topicConfig is DescribeConfigsResult describeConfigsResult)
-		{
-			await _topicsService.DeleteTopicAsync(clusterIdx, topicName);
+        await topicsService.UpdateTopicAsync(ClusterIdx, TopicName, req);
 
-			var configs = describeConfigsResult
-				.Entries.Where(e => e.Value != null && !e.Value.IsDefault)
-				.ToDictionary(e => e.Key, e => e.Value.Value);
+        return Ok();
+    }
 
-			var topicSpec = new TopicSpecification()
-			{
-				Name = topicName,
-				NumPartitions = req.numPartitions,
-				ReplicationFactor = req.replicationFactor,
-				Configs = configs,
-			};
+    /// <summary>
+    /// POST api/clusters/{clusterIdx}/topics/{topicName}/recreate
+    /// </summary>
+    /// <param name="req"></param>
+    /// <param name="topicsService"></param>
+    /// <returns></returns>
+    [HttpPost("recreate")]
+    public async Task<ActionResult> RecreateTopicAsync(
+        [FromBody] RecreateTopicModel req,
+        [FromServices] TopicsService topicsService
+    )
+    {
+        await topicsService.RecreateAsync(ClusterIdx, TopicName, req);
+        return Ok();
+    }
 
-			await _topicsService.CreateTopicsAsync(clusterIdx, topicSpec);
+    /// <summary>
+    /// GET api/clusters/{clusterIdx}/topics/{topicName}/settings
+    /// </summary>
+    /// <param name="svc"></param>
+    /// <returns></returns>
+    [HttpGet("settings")]
+    public async Task<ActionResult<TopicSettingRow[]>> GetSettingsAsync(
+        [FromServices] SettingsService svc
+    ) => await svc.GetAsync(ClusterIdx, TopicName);
 
-			return Ok();
-		}
+    /// <summary>
+    /// PATCH api/clusters/{clusterIdx}/topics/{topicName}/settings/{name}
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="model"></param>
+    /// <param name="svc"></param>
+    /// <returns></returns>
+    [HttpPatch("settings/{name}")]
+    public async Task<ActionResult> PatchSettingsAsync(
+        [FromRoute] string name,
+        [FromBody] PatchSettingModel model,
+        [FromServices] SettingsService svc
+    )
+    {
+        if (model.name != name)
+        {
+            ModelState.AddModelError(
+                "name",
+                $"Route parameter '{name}' must match model.name '{model.name}'."
+            );
+            return ValidationProblem(ModelState);
+        }
 
-		return NotFound($"Can't get configs for topic");
-	}
+        await svc.UpdatePartialAsync(ClusterIdx, TopicName, model);
+        return NoContent();
+    }
 
-	[HttpPut]
-	public async Task<ActionResult> UpdateAsync(
-		int clusterIdx,
-		string topicName,
-		UpdateTopicModel req
-	)
-	{
-		// Will throw DescribeTopicsException when topic not found
-		var topicResult = await _topicsService.DescribeTopicsAsync(clusterIdx, topicName);
-
-		var desc =
-			topicResult.TopicDescriptions.FirstOrDefault()
-			?? throw new InvalidOperationException(
-				$"Topic '{topicName}' was not found in cluster {clusterIdx}."
-			);
-
-		if (req.NumPartitions.HasValue && req.NumPartitions.Value <= desc.Partitions.Count)
-		{
-			ModelState.AddModelError(
-				nameof(req.NumPartitions),
-				"NumPartitions must be greater than current partition count."
-			);
-
-			return ValidationProblem(ModelState);
-		}
-
-		await _topicsService.UpdateTopicAsync(clusterIdx, topicName, req);
-
-		return Ok();
-	}
+    /// <summary>
+    /// GET api/clusters/{clusterIdx}/topics/{topicName}/consumers
+    /// </summary>
+    /// <param name="consumersService"></param>
+    /// <returns></returns>
+    [HttpGet("consumers")]
+    public async Task<IEnumerable<TopicConsumersRow>> GetTopicConsumersAsync(
+        [FromServices] ConsumersService consumersService
+    )
+    {
+        var groups = await consumersService.GetConsumersAsync(ClusterIdx, TopicName);
+        return TopicConsumersRow.FromConsumerGroupDescription(groups);
+    }
 }
