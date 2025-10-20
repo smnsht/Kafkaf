@@ -10,12 +10,13 @@ public record ReadMessagesRequest(
     [EnumDataType(typeof(SerdeTypes))] string? keySerde = null,
     [EnumDataType(typeof(SerdeTypes))] string? valueSerde = null,
     int? Offset = null,
+    int? Limit = null,
     DateTime? Timestamp = null
 ) : IValidatableObject
 {
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (Partitions.Any(p => int.TryParse(p, out var _)))
+        if (Partitions.Any(p => !int.TryParse(p, out var _)))
         {
             yield return new ValidationResult(
                 "Invalid numeric array.",
@@ -27,4 +28,6 @@ public record ReadMessagesRequest(
     }
 
     public int[] PartitionsAsInt() => Partitions.Select(int.Parse).Distinct().ToArray();
+
+    public int LimitOrDefault => Limit ?? 25;
 }

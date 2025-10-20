@@ -2,7 +2,7 @@ import { Component, inject, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LoggerService } from '@app/shared';
 
-export type SeekType = 'Offset' | 'Timestamp';
+export type SeekType = 'END' | 'BEGINNING' | 'OFFSET' | 'TIMESTAMP';
 
 @Component({
   selector: 'ddl-seek-type',
@@ -14,7 +14,7 @@ export type SeekType = 'Offset' | 'Timestamp';
         <div class="select is-fullwidth">
           <select [ngModel]="seekType()" (ngModelChange)="onModelChange($event)">
             @for (option of options; track $index) {
-              <option [value]="option">{{ option }}</option>
+              <option [value]="option[0]">{{ option[1] }}</option>
             }
           </select>
         </div>
@@ -25,8 +25,14 @@ export type SeekType = 'Offset' | 'Timestamp';
 export class DdlSeekType {
   private readonly logger = inject(LoggerService);
 
-  options: SeekType[] = ['Offset', 'Timestamp'];
-  seekType = model<SeekType>('Timestamp');
+  options = new Map<SeekType, string>([
+    ['END', 'From latest'],
+    ['BEGINNING', 'From beginning'],
+    ['OFFSET', 'Offset'],
+    ['TIMESTAMP', 'Timestamp'],
+  ]);
+
+  seekType = model<SeekType>('END');
 
   onModelChange(newValue: SeekType): void {
     this.logger.debug('[DdlSeekType]: ', newValue);

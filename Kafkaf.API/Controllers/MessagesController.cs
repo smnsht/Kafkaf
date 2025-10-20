@@ -34,21 +34,21 @@ public class MessagesController : ControllerBase
         CancellationToken ct
     )
     {
-        var results = req.seekDirection switch
+        var args = new MessageReaderArgs(
+            clusterIdx,
+            topicName,
+            req.PartitionsAsInt(),
+            ct,
+            Offset: req.Offset,
+            Limit: req.Limit
+        );
+
+        var results = req.seekType switch
         {
-            SeekDirection.FORWARD => _readerService.ReadMessages(
-                clusterIdx,
-                topicName,
-                req,
-                ct
-            ),
-            SeekDirection.BACKWARD => _readerService.ReadMessagesBackwards(
-                clusterIdx,
-                topicName,
-                req,
-                ct
-            ),
-            SeekDirection.TAILING => throw new NotImplementedException(),
+            SeekType.BEGINNING => _readerService.ReadFromBeginning(args),
+            SeekType.END => _readerService.ReadFromEnd(args),
+            SeekType.OFFSET => _readerService.ReadFromOffset(args),
+            //SeekType.TIMESTAMP => _readerService.ReadFromTimestamp(args),
             _ => throw new ArgumentOutOfRangeException(nameof(req)),
         };
 
