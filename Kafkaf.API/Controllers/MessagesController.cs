@@ -48,11 +48,11 @@ public class MessagesController : ControllerBase
             SeekType.BEGINNING => _readerService.ReadFromBeginning(args),
             SeekType.END => _readerService.ReadFromEnd(args),
             SeekType.OFFSET => _readerService.ReadFromOffset(args),
-            //SeekType.TIMESTAMP => _readerService.ReadFromTimestamp(args),
+            SeekType.TIMESTAMP => _readerService.ReadFromTimestamp(args),
             _ => throw new ArgumentOutOfRangeException(nameof(req)),
         };
 
-        return results.Select(MessageRow.FromResult);
+        return MessageRow.FromResults(results, req.sort == SortDirection.ASC);
     }
 
     /// <summary>

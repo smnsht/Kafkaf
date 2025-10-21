@@ -31,8 +31,8 @@ public class WatermarkOffsetsService
             .Select(partition =>
             {
                 var tp = new TopicPartition(topicName, partition);
-                var ts = TimeSpan.FromSeconds(_options.TimeoutInSeconds);
-                var offsets = consumer.QueryWatermarkOffsets(tp, ts);
+                var timeout = TimeSpan.FromSeconds(_options.TimeoutInSeconds);
+                var offsets = consumer.QueryWatermarkOffsets(tp, timeout);
                 return new KeyValuePair<int, WatermarkOffsets?>(partition, offsets);
             })
             .ToDictionary(pair => pair.Key, pair => pair.Value);

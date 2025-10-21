@@ -5,8 +5,7 @@ namespace Kafkaf.API.Models;
 public record ReadMessagesRequest(
     string[] Partitions,
     [EnumDataType(typeof(SeekType))] SeekType seekType = SeekType.OFFSET,
-    [EnumDataType(typeof(SeekDirection))]
-        SeekDirection seekDirection = SeekDirection.FORWARD,
+    [EnumDataType(typeof(SortDirection))] SortDirection sort = SortDirection.DESC,
     [EnumDataType(typeof(SerdeTypes))] string? keySerde = null,
     [EnumDataType(typeof(SerdeTypes))] string? valueSerde = null,
     int? Offset = null,
@@ -21,6 +20,14 @@ public record ReadMessagesRequest(
             yield return new ValidationResult(
                 "Invalid numeric array.",
                 [nameof(Partitions)]
+            );
+        }
+
+        if (seekType == SeekType.TIMESTAMP && !Timestamp.HasValue)
+        {
+            yield return new ValidationResult(
+                "Timestamp value is required when seek type is 'Timestamp'.",
+                [nameof(Timestamp)]
             );
         }
 

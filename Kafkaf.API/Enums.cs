@@ -42,16 +42,13 @@ public enum SeekType
     TIMESTAMP,
 }
 
-public enum SeekDirection
+public enum SortDirection
 {
-    [Display(Name = "Oldest First")]
-    FORWARD,
+	[Display(Name = "Oldest First")]
+    DESC,
 
-    [Display(Name = "Newest First")]
-    BACKWARD,
-
-    [Display(Name = "Live Mode")]
-    TAILING,
+	[Display(Name = "Newest First")]
+	ASC
 }
 
 public enum SerdeTypes

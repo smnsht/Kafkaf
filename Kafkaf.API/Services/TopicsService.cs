@@ -1,9 +1,11 @@
 ﻿using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using Kafkaf.API.ClientPools;
+using Kafkaf.API.Config;
 using Kafkaf.API.Infra;
 using Kafkaf.API.Models;
 using Kafkaf.API.ViewModels;
+using Microsoft.Extensions.Options;
 
 namespace Kafkaf.API.Services;
 
@@ -13,23 +15,31 @@ public class TopicsService
 {
     private readonly ILogger<TopicsService> _logger;
     private readonly AdminClientPool _clientPool;
+    private readonly TimeSpan _operationTimeout;
+    private readonly TimeSpan _requestTimeout;
 
-    public TopicsService(ILogger<TopicsService> logger, AdminClientPool clientPool)
+    public TopicsService(
+        ILogger<TopicsService> logger,
+        AdminClientPool clientPool,
+        IOptions<AdminClientConfigOptions> options
+    )
     {
         _logger = logger;
         _clientPool = clientPool;
+
+        _operationTimeout = TimeSpan.FromSeconds(options.Value.OperationTimeout);
+        _requestTimeout = TimeSpan.FromSeconds(options.Value.RequestTimeout);
     }
 
-	public List<TopicMetadata> GetAllTopicsMetadata(int clusterIdx)
-	{
-		var adminClient = _clientPool.GetClient(clusterIdx);
-		var timeout = TimeSpan.FromSeconds(10);
-		var meta = adminClient.GetMetadata(timeout);
+    public List<TopicMetadata> GetAllTopicsMetadata(int clusterIdx)
+    {
+        var adminClient = _clientPool.GetClient(clusterIdx);
+        var meta = adminClient.GetMetadata(_requestTimeout);
 
-		return meta.Topics;
-	}
+        return meta.Topics;
+    }
 
-	public async Task<TopicDescription> DescribeTopicsAsync(
+    public async Task<TopicDescription> DescribeTopicsAsync(
         int clusterIdx,
         string topicName
     )
@@ -37,7 +47,10 @@ public class TopicsService
         var topics = TopicCollection.OfTopicNames([topicName]);
         var adminClient = _clientPool.GetClient(clusterIdx);
 
-        var result = await adminClient.DescribeTopicsAsync(topics);
+        var result = await adminClient.DescribeTopicsAsync(
+            topics,
+            new DescribeTopicsOptions() { RequestTimeout = _requestTimeout }
+        );
 
         if (!result.TopicDescriptions.Any())
         {
@@ -65,14 +78,12 @@ public class TopicsService
             await adminClient.DescribeConfigsAsync([topicResource])
             ?? throw new KafkaTopicNotFoundException(clusterIdx, topicName);
 
-        var timeout = TimeSpan.FromSeconds(10);
-
         await adminClient.DeleteTopicsAsync(
             [topicName],
             new DeleteTopicsOptions()
             {
-                OperationTimeout = timeout,
-                RequestTimeout = timeout,
+                OperationTimeout = _operationTimeout,
+                RequestTimeout = _requestTimeout,
             }
         );
 
@@ -90,23 +101,22 @@ public class TopicsService
             [specification],
             new CreateTopicsOptions()
             {
-                RequestTimeout = timeout,
-                OperationTimeout = timeout,
+                RequestTimeout = _requestTimeout,
+                OperationTimeout = _operationTimeout,
             }
         );
     }
 
     public async Task CreateTopicsAsync(int clusterIdx, TopicSpecification topic)
     {
-        var timeout = TimeSpan.FromSeconds(10);
         var adminClient = _clientPool.GetClient(clusterIdx);
 
         await adminClient.CreateTopicsAsync(
             [topic],
             new CreateTopicsOptions()
             {
-                RequestTimeout = timeout,
-                OperationTimeout = timeout,
+                RequestTimeout = _requestTimeout,
+                OperationTimeout = _operationTimeout,
             }
         );
     }
@@ -190,7 +200,6 @@ public class TopicsService
     )
     {
         var adminClient = _clientPool.GetClient(clusterIdx);
-        var timeout = TimeSpan.FromSeconds(10);
 
         List<BatchItemResult> retval = new();
         foreach (var topic in topicNames)
@@ -201,8 +210,8 @@ public class TopicsService
                     [topic],
                     new DeleteTopicsOptions()
                     {
-                        OperationTimeout = timeout,
-                        RequestTimeout = timeout,
+                        OperationTimeout = _operationTimeout,
+                        RequestTimeout = _requestTimeout,
                     }
                 );
                 retval.Add(new BatchItemResult(topic, true));
@@ -220,15 +229,14 @@ public class TopicsService
 
     public async Task DeleteTopicAsync(int clusterIdx, string topicName)
     {
-        var timeout = TimeSpan.FromSeconds(10);
         var adminClient = _clientPool.GetClient(clusterIdx);
 
         await adminClient.DeleteTopicsAsync(
             [topicName],
             new DeleteTopicsOptions()
             {
-                OperationTimeout = timeout,
-                RequestTimeout = timeout,
+                OperationTimeout = _operationTimeout,
+                RequestTimeout = _requestTimeout,
             }
         );
     }
