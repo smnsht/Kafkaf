@@ -1,159 +1,281 @@
 ﻿using Confluent.Kafka;
+using Kafkaf.API.ClientPools;
 using Kafkaf.API.Config;
-using Kafkaf.API.Models;
 using Microsoft.Extensions.Options;
 
 namespace Kafkaf.API.Services;
 
-public class MessagesReaderService
+public class MessagesReaderService : IMessagesReaderService
 {
-	private readonly MessagesReaderServiceOptions _options;
-	private readonly IReadOnlyList<ClusterConfigOptions> _clusterConfigs;
+    private readonly MessagesReaderServiceOptions _options;
+    private readonly MessagesConsumerPool _consumerPool;
 
-	internal record ReadingContext(
-		int clusterIdx,
-		string topicName,
-		ReadMessagesRequest request,
-		IConsumer<byte[]?, byte[]?> consumer,
-		CancellationToken token
-	) : IDisposable
-	{
-		public void Dispose() => consumer?.Dispose();
-	}
+    public MessagesReaderService(
+        IOptions<MessagesReaderServiceOptions> options,
+        MessagesConsumerPool consumerPool
+    )
+    {
+        _options = options.Value;
+        _consumerPool = consumerPool;
+    }
 
-	public MessagesReaderService(
-		IOptions<MessagesReaderServiceOptions> options,
-		IReadOnlyList<ClusterConfigOptions> clusterConfigs
-	)
-	{
-		_options = options.Value;
-		_clusterConfigs = clusterConfigs;
-	}
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadFromBeginning(
+        MessageReaderArgs args
+    ) =>
+        ReadFromBeginning(
+            args.ClusterIdx,
+            args.TopicName,
+            args.Partitions,
+            firstN: args.LimitOrDefault,
+            args.Ct
+        );
 
-	// TODO: create Stream
-	public List<ConsumeResult<byte[]?, byte[]?>> ReadMessagesBackwards(
-		int clusterIdx,
-		string topicName,
-		ReadMessagesRequest request,
-		CancellationToken ct
-	)
-	{
-		var messages = new List<ConsumeResult<byte[]?, byte[]?>>();
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadFromBeginning(
+        int clusterIdx,
+        string topicName,
+        int[] partitions,
+        int firstN,
+        CancellationToken ct
+    )
+    {
+        using var consumer = _consumerPool.GetClient(clusterIdx);
 
-		using (var consumer = _buildConsumer(clusterIdx))
-		{
-			// Get metadata to discover partitions
-			var partitions = request
-				.PartitionsAsInt()
-				.Select(p => new TopicPartition(topicName, new Partition(p)))
-				.ToList();
+        var topicPartitions = partitions.Select(partition => new TopicPartitionOffset(
+            topicName,
+            partition,
+            Offset.Beginning
+        ));
 
-			foreach (var tp in partitions)
-			{
-				// Query watermarks for this partition
-				var watermark = consumer.QueryWatermarkOffsets(tp, TimeSpan.FromSeconds(5));
-				var lastOffset = watermark.High - 1;
+        consumer.Assign(topicPartitions);
 
-				// Walk backwards through this partition
-				for (var offset = lastOffset; offset >= watermark.Low; offset--)
-				{
-					if (ct.IsCancellationRequested || messages.Count > _options.MaxMessages)
-					{
-						break;
-					}
+        return _consume(consumer, firstN, ct);
+    }
 
-					var tpo = new TopicPartitionOffset(tp, new Offset(offset));
-					consumer.Assign(tpo);
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadFromEnd(MessageReaderArgs args)
+    {
+        var results = ReadFromEnd(
+            args.ClusterIdx,
+            args.TopicName,
+            args.Partitions,
+            lastN: args.LimitOrDefault,
+            args.Ct
+        );
 
-					var cr = consumer.Consume(TimeSpan.FromSeconds(2));
+        results.Reverse();
+        return results;
+    }
 
-					if (cr is null || cr.IsPartitionEOF)
-					{
-						// No more messages right now — we've reached the "end"
-						break;
-					}
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadFromEnd(
+        int clusterIdx,
+        string topicName,
+        int[] partitions,
+        int lastN,
+        CancellationToken ct
+    )
+    {
+        using var consumer = _consumerPool.GetClient(clusterIdx);
 
-					messages.Add(cr);
-				}
-			}
-		}
+        var topicPartitions = partitions.Select(partition =>
+        {
+            var tp = new TopicPartition(topicName, partition);
+            var timeout = TimeSpan.FromSeconds(_options.QueryWatermarkOffsetsTimeout);
+            var watermark = consumer.QueryWatermarkOffsets(tp, timeout);
+            long endOffset = watermark.High;
 
-		return messages;
-	}
+            // Calculate start offset for "last N messages"
+            var startOffset = Math.Max(endOffset - lastN, watermark.Low);
 
-	public List<ConsumeResult<byte[]?, byte[]?>> ReadMessages(
-		int clusterIdx,
-		string topicName,
-		ReadMessagesRequest request,
-		CancellationToken ct
-	)
-	{
-		using (
-			var ctx = new ReadingContext(
-				clusterIdx: clusterIdx,
-				topicName: topicName,
-				request: request,
-				consumer: _buildConsumer(clusterIdx),
-				token: ct
-			)
-		)
-		{
-			_assignTopicPartitions(ctx);
-			return _consume(ctx);
-		}
-	}
+            return new TopicPartitionOffset(tp, new Offset(startOffset));
+        });
 
-	internal IConsumer<byte[]?, byte[]?> _buildConsumer(int clusterIdx)
-	{
-		var clusterConfig =
-			_clusterConfigs[clusterIdx]
-			?? throw new ArgumentOutOfRangeException(nameof(clusterIdx));
+        consumer.Assign(topicPartitions);
 
-		var config = new ConsumerConfig
-		{
-			BootstrapServers = clusterConfig.Address,
-			GroupId = _options.GroupId,
-			EnableAutoCommit = false,
-			AutoOffsetReset = AutoOffsetReset.Earliest,
-		};
+        return _consume(consumer, lastN, ct);
+    }
 
-		return new ConsumerBuilder<byte[]?, byte[]?>(config).Build();
-	}
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadUntilOffset(MessageReaderArgs args)
+    {
+        var startOffset = Math.Max(0, args.OffsetOrDefault - _options.MaxMessages);
 
-	internal static void _assignTopicPartitions(ReadingContext ctx)
-	{
-		var topicPartitions = ctx
-			.request.PartitionsAsInt()
-			.Select(partition => new TopicPartitionOffset(
-				topic: ctx.topicName,
-				partition: partition,
-				offset: ctx.request.seekDirection == SeekDirection.BACKWARD
-					? Offset.End
-					: Offset.Beginning
-			));
+        var results = ReadFromOffset(
+            args.ClusterIdx,
+            args.TopicName,
+            args.Partitions,
+            startOffset,
+            args.Ct
+        );
 
-		ctx.consumer.Assign(topicPartitions);
-	}
+        results.RemoveAll(x => x.Offset > args.OffsetOrDefault);
+        results.Reverse();
 
-	internal List<ConsumeResult<byte[]?, byte[]?>> _consume(ReadingContext ctx)
-	{
-		var consumer = ctx.consumer;
-		var timeout = TimeSpan.FromSeconds(_options.ConsumeTimeoutInSeconds);
-		var messages = new List<ConsumeResult<byte[]?, byte[]?>>();
+        return results;
+    }
 
-		for (var i = 0; i <= _options.MaxMessages && !ctx.token.IsCancellationRequested; i++)
-		{
-			var cr = consumer.Consume(timeout);
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadFromOffset(MessageReaderArgs args) =>
+        ReadFromOffset(
+            args.ClusterIdx,
+            args.TopicName,
+            args.Partitions,
+            args.OffsetOrDefault,
+            args.Ct
+        );
 
-			if (cr is null || cr.IsPartitionEOF)
-			{
-				// No more messages right now — we've reached the "end"
-				break;
-			}
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadFromOffset(
+        int clusterIdx,
+        string topicName,
+        int[] partitions,
+        long? offset,
+        CancellationToken ct
+    )
+    {
+        using var consumer = _consumerPool.GetClient(clusterIdx);
 
-			messages.Add(cr);
-		}
+        var topicPartitions = partitions.Select(partition => new TopicPartitionOffset(
+            topicName,
+            partition,
+            new Offset(offset ?? 0)
+        ));
 
-		return messages;
-	}
+        consumer.Assign(topicPartitions);
+
+        return _consume(consumer, _options.MaxMessages, ct);
+    }
+
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadFromTimestamp(
+        MessageReaderArgs args
+    ) =>
+        ReadFromTimestamp(
+            args.ClusterIdx,
+            args.TopicName,
+            args.Partitions,
+            args.RequiredTimestamp,
+            args.Ct
+        );
+
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadFromTimestamp(
+        int clusterIdx,
+        string topicName,
+        int[] partitions,
+        DateTime timestamp,
+        CancellationToken ct
+    )
+    {
+        using var consumer = _consumerPool.GetClient(clusterIdx);
+
+        // Build TopicPartitionTimestamp list
+        var topicPartitionTimestamps = partitions
+            .Select(p => new TopicPartitionTimestamp(
+                new TopicPartition(topicName, p),
+                new Timestamp(timestamp)
+            ))
+            .ToList();
+
+        // Query broker for offsets corresponding to the timestamp
+        var offsetsForTimes = consumer.OffsetsForTimes(
+            topicPartitionTimestamps,
+            TimeSpan.FromSeconds(_options.OffsetsForTimesTimeout)
+        );
+
+        // Assign consumer to those offsets
+        consumer.Assign(offsetsForTimes);
+
+        return _consume(consumer, _options.MaxMessages, ct);
+    }
+
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadUntilTimestamp(
+        MessageReaderArgs args
+    ) =>
+        ReadUntilTimestamp(
+            args.ClusterIdx,
+            args.TopicName,
+            args.Partitions,
+            args.RequiredTimestamp,
+            args.Ct
+        );
+
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadUntilTimestamp(
+        int clusterIdx,
+        string topicName,
+        int[] partitions,
+        DateTime timestamp,
+        CancellationToken ct
+    )
+    {
+        using var consumer = _consumerPool.GetClient(clusterIdx);
+
+        // Build TopicPartitionTimestamp list
+        var topicPartitionTimestamps = partitions
+            .Select(p => new TopicPartitionTimestamp(
+                new TopicPartition(topicName, p),
+                new Timestamp(timestamp)
+            ))
+            .ToList();
+
+        // Query broker for offsets corresponding to the timestamp
+        var offsetsForTimes = consumer.OffsetsForTimes(
+            topicPartitionTimestamps,
+            TimeSpan.FromSeconds(_options.OffsetsForTimesTimeout)
+        );
+
+        var results = new List<ConsumeResult<byte[]?, byte[]?>>();
+
+        foreach (var tpOffset in offsetsForTimes)
+        {
+            if (tpOffset.Offset == Offset.Unset)
+                continue;
+
+            // Calculate start offset (bounded by MaxMessages)
+            var startOffset = Math.Max(0, tpOffset.Offset.Value - _options.MaxMessages);
+
+            consumer.Assign(
+                new TopicPartitionOffset(tpOffset.TopicPartition, new Offset(startOffset))
+            );
+
+            var partitionResults = _consume(consumer, _options.MaxMessages, ct);
+
+            results.AddRange(partitionResults);
+        }
+
+        results.RemoveAll(r =>
+            r.Message.Timestamp.UtcDateTime > timestamp.ToUniversalTime()
+        );
+        results.Reverse();
+
+        return results;
+    }
+
+    internal List<ConsumeResult<byte[]?, byte[]?>> _consume(
+        IConsumer<byte[]?, byte[]?> consumer,
+        int maxMessages,
+        CancellationToken ct
+    )
+    {
+        var timeout = TimeSpan.FromSeconds(_options.ConsumeTimeout);
+        var messages = new List<ConsumeResult<byte[]?, byte[]?>>();
+        var eofPartitions = new HashSet<Partition>();
+        var assigned = consumer.Assignment.Select(tp => tp.Partition).ToHashSet();
+
+        while (messages.Count < maxMessages && !ct.IsCancellationRequested)
+        {
+            var cr = consumer.Consume(timeout);
+
+            if (cr is null)
+            {
+                // No message within timeout → assume we're done
+                break;
+            }
+
+            if (cr.IsPartitionEOF)
+            {
+                eofPartitions.Add(cr.Partition);
+                if (eofPartitions.SetEquals(assigned))
+                    break;
+                continue;
+            }
+
+            messages.Add(cr);
+        }
+
+        return messages;
+    }
 }

@@ -13,7 +13,8 @@
               <label class="Label" for="partition">Partition</label>
               <div class="control">
                 <div class="select is-fullwidth">
-                  <select id="partition" [(ngModel)]="payload.partition" name="partition" disabled="true">
+                  <select id="partition" [(ngModel)]="payload.partition" name="partition">
+                    <option [value]="undefined">--not specified--</option>
                     @for (p of store.partitions(); track $index) {
                       <option [value]="p.partition">{{ p.partition }}</option>
                     }

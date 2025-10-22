@@ -23,8 +23,8 @@ public class TopicController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     public async Task<ActionResult<TopicDetailsViewModel>> GetTopicDetailsAsync(
-        [FromServices] WatermarkOffsetsService offsetsService,
-        [FromServices] TopicsService topicsService
+        [FromServices] IWatermarkOffsetsService offsetsService,
+        [FromServices] ITopicsService topicsService
     )
     {
         var topicDescription = await topicsService.DescribeTopicsAsync(
@@ -47,7 +47,7 @@ public class TopicController : ControllerBase
     /// <returns></returns>
     [HttpDelete]
     public async Task<ActionResult> DeleteTopicAsync(
-        [FromServices] TopicsService topicsService
+        [FromServices] ITopicsService topicsService
     )
     {
         await topicsService.DeleteTopicAsync(ClusterIdx, TopicName);
@@ -63,7 +63,7 @@ public class TopicController : ControllerBase
     [HttpPut]
     public async Task<ActionResult> UpdateTopicAsync(
         UpdateTopicModel req,
-        [FromServices] TopicsService topicsService
+        [FromServices] ITopicsService topicsService
     )
     {
         var topicDescription = await topicsService.DescribeTopicsAsync(
@@ -98,7 +98,7 @@ public class TopicController : ControllerBase
     [HttpPost("recreate")]
     public async Task<ActionResult> RecreateTopicAsync(
         [FromBody] RecreateTopicModel req,
-        [FromServices] TopicsService topicsService
+        [FromServices] ITopicsService topicsService
     )
     {
         await topicsService.RecreateAsync(ClusterIdx, TopicName, req);
@@ -112,7 +112,7 @@ public class TopicController : ControllerBase
     /// <returns></returns>
     [HttpGet("settings")]
     public async Task<ActionResult<TopicSettingRow[]>> GetSettingsAsync(
-        [FromServices] SettingsService svc
+        [FromServices] ISettingsService svc
     ) => await svc.GetAsync(ClusterIdx, TopicName);
 
     /// <summary>
@@ -126,7 +126,7 @@ public class TopicController : ControllerBase
     public async Task<ActionResult> PatchSettingsAsync(
         [FromRoute] string name,
         [FromBody] PatchSettingModel model,
-        [FromServices] SettingsService svc
+        [FromServices] ISettingsService svc
     )
     {
         if (model.name != name)
@@ -149,7 +149,7 @@ public class TopicController : ControllerBase
     /// <returns></returns>
     [HttpGet("consumers")]
     public async Task<IEnumerable<TopicConsumersRow>> GetTopicConsumersAsync(
-        [FromServices] ConsumersService consumersService
+        [FromServices] IConsumersService consumersService
     )
     {
         var groups = await consumersService.GetConsumersAsync(ClusterIdx, TopicName);

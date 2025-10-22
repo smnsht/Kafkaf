@@ -5,7 +5,16 @@ using Microsoft.Extensions.Options;
 
 namespace Kafkaf.API.Services;
 
-public class WatermarkOffsetsService
+public interface IWatermarkOffsetsService
+{
+    Dictionary<int, WatermarkOffsets?> GetWatermarkOffsets(
+        int clusterNo,
+        string topicName,
+        int[] partitions
+    );
+}
+
+public class WatermarkOffsetsService : IWatermarkOffsetsService
 {
     private readonly WatermarkOffsetsClientPool _pool;
     private readonly MessageConsumerOptions _options;
@@ -31,8 +40,8 @@ public class WatermarkOffsetsService
             .Select(partition =>
             {
                 var tp = new TopicPartition(topicName, partition);
-                var ts = TimeSpan.FromSeconds(_options.TimeoutInSeconds);
-                var offsets = consumer.QueryWatermarkOffsets(tp, ts);
+                var timeout = TimeSpan.FromSeconds(_options.TimeoutInSeconds);
+                var offsets = consumer.QueryWatermarkOffsets(tp, timeout);
                 return new KeyValuePair<int, WatermarkOffsets?>(partition, offsets);
             })
             .ToDictionary(pair => pair.Key, pair => pair.Value);

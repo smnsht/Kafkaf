@@ -4,6 +4,7 @@ using Confluent.Kafka;
 namespace Kafkaf.API.Models;
 
 public record CreateMessageModel(
+	int? Partition,
     string? key,
     string? value,
     Dictionary<string, string> headers

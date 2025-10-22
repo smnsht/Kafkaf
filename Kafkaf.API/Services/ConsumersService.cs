@@ -1,49 +1,71 @@
 ﻿using Confluent.Kafka.Admin;
 using Kafkaf.API.ClientPools;
+using Kafkaf.API.Config;
+using Microsoft.Extensions.Options;
 
 namespace Kafkaf.API.Services;
 
-public class ConsumersService
+public interface IConsumersService
 {
-	private readonly AdminClientPool _clientPool;
+    Task<List<ConsumerGroupDescription>> GetConsumersAsync(int clusterIdx);
+    Task<List<ConsumerGroupDescription>> GetConsumersAsync(int clusterIdx, string topic);
+}
 
-	public ConsumersService(AdminClientPool clientPool) => _clientPool = clientPool;
+public class ConsumersService : IConsumersService
+{
+    private readonly AdminClientPool _clientPool;
+    private readonly AdminClientConfigOptions _options;
 
-	public async Task<List<ConsumerGroupDescription>> GetConsumersAsync(int clusterIdx)
-	{
-		var adminClient = _clientPool.GetClient(clusterIdx);
-		var groups = await adminClient.ListConsumerGroupsAsync();
-		var groupNames = groups.Valid.Select(group => group.GroupId);
-		var groupInfo = await adminClient.DescribeConsumerGroupsAsync(groupNames);
+    public ConsumersService(
+        AdminClientPool clientPool,
+        IOptions<AdminClientConfigOptions> options
+    )
+    {
+        _clientPool = clientPool;
+        _options = options.Value;
+    }
 
-		return groupInfo.ConsumerGroupDescriptions;
-	}
+    public async Task<List<ConsumerGroupDescription>> GetConsumersAsync(int clusterIdx)
+    {
+        var adminClient = _clientPool.GetClient(clusterIdx);
+        var groups = await adminClient.ListConsumerGroupsAsync();
+        var groupNames = groups.Valid.Select(group => group.GroupId);
+        var groupInfo = await adminClient.DescribeConsumerGroupsAsync(groupNames);
 
-	public async Task<List<ConsumerGroupDescription>> GetConsumersAsync(
-		int clusterIdx,
-		string topic
-	)
-	{
-		var adminClient = _clientPool.GetClient(clusterIdx);
-		var groups = await adminClient.ListConsumerGroupsAsync();
+        return groupInfo.ConsumerGroupDescriptions;
+    }
 
-		var retval = new List<ConsumerGroupDescription>();
+    public async Task<List<ConsumerGroupDescription>> GetConsumersAsync(
+        int clusterIdx,
+        string topic
+    )
+    {
+        var adminClient = _clientPool.GetClient(clusterIdx);
+        var timeout = TimeSpan.FromSeconds(_options.RequestTimeout);
+        var groups = await adminClient.ListConsumerGroupsAsync(
+            new ListConsumerGroupsOptions() { RequestTimeout = timeout }
+        );
 
-		foreach (var g in groups.Valid)
-		{
-			var groupInfo = await adminClient.DescribeConsumerGroupsAsync([g.GroupId]);
+        var retval = new List<ConsumerGroupDescription>();
 
-			var assignedToTopic = groupInfo
-				.ConsumerGroupDescriptions.SelectMany(desc => desc.Members)
-				.SelectMany(member => member.Assignment.TopicPartitions)
-				.Any(tp => tp.Topic == topic);
+        foreach (var g in groups.Valid)
+        {
+            var groupInfo = await adminClient.DescribeConsumerGroupsAsync(
+                [g.GroupId],
+                new DescribeConsumerGroupsOptions() { RequestTimeout = timeout }
+            );
 
-			if (assignedToTopic)
-			{
-				retval.AddRange(groupInfo.ConsumerGroupDescriptions);
-			}
-		}
+            var assignedToTopic = groupInfo
+                .ConsumerGroupDescriptions.SelectMany(desc => desc.Members)
+                .SelectMany(member => member.Assignment.TopicPartitions)
+                .Any(tp => tp.Topic == topic);
 
-		return retval;
-	}
+            if (assignedToTopic)
+            {
+                retval.AddRange(groupInfo.ConsumerGroupDescriptions);
+            }
+        }
+
+        return retval;
+    }
 }

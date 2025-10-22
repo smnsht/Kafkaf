@@ -23,15 +23,17 @@ namespace Kafkaf.API
 			builder.Services.AddSingleton<AdminClientPool>();
 			builder.Services.AddSingleton<WatermarkOffsetsClientPool>();
 			builder.Services.AddSingleton<ProducersPool>();
+			builder.Services.AddSingleton<MessagesConsumerPool>();
 
 
-			builder.Services.AddSingleton<ClusterService>();
-			builder.Services.AddSingleton<BrokersService>();
-			builder.Services.AddSingleton<TopicsService>();
-			builder.Services.AddSingleton<WatermarkOffsetsService>();
-			builder.Services.AddSingleton<MessagesReaderService>();
-			builder.Services.AddSingleton<SettingsService>();
-			builder.Services.AddSingleton<ConsumersService>();
+			builder.Services.AddSingleton<IClusterService, ClusterService>();
+			builder.Services.AddSingleton<IBrokersService, BrokersService>();
+			builder.Services.AddSingleton<ITopicsService, TopicsService>();
+			builder.Services.AddSingleton<IWatermarkOffsetsService, WatermarkOffsetsService>();
+			builder.Services.AddSingleton<IMessagesReaderService, MessagesReaderService>();
+			builder.Services.AddSingleton<IMessagesWriterService, MessagesWriterService>();
+			builder.Services.AddSingleton<ISettingsService, SettingsService>();
+			builder.Services.AddSingleton<IConsumersService, ConsumersService>();
 
 			// Register custom constraint
 			builder.Services.Configure<RouteOptions>(options =>

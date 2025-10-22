@@ -29,6 +29,9 @@ public enum CleanupPolicy
 
 public enum SeekType
 {
+    [Display(Name = "Limit")]
+    LIMIT,
+
     [Display(Name = "Offset")]
     OFFSET,
 
@@ -51,29 +54,29 @@ public enum SeekDirection
 public enum SerdeTypes
 {
     [Display(Name = "String")]
-    STRING,
+    String,
 
     [Display(Name = "Int32")]
-    INT32,
+    Int32,
 
     [Display(Name = "Int64")]
     INT64,
 
     [Display(Name = "UInt32")]
-    UINT32,
+    Int64,
 
     [Display(Name = "UInt64")]
-    UINT64,
+    UInt64,
 
     [Display(Name = "Avro")]
-    AVRO,
+    Avro,
 
     [Display(Name = "Base64")]
-    BASE64,
+    Base64,
 
     [Display(Name = "UUIDBinary")]
-    UUIDBINARY,
+    UUIDBinary,
 
     [Display(Name = "ProtobufDecodeRaw")]
-    PROBUF_DECODE_RAW,
+    ProtobufDecodeRaw,
 }

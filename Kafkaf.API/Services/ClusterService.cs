@@ -3,42 +3,57 @@ using Confluent.Kafka.Admin;
 using Kafkaf.API.ClientPools;
 using Kafkaf.API.Config;
 using Kafkaf.API.ViewModels;
+using Microsoft.Extensions.Options;
 
 namespace Kafkaf.API.Services;
 
-public class ClusterService
+public interface IClusterService
+{
+	ClusterConfigOptions[] ClusterConfigOptions();
+	Task<DescribeClusterResult> DescribeClusterAsync(int clusterNo);
+	Task<ClusterInfoViewModel> FetchClusterInfoAsync(string alias, CancellationToken ct);
+	Metadata GetMetadata(int clusterNo);
+	Metadata GetMetadata(string alias);
+}
+
+public class ClusterService : IClusterService
 {
 	private readonly IReadOnlyList<ClusterConfigOptions> _clusterConfigOptions;
 	private readonly AdminClientPool _clientPool;
+	private readonly TimeSpan _requestTimeout;
 
 	public ClusterService(
 		IReadOnlyList<ClusterConfigOptions> clusterConfigOptions,
-		AdminClientPool clientPool
+		AdminClientPool clientPool,
+		IOptions<AdminClientConfigOptions> clientConfigOptions
 	)
 	{
 		_clusterConfigOptions = clusterConfigOptions;
 		_clientPool = clientPool;
+
+		_requestTimeout = TimeSpan.FromSeconds(clientConfigOptions.Value.RequestTimeout);
 	}
 
-	public ClusterConfigOptions[] ClusterConfigOptions() => _clusterConfigOptions.ToArray();
+	public ClusterConfigOptions[] ClusterConfigOptions() =>
+		_clusterConfigOptions.ToArray();
 
 	public Metadata GetMetadata(int clusterNo)
 	{
 		var client = _clientPool.GetClient(clusterNo);
-		var timeout = TimeSpan.FromSeconds(10);
-
-		return client.GetMetadata(timeout);
+		return client.GetMetadata(_requestTimeout);
 	}
 
 	public Metadata GetMetadata(string alias)
 	{
 		var client = _clientPool.GetClient(alias);
-		var timeout = TimeSpan.FromSeconds(10);
 
-		return client.GetMetadata(timeout);
+		return client.GetMetadata(_requestTimeout);
 	}
 
-	public Task<ClusterInfoViewModel> FetchClusterInfoAsync(string alias, CancellationToken ct) =>
+	public Task<ClusterInfoViewModel> FetchClusterInfoAsync(
+		string alias,
+		CancellationToken ct
+	) =>
 		Task.Run(
 			() =>
 			{
@@ -59,6 +74,8 @@ public class ClusterService
 	{
 		var client = _clientPool.GetClient(clusterNo);
 
-		return await client.DescribeClusterAsync();
+		return await client.DescribeClusterAsync(
+			new DescribeClusterOptions() { RequestTimeout = _requestTimeout }
+		);
 	}
 }
