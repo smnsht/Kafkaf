@@ -40,15 +40,9 @@ public record MessageRow(
     public static MessageRow FromResult(ConsumeResult<byte[]?, byte[]?> result) =>
         new MessageRow(result);
 
-    public static MessageRow[] FromResults(
-        IEnumerable<ConsumeResult<byte[]?, byte[]?>> results,
-        bool sortAscending = true
-    ) =>
-        (
-            sortAscending
-                ? results.Select(FromResult).OrderBy(r => r.timestamp)
-                : results.Select(FromResult).OrderByDescending(r => r.timestamp)
-        ).ToArray();
+    public static IEnumerable<MessageRow> FromResults(
+        IEnumerable<ConsumeResult<byte[]?, byte[]?>> results
+    ) => results.Select(FromResult);
 
     internal static string _str(byte[]? bytes) =>
         bytes is null ? string.Empty : Encoding.UTF8.GetString(bytes);

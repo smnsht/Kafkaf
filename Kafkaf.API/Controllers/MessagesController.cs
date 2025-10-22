@@ -1,5 +1,4 @@
 ﻿using Confluent.Kafka;
-using Kafkaf.API.ClientPools;
 using Kafkaf.API.Models;
 using Kafkaf.API.Services;
 using Kafkaf.API.ViewModels;
@@ -11,11 +10,6 @@ namespace Kafkaf.API.Controllers;
 [ApiController]
 public class MessagesController : ControllerBase
 {
-    private readonly MessagesReaderService _readerService;
-
-    public MessagesController(MessagesReaderService readerService) =>
-        _readerService = readerService;
-
     /// <summary>
     /// GET api/clusters/{clusterIdx}/topics/{topicName}/messages
     /// </summary>
@@ -31,6 +25,7 @@ public class MessagesController : ControllerBase
         [FromRoute] int clusterIdx,
         [FromRoute] string topicName,
         [FromQuery] ReadMessagesRequest req,
+        [FromServices] MessagesReaderService readerService,
         CancellationToken ct
     )
     {
@@ -40,19 +35,23 @@ public class MessagesController : ControllerBase
             req.PartitionsAsInt(),
             ct,
             Offset: req.Offset,
-            Limit: req.Limit
+            Limit: req.Limit,
+            Timestamp: req.Timestamp
         );
-
-        var results = req.seekType switch
+        // csharpier-ignore-start
+		var results = (req.seekType, req.seekDirection) switch
         {
-            SeekType.BEGINNING => _readerService.ReadFromBeginning(args),
-            SeekType.END => _readerService.ReadFromEnd(args),
-            SeekType.OFFSET => _readerService.ReadFromOffset(args),
-            SeekType.TIMESTAMP => _readerService.ReadFromTimestamp(args),
+            (SeekType.LIMIT, SeekDirection.FORWARD) => readerService.ReadFromBeginning(args),
+            (SeekType.LIMIT, SeekDirection.BACKWARD) => readerService.ReadFromEnd(args),
+            (SeekType.OFFSET, SeekDirection.FORWARD) => readerService.ReadFromOffset(args),
+            (SeekType.OFFSET, SeekDirection.BACKWARD) => readerService.ReadUntilOffset(args),
+            (SeekType.TIMESTAMP, SeekDirection.FORWARD) => readerService.ReadFromTimestamp(args),
+            (SeekType.TIMESTAMP, SeekDirection.BACKWARD) => readerService.ReadUntilTimestamp(args),
             _ => throw new ArgumentOutOfRangeException(nameof(req)),
         };
+        // csharpier-ignore-end
 
-        return MessageRow.FromResults(results, req.sort == SortDirection.ASC);
+        return MessageRow.FromResults(results);
     }
 
     /// <summary>
@@ -69,20 +68,14 @@ public class MessagesController : ControllerBase
         [FromRoute] int clusterIdx,
         [FromRoute] string topicName,
         [FromBody] CreateMessageModel model,
-        [FromServices] ProducersPool pool,
+        [FromServices] MessagesWriterService writerService,
         CancellationToken cancellationToken
     )
     {
-        var producer = pool.GetClient(clusterIdx);
-
-        var dr = await producer.ProduceAsync(
+        var dr = await writerService.CreateMessageAsync(
+            clusterIdx,
             topicName,
-            new Message<byte[]?, byte[]?>
-            {
-                Key = model.KeyBytes,
-                Value = model.ValueBytes,
-                Headers = model.MessageHeaders,
-            },
+            model,
             cancellationToken
         );
 

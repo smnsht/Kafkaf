@@ -31,6 +31,7 @@ namespace Kafkaf.API
 			builder.Services.AddSingleton<TopicsService>();
 			builder.Services.AddSingleton<WatermarkOffsetsService>();
 			builder.Services.AddSingleton<MessagesReaderService>();
+			builder.Services.AddSingleton<MessagesWriterService>();
 			builder.Services.AddSingleton<SettingsService>();
 			builder.Services.AddSingleton<ConsumersService>();
 

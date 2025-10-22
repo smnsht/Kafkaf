@@ -3,14 +3,23 @@
 namespace Kafkaf.API.Models;
 
 public record ReadMessagesRequest(
-    string[] Partitions,
+    // csharpier-ignore-start
+	string[] Partitions,
+
     [EnumDataType(typeof(SeekType))] SeekType seekType = SeekType.OFFSET,
-    [EnumDataType(typeof(SortDirection))] SortDirection sort = SortDirection.DESC,
+
+	[EnumDataType(typeof(SeekDirection))] SeekDirection seekDirection = SeekDirection.FORWARD,
+
     [EnumDataType(typeof(SerdeTypes))] string? keySerde = null,
+
     [EnumDataType(typeof(SerdeTypes))] string? valueSerde = null,
+
     int? Offset = null,
+
     int? Limit = null,
+
     DateTime? Timestamp = null
+// csharpier-ignore-end
 ) : IValidatableObject
 {
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

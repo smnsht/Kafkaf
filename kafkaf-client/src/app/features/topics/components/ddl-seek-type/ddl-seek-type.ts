@@ -2,7 +2,7 @@ import { Component, inject, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LoggerService } from '@app/shared';
 
-export type SeekType = 'END' | 'BEGINNING' | 'OFFSET' | 'TIMESTAMP';
+export type SeekType = 'LIMIT' | 'OFFSET' | 'TIMESTAMP';
 
 @Component({
   selector: 'ddl-seek-type',
@@ -26,13 +26,12 @@ export class DdlSeekType {
   private readonly logger = inject(LoggerService);
 
   options = new Map<SeekType, string>([
-    ['END', 'From latest'],
-    ['BEGINNING', 'From beginning'],
+    ['LIMIT', 'Limit'],
     ['OFFSET', 'Offset'],
     ['TIMESTAMP', 'Timestamp'],
   ]);
 
-  seekType = model<SeekType>('END');
+  seekType = model<SeekType>('LIMIT');
 
   onModelChange(newValue: SeekType): void {
     this.logger.debug('[DdlSeekType]: ', newValue);

@@ -11,7 +11,7 @@ export interface SearchMessagesOptions {
   sortOrder: SortOrderType;
   offset?: number;
   limit?: number;
-  timestamp?: Date;
+  timestamp?: string;
 }
 
 export function createHttpParamsFromSearchOptions(options: SearchMessagesOptions): HttpParams {
@@ -34,7 +34,8 @@ export function createHttpParamsFromSearchOptions(options: SearchMessagesOptions
   }
 
   if (options.timestamp) {
-    params = params.append('timestamp', options.timestamp.toISOString());
+    const ts = new Date(options.timestamp).toISOString();
+    params = params.append('timestamp', ts);
   }
 
   return params;

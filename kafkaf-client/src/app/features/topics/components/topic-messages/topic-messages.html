@@ -8,20 +8,12 @@
       <div class="label">&nbsp;</div>
       <div class="control">
         @switch (searchMessagesOptions.seekType) {
-          @case ('END') {
+          @case ('LIMIT') {
             <input
               class="input"
               type="number"
               [(ngModel)]="searchMessagesOptions.limit"
-              placeholder="Last N"
-            />
-          }
-          @case ('BEGINNING') {
-            <input
-              class="input"
-              type="number"
-              [(ngModel)]="searchMessagesOptions.limit"
-              placeholder="First N"
+              placeholder="Maximum N"
             />
           }
           @case ('OFFSET') {

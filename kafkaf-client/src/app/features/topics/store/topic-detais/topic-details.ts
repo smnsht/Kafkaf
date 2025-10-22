@@ -16,7 +16,7 @@ import { CreateMessage } from '../../models/create-message';
 
 export const defaultSearchMessagesOptions: SearchMessagesOptions = {
   partitions: [],
-  seekType: 'END',
+  seekType: 'LIMIT',
   sortOrder: 'FORWARD',
   keySerde: 'String',
   valueSerde: 'String',
@@ -91,8 +91,8 @@ export class TopicDetailsStore {
     this.state.update((state) => ({ ...state, showMessageForm }));
   }
 
-  loadTopicDetails(): void {
-    if (!this.details() && !this.loadingDetails()) {
+  loadTopicDetails(reload = false): void {
+    if (reload || (!this.details() && !this.loadingDetails())) {
       this.state.update((state) => ({
         ...state,
         loadingDetails: true,
@@ -283,7 +283,7 @@ export class TopicDetailsStore {
         this.state.update((state) => ({
           ...state,
           loadingMessages: false,
-          errorDetails: getErrorMessage(err),
+          errorMessages: getErrorMessage(err),
         })),
     });
   }

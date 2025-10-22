@@ -29,26 +29,26 @@ public enum CleanupPolicy
 
 public enum SeekType
 {
-	[Display(Name = "From latest")]
-	END,
+    [Display(Name = "Limit")]
+    LIMIT,
 
-	[Display(Name = "From beginning")]
-	BEGINNING,
-
-	[Display(Name = "Offset")]
+    [Display(Name = "Offset")]
     OFFSET,
 
     [Display(Name = "Timestamp")]
     TIMESTAMP,
 }
 
-public enum SortDirection
+public enum SeekDirection
 {
-	[Display(Name = "Oldest First")]
-    DESC,
+    [Display(Name = "Oldest First")]
+    FORWARD,
 
-	[Display(Name = "Newest First")]
-	ASC
+    [Display(Name = "Newest First")]
+    BACKWARD,
+
+    [Display(Name = "Live Mode")]
+    TAILING,
 }
 
 public enum SerdeTypes

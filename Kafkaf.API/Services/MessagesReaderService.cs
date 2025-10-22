@@ -51,14 +51,19 @@ public class MessagesReaderService
         return _consume(consumer, firstN, ct);
     }
 
-    public List<ConsumeResult<byte[]?, byte[]?>> ReadFromEnd(MessageReaderArgs args) =>
-        ReadFromEnd(
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadFromEnd(MessageReaderArgs args)
+    {
+        var results = ReadFromEnd(
             args.ClusterIdx,
             args.TopicName,
             args.Partitions,
             lastN: args.LimitOrDefault,
             args.Ct
         );
+
+        results.Reverse();
+        return results;
+    }
 
     public List<ConsumeResult<byte[]?, byte[]?>> ReadFromEnd(
         int clusterIdx,
@@ -73,9 +78,7 @@ public class MessagesReaderService
         var topicPartitions = partitions.Select(partition =>
         {
             var tp = new TopicPartition(topicName, partition);
-            var timeout = TimeSpan.FromSeconds(
-                _options.QueryWatermarkOffsetsTimeout
-            );
+            var timeout = TimeSpan.FromSeconds(_options.QueryWatermarkOffsetsTimeout);
             var watermark = consumer.QueryWatermarkOffsets(tp, timeout);
             long endOffset = watermark.High;
 
@@ -88,6 +91,24 @@ public class MessagesReaderService
         consumer.Assign(topicPartitions);
 
         return _consume(consumer, lastN, ct);
+    }
+
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadUntilOffset(MessageReaderArgs args)
+    {
+        var startOffset = Math.Max(0, args.OffsetOrDefault - _options.MaxMessages);
+
+        var results = ReadFromOffset(
+            args.ClusterIdx,
+            args.TopicName,
+            args.Partitions,
+            startOffset,
+            args.Ct
+        );
+
+        results.RemoveAll(x => x.Offset > args.OffsetOrDefault);
+        results.Reverse();
+
+        return results;
     }
 
     public List<ConsumeResult<byte[]?, byte[]?>> ReadFromOffset(MessageReaderArgs args) =>
@@ -159,6 +180,68 @@ public class MessagesReaderService
         consumer.Assign(offsetsForTimes);
 
         return _consume(consumer, _options.MaxMessages, ct);
+    }
+
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadUntilTimestamp(
+        MessageReaderArgs args
+    ) =>
+        ReadUntilTimestamp(
+            args.ClusterIdx,
+            args.TopicName,
+            args.Partitions,
+            args.RequiredTimestamp,
+            args.Ct
+        );
+
+    public List<ConsumeResult<byte[]?, byte[]?>> ReadUntilTimestamp(
+        int clusterIdx,
+        string topicName,
+        int[] partitions,
+        DateTime timestamp,
+        CancellationToken ct
+    )
+    {
+        using var consumer = _consumerPool.GetClient(clusterIdx);
+
+        // Build TopicPartitionTimestamp list
+        var topicPartitionTimestamps = partitions
+            .Select(p => new TopicPartitionTimestamp(
+                new TopicPartition(topicName, p),
+                new Timestamp(timestamp)
+            ))
+            .ToList();
+
+        // Query broker for offsets corresponding to the timestamp
+        var offsetsForTimes = consumer.OffsetsForTimes(
+            topicPartitionTimestamps,
+            TimeSpan.FromSeconds(_options.OffsetsForTimesTimeout)
+        );
+
+        var results = new List<ConsumeResult<byte[]?, byte[]?>>();
+
+        foreach (var tpOffset in offsetsForTimes)
+        {
+            if (tpOffset.Offset == Offset.Unset)
+                continue;
+
+            // Calculate start offset (bounded by MaxMessages)
+            var startOffset = Math.Max(0, tpOffset.Offset.Value - _options.MaxMessages);
+
+            consumer.Assign(
+                new TopicPartitionOffset(tpOffset.TopicPartition, new Offset(startOffset))
+            );
+
+            var partitionResults = _consume(consumer, _options.MaxMessages, ct);
+
+            results.AddRange(partitionResults);
+        }
+
+        results.RemoveAll(r =>
+            r.Message.Timestamp.UtcDateTime > timestamp.ToUniversalTime()
+        );
+        results.Reverse();
+
+        return results;
     }
 
     internal List<ConsumeResult<byte[]?, byte[]?>> _consume(
