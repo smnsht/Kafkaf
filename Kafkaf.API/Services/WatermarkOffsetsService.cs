@@ -5,7 +5,16 @@ using Microsoft.Extensions.Options;
 
 namespace Kafkaf.API.Services;
 
-public class WatermarkOffsetsService
+public interface IWatermarkOffsetsService
+{
+    Dictionary<int, WatermarkOffsets?> GetWatermarkOffsets(
+        int clusterNo,
+        string topicName,
+        int[] partitions
+    );
+}
+
+public class WatermarkOffsetsService : IWatermarkOffsetsService
 {
     private readonly WatermarkOffsetsClientPool _pool;
     private readonly MessageConsumerOptions _options;

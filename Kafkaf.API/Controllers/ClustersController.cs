@@ -15,8 +15,8 @@ public class ClustersController : ControllerBase
     /// <param name="ct"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<IEnumerable<ClusterInfoViewModel>> Get(
-        [FromServices] ClusterService clusterService,
+    public async Task<IEnumerable<ClusterInfoViewModel>> GetClustersAsync(
+        [FromServices] IClusterService clusterService,
         CancellationToken ct
     )
     {
@@ -34,7 +34,7 @@ public class ClustersController : ControllerBase
     /// <returns></returns>
     [HttpGet("configs")]
     public IEnumerable<ClusterConfigViewModel> GetConfigs(
-        [FromServices] ClusterService clusterService
+        [FromServices] IClusterService clusterService
     ) =>
         clusterService
             .ClusterConfigOptions()
@@ -50,7 +50,7 @@ public class ClustersController : ControllerBase
     [HttpGet("{cluserIdx}")]
     public async Task<ClusterInfoViewModel> GetCluster(
         [FromRoute] int cluserIdx,
-        [FromServices] ClusterService clusterService,
+        [FromServices] IClusterService clusterService,
         CancellationToken ct
     )
     {
@@ -66,9 +66,9 @@ public class ClustersController : ControllerBase
     /// <param name="consumersService"></param>
     /// <returns></returns>
     [HttpGet("{cluserIdx:clusterIndex}/consumers")]
-    public async Task<IEnumerable<ConsumerGroupRow>> GetAsync(
+    public async Task<IEnumerable<ConsumerGroupRow>> GetConsumersAsync(
         [FromRoute] int cluserIdx,
-        [FromServices] ConsumersService consumersService
+        [FromServices] IConsumersService consumersService
     )
     {
         var groups = await consumersService.GetConsumersAsync(cluserIdx);
@@ -84,7 +84,7 @@ public class ClustersController : ControllerBase
     [HttpGet("{cluserIdx:clusterIndex}/brokers")]
     public async Task<BrokerInfoRow[]> GetBrokersAsync(
         [FromRoute] int cluserIdx,
-        [FromServices] ClusterService clusterService
+        [FromServices] IClusterService clusterService
     )
     {
         var result = await clusterService.DescribeClusterAsync(cluserIdx);
@@ -102,7 +102,7 @@ public class ClustersController : ControllerBase
     public async Task<BrokerConfigRow[]> GetBrokerConfigsAsync(
         [FromRoute] int cluserIdx,
         [FromRoute] int brokerId,
-        [FromServices] BrokersService brokersService
+        [FromServices] IBrokersService brokersService
     )
     {
         var result = await brokersService.DescribeBrokerAsync(cluserIdx, brokerId);

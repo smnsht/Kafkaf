@@ -5,16 +5,30 @@ using Kafkaf.API.Models;
 
 namespace Kafkaf.API.Services;
 
-public class MessagesWriterService
+public interface IMessagesWriterService
+{
+    Task<DeliveryResult<byte[]?, byte[]?>> CreateMessageAsync(
+        int clusterIdx,
+        string topicName,
+        CreateMessageModel model,
+        CancellationToken ct
+    );
+    Task<List<DeleteRecordsResult>> TruncateMessagesAsync(
+        int clusterIdx,
+        TopicDescription topicDescription
+    );
+}
+
+public class MessagesWriterService : IMessagesWriterService
 {
     private readonly ProducersPool _producersPool;
     private readonly AdminClientPool _adminClientPool;
-    private readonly WatermarkOffsetsService _watermarkOffsetsService;
+    private readonly IWatermarkOffsetsService _watermarkOffsetsService;
 
     public MessagesWriterService(
         ProducersPool pool,
         AdminClientPool adminClientPool,
-        WatermarkOffsetsService watermarkOffsetsService
+        IWatermarkOffsetsService watermarkOffsetsService
     )
     {
         _producersPool = pool;

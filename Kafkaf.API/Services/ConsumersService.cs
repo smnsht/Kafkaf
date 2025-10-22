@@ -5,7 +5,13 @@ using Microsoft.Extensions.Options;
 
 namespace Kafkaf.API.Services;
 
-public class ConsumersService
+public interface IConsumersService
+{
+    Task<List<ConsumerGroupDescription>> GetConsumersAsync(int clusterIdx);
+    Task<List<ConsumerGroupDescription>> GetConsumersAsync(int clusterIdx, string topic);
+}
+
+public class ConsumersService : IConsumersService
 {
     private readonly AdminClientPool _clientPool;
     private readonly AdminClientConfigOptions _options;

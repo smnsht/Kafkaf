@@ -25,7 +25,7 @@ public class MessagesController : ControllerBase
         [FromRoute] int clusterIdx,
         [FromRoute] string topicName,
         [FromQuery] ReadMessagesRequest req,
-        [FromServices] MessagesReaderService readerService,
+        [FromServices] IMessagesReaderService readerService,
         CancellationToken ct
     )
     {
@@ -68,7 +68,7 @@ public class MessagesController : ControllerBase
         [FromRoute] int clusterIdx,
         [FromRoute] string topicName,
         [FromBody] CreateMessageModel model,
-        [FromServices] MessagesWriterService writerService,
+        [FromServices] IMessagesWriterService writerService,
         CancellationToken cancellationToken
     )
     {
@@ -100,8 +100,8 @@ public class MessagesController : ControllerBase
     public async Task<ActionResult<int>> PurgeMessagesAsync(
         [FromRoute] int clusterIdx,
         [FromRoute] string topicName,
-		[FromServices] TopicsService topicsService,
-		[FromServices] MessagesWriterService messagesWriterService        
+		[FromServices] ITopicsService topicsService,
+		[FromServices] IMessagesWriterService messagesWriterService        
     )
     {
 		var td = await topicsService.DescribeTopicsAsync(clusterIdx, topicName);

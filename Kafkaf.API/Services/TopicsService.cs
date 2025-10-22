@@ -11,233 +11,244 @@ namespace Kafkaf.API.Services;
 
 public record ClusterTopic(int clusterIdx, string topicName);
 
-public class TopicsService
+public interface ITopicsService
 {
-    private readonly ILogger<TopicsService> _logger;
-    private readonly AdminClientPool _clientPool;
-    private readonly TimeSpan _operationTimeout;
-    private readonly TimeSpan _requestTimeout;
+	Task CreateTopicsAsync(int clusterIdx, TopicSpecification topic);
+	Task DeleteTopicAsync(int clusterIdx, string topicName);
+	Task<List<BatchItemResult>> DeleteTopicsAsync(int clusterIdx, IEnumerable<string> topicNames);
+	Task<TopicDescription> DescribeTopicsAsync(int clusterIdx, string topicName);
+	List<TopicMetadata> GetAllTopicsMetadata(int clusterIdx);
+	Task RecreateAsync(int clusterIdx, string topicName, RecreateTopicModel req);
+	Task UpdateTopicAsync(int clusterIdx, string topicName, UpdateTopicModel model);
+}
 
-    public TopicsService(
-        ILogger<TopicsService> logger,
-        AdminClientPool clientPool,
-        IOptions<AdminClientConfigOptions> options
-    )
-    {
-        _logger = logger;
-        _clientPool = clientPool;
+public class TopicsService : ITopicsService
+{
+	private readonly ILogger<TopicsService> _logger;
+	private readonly AdminClientPool _clientPool;
+	private readonly TimeSpan _operationTimeout;
+	private readonly TimeSpan _requestTimeout;
 
-        _operationTimeout = TimeSpan.FromSeconds(options.Value.OperationTimeout);
-        _requestTimeout = TimeSpan.FromSeconds(options.Value.RequestTimeout);
-    }
+	public TopicsService(
+		ILogger<TopicsService> logger,
+		AdminClientPool clientPool,
+		IOptions<AdminClientConfigOptions> options
+	)
+	{
+		_logger = logger;
+		_clientPool = clientPool;
 
-    public List<TopicMetadata> GetAllTopicsMetadata(int clusterIdx)
-    {
-        var adminClient = _clientPool.GetClient(clusterIdx);
-        var meta = adminClient.GetMetadata(_requestTimeout);
+		_operationTimeout = TimeSpan.FromSeconds(options.Value.OperationTimeout);
+		_requestTimeout = TimeSpan.FromSeconds(options.Value.RequestTimeout);
+	}
 
-        return meta.Topics;
-    }
+	public List<TopicMetadata> GetAllTopicsMetadata(int clusterIdx)
+	{
+		var adminClient = _clientPool.GetClient(clusterIdx);
+		var meta = adminClient.GetMetadata(_requestTimeout);
 
-    public async Task<TopicDescription> DescribeTopicsAsync(
-        int clusterIdx,
-        string topicName
-    )
-    {
-        var topics = TopicCollection.OfTopicNames([topicName]);
-        var adminClient = _clientPool.GetClient(clusterIdx);
+		return meta.Topics;
+	}
 
-        var result = await adminClient.DescribeTopicsAsync(
-            topics,
-            new DescribeTopicsOptions() { RequestTimeout = _requestTimeout }
-        );
+	public async Task<TopicDescription> DescribeTopicsAsync(
+		int clusterIdx,
+		string topicName
+	)
+	{
+		var topics = TopicCollection.OfTopicNames([topicName]);
+		var adminClient = _clientPool.GetClient(clusterIdx);
 
-        if (!result.TopicDescriptions.Any())
-        {
-            throw new KafkaTopicNotFoundException(clusterIdx, topicName);
-        }
+		var result = await adminClient.DescribeTopicsAsync(
+			topics,
+			new DescribeTopicsOptions() { RequestTimeout = _requestTimeout }
+		);
 
-        return result.TopicDescriptions[0];
-    }
+		if (!result.TopicDescriptions.Any())
+		{
+			throw new KafkaTopicNotFoundException(clusterIdx, topicName);
+		}
 
-    public async Task RecreateAsync(
-        int clusterIdx,
-        string topicName,
-        RecreateTopicModel req
-    )
-    {
-        var topicResource = new ConfigResource()
-        {
-            Name = topicName,
-            Type = ResourceType.Topic,
-        };
+		return result.TopicDescriptions[0];
+	}
 
-        var adminClient = _clientPool.GetClient(clusterIdx);
+	public async Task RecreateAsync(
+		int clusterIdx,
+		string topicName,
+		RecreateTopicModel req
+	)
+	{
+		var topicResource = new ConfigResource()
+		{
+			Name = topicName,
+			Type = ResourceType.Topic,
+		};
 
-        var configs =
-            await adminClient.DescribeConfigsAsync([topicResource])
-            ?? throw new KafkaTopicNotFoundException(clusterIdx, topicName);
+		var adminClient = _clientPool.GetClient(clusterIdx);
 
-        await adminClient.DeleteTopicsAsync(
-            [topicName],
-            new DeleteTopicsOptions()
-            {
-                OperationTimeout = _operationTimeout,
-                RequestTimeout = _requestTimeout,
-            }
-        );
+		var configs =
+			await adminClient.DescribeConfigsAsync([topicResource])
+			?? throw new KafkaTopicNotFoundException(clusterIdx, topicName);
 
-        var specification = new TopicSpecification()
-        {
-            Name = topicName,
-            NumPartitions = req.numPartitions,
-            ReplicationFactor = req.replicationFactor,
-            Configs = configs[0]
-                .Entries.Where(e => e.Value != null && !e.Value.IsDefault)
-                .ToDictionary(e => e.Key, e => e.Value.Value),
-        };
+		await adminClient.DeleteTopicsAsync(
+			[topicName],
+			new DeleteTopicsOptions()
+			{
+				OperationTimeout = _operationTimeout,
+				RequestTimeout = _requestTimeout,
+			}
+		);
 
-        await adminClient.CreateTopicsAsync(
-            [specification],
-            new CreateTopicsOptions()
-            {
-                RequestTimeout = _requestTimeout,
-                OperationTimeout = _operationTimeout,
-            }
-        );
-    }
+		var specification = new TopicSpecification()
+		{
+			Name = topicName,
+			NumPartitions = req.numPartitions,
+			ReplicationFactor = req.replicationFactor,
+			Configs = configs[0]
+				.Entries.Where(e => e.Value != null && !e.Value.IsDefault)
+				.ToDictionary(e => e.Key, e => e.Value.Value),
+		};
 
-    public async Task CreateTopicsAsync(int clusterIdx, TopicSpecification topic)
-    {
-        var adminClient = _clientPool.GetClient(clusterIdx);
+		await adminClient.CreateTopicsAsync(
+			[specification],
+			new CreateTopicsOptions()
+			{
+				RequestTimeout = _requestTimeout,
+				OperationTimeout = _operationTimeout,
+			}
+		);
+	}
 
-        await adminClient.CreateTopicsAsync(
-            [topic],
-            new CreateTopicsOptions()
-            {
-                RequestTimeout = _requestTimeout,
-                OperationTimeout = _operationTimeout,
-            }
-        );
-    }
+	public async Task CreateTopicsAsync(int clusterIdx, TopicSpecification topic)
+	{
+		var adminClient = _clientPool.GetClient(clusterIdx);
 
-    public async Task UpdateTopicAsync(
-        int clusterIdx,
-        string topicName,
-        UpdateTopicModel model
-    )
-    {
-        var newConfigs = new List<ConfigEntry>();
+		await adminClient.CreateTopicsAsync(
+			[topic],
+			new CreateTopicsOptions()
+			{
+				RequestTimeout = _requestTimeout,
+				OperationTimeout = _operationTimeout,
+			}
+		);
+	}
 
-        if (model.TimeToRetain.HasValue)
-        {
-            newConfigs.Add(
-                new ConfigEntry()
-                {
-                    Name = "retention.ms",
-                    Value = model.TimeToRetain.Value.ToString(),
-                }
-            );
-        }
+	public async Task UpdateTopicAsync(
+		int clusterIdx,
+		string topicName,
+		UpdateTopicModel model
+	)
+	{
+		var newConfigs = new List<ConfigEntry>();
 
-        if (model.MinInSyncReplicas.HasValue)
-        {
-            newConfigs.Add(
-                new ConfigEntry()
-                {
-                    Name = "min.insync.replicas",
-                    Value = model.MinInSyncReplicas.Value.ToString(),
-                }
-            );
-        }
+		if (model.TimeToRetain.HasValue)
+		{
+			newConfigs.Add(
+				new ConfigEntry()
+				{
+					Name = "retention.ms",
+					Value = model.TimeToRetain.Value.ToString(),
+				}
+			);
+		}
 
-        if (!string.IsNullOrWhiteSpace(model.CleanupPolicy))
-        {
-            newConfigs.Add(
-                new ConfigEntry() { Name = "cleanup.policy", Value = model.CleanupPolicy }
-            );
-        }
+		if (model.MinInSyncReplicas.HasValue)
+		{
+			newConfigs.Add(
+				new ConfigEntry()
+				{
+					Name = "min.insync.replicas",
+					Value = model.MinInSyncReplicas.Value.ToString(),
+				}
+			);
+		}
 
-        var adminClient = _clientPool.GetClient(clusterIdx);
+		if (!string.IsNullOrWhiteSpace(model.CleanupPolicy))
+		{
+			newConfigs.Add(
+				new ConfigEntry() { Name = "cleanup.policy", Value = model.CleanupPolicy }
+			);
+		}
 
-        if (newConfigs.Count > 0)
-        {
-            // 1. Alter topic configs
-            var resource = new ConfigResource
-            {
-                Type = ResourceType.Topic,
-                Name = topicName,
-            };
+		var adminClient = _clientPool.GetClient(clusterIdx);
 
-            var configs = new Dictionary<ConfigResource, List<ConfigEntry>>
-            {
-                { resource, newConfigs },
-            };
+		if (newConfigs.Count > 0)
+		{
+			// 1. Alter topic configs
+			var resource = new ConfigResource
+			{
+				Type = ResourceType.Topic,
+				Name = topicName,
+			};
 
-            await adminClient.AlterConfigsAsync(configs);
-        }
+			var configs = new Dictionary<ConfigResource, List<ConfigEntry>>
+			{
+				{ resource, newConfigs },
+			};
 
-        if (model.NumPartitions.HasValue)
-        {
-            // 2. Increase partitions
-            await adminClient.CreatePartitionsAsync(
-                new List<PartitionsSpecification>
-                {
-                    new PartitionsSpecification
-                    {
-                        Topic = topicName,
+			await adminClient.AlterConfigsAsync(configs);
+		}
+
+		if (model.NumPartitions.HasValue)
+		{
+			// 2. Increase partitions
+			await adminClient.CreatePartitionsAsync(
+				new List<PartitionsSpecification>
+				{
+					new PartitionsSpecification
+					{
+						Topic = topicName,
                         // must be greater than current partition count
                         IncreaseTo = model.NumPartitions.Value,
-                    },
-                }
-            );
-        }
-    }
+					},
+				}
+			);
+		}
+	}
 
-    public async Task<List<BatchItemResult>> DeleteTopicsAsync(
-        int clusterIdx,
-        IEnumerable<string> topicNames
-    )
-    {
-        var adminClient = _clientPool.GetClient(clusterIdx);
+	public async Task<List<BatchItemResult>> DeleteTopicsAsync(
+		int clusterIdx,
+		IEnumerable<string> topicNames
+	)
+	{
+		var adminClient = _clientPool.GetClient(clusterIdx);
 
-        List<BatchItemResult> retval = new();
-        foreach (var topic in topicNames)
-        {
-            try
-            {
-                await adminClient.DeleteTopicsAsync(
-                    [topic],
-                    new DeleteTopicsOptions()
-                    {
-                        OperationTimeout = _operationTimeout,
-                        RequestTimeout = _requestTimeout,
-                    }
-                );
-                retval.Add(new BatchItemResult(topic, true));
-            }
-            catch (Exception e)
-            {
-                _logger.LogDebug(e, "DeleteTopicsAsync(...) failed for topic {0}", topic);
+		List<BatchItemResult> retval = new();
+		foreach (var topic in topicNames)
+		{
+			try
+			{
+				await adminClient.DeleteTopicsAsync(
+					[topic],
+					new DeleteTopicsOptions()
+					{
+						OperationTimeout = _operationTimeout,
+						RequestTimeout = _requestTimeout,
+					}
+				);
+				retval.Add(new BatchItemResult(topic, true));
+			}
+			catch (Exception e)
+			{
+				_logger.LogDebug(e, "DeleteTopicsAsync(...) failed for topic {0}", topic);
 
-                retval.Add(new BatchItemResult(topic, false, e.Message));
-            }
-        }
+				retval.Add(new BatchItemResult(topic, false, e.Message));
+			}
+		}
 
-        return retval;
-    }
+		return retval;
+	}
 
-    public async Task DeleteTopicAsync(int clusterIdx, string topicName)
-    {
-        var adminClient = _clientPool.GetClient(clusterIdx);
+	public async Task DeleteTopicAsync(int clusterIdx, string topicName)
+	{
+		var adminClient = _clientPool.GetClient(clusterIdx);
 
-        await adminClient.DeleteTopicsAsync(
-            [topicName],
-            new DeleteTopicsOptions()
-            {
-                OperationTimeout = _operationTimeout,
-                RequestTimeout = _requestTimeout,
-            }
-        );
-    }
+		await adminClient.DeleteTopicsAsync(
+			[topicName],
+			new DeleteTopicsOptions()
+			{
+				OperationTimeout = _operationTimeout,
+				RequestTimeout = _requestTimeout,
+			}
+		);
+	}
 }

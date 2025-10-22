@@ -5,7 +5,15 @@ using Kafkaf.API.ViewModels;
 
 namespace Kafkaf.API.Services;
 
-public class SettingsService
+public interface ISettingsService
+{
+    Task<TopicSettingRow[]> GetAsync(ClusterTopic clusterTopic);
+    Task<TopicSettingRow[]> GetAsync(int clusterIdx, string topicName);
+    Task UpdatePartialAsync(ClusterTopic clusterTopic, PatchSettingModel model);
+    Task UpdatePartialAsync(int clusterIdx, string topicName, PatchSettingModel model);
+}
+
+public class SettingsService : ISettingsService
 {
     private readonly ILogger<SettingsService> _logger;
     private readonly AdminClientPool _clientPool;

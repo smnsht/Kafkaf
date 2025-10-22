@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace Kafkaf.API.Services;
 
-public class MessagesReaderService
+public class MessagesReaderService : IMessagesReaderService
 {
     private readonly MessagesReaderServiceOptions _options;
     private readonly MessagesConsumerPool _consumerPool;

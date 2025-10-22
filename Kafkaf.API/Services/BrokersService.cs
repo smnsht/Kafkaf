@@ -3,7 +3,12 @@ using Kafkaf.API.ClientPools;
 
 namespace Kafkaf.API.Services;
 
-public class BrokersService
+public interface IBrokersService
+{
+    Task<DescribeConfigsResult> DescribeBrokerAsync(int clusterNo, int brokerId);
+}
+
+public class BrokersService : IBrokersService
 {
     private readonly AdminClientPool _clientPool;
 

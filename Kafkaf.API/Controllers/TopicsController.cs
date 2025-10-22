@@ -10,9 +10,9 @@ namespace Kafkaf.API.Controllers;
 [ApiController]
 public class TopicsController : ControllerBase
 {
-    private readonly TopicsService _topicsService;
+    private readonly ITopicsService _topicsService;
 
-    public TopicsController(TopicsService topicsService) =>
+    public TopicsController(ITopicsService topicsService) =>
         _topicsService = topicsService;
 
     /// <summary>
