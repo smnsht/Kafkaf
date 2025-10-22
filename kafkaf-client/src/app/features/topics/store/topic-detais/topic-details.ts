@@ -139,6 +139,10 @@ export class TopicDetailsStore {
     this.fetchMessages(params);
   }
 
+  clearMessages(): void {
+    this.state.update((state) => ({ ...state, messages: undefined }));
+  }
+
   produceMessage(msg: CreateMessage): Observable<object> {
     this.state.update((state) => ({
       ...state,

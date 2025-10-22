@@ -87,23 +87,27 @@ public class MessagesController : ControllerBase
         return Ok(dr);
     }
 
-    /// <summary>
-    /// DELETE api/clusters/{clusterIdx}/topics/{topicName}/messages
-    /// </summary>
-    /// <param name="clusterIdx"></param>
-    /// <param name="topicName"></param>
-    /// <param name="ct"></param>
-    /// <returns></returns>
-    [HttpDelete]
+	/// <summary>
+	/// DELETE api/clusters/{clusterIdx}/topics/{topicName}/messages
+	/// </summary>
+	/// <param name="clusterIdx"></param>
+	/// <param name="topicName"></param>
+	/// <param name="topicsService"></param>
+	/// <param name="messagesWriterService"></param>
+	/// <param name="ct"></param>
+	/// <returns></returns>
+	[HttpDelete]
     public async Task<ActionResult<int>> PurgeMessagesAsync(
         [FromRoute] int clusterIdx,
         [FromRoute] string topicName,
-        CancellationToken ct
+		[FromServices] TopicsService topicsService,
+		[FromServices] MessagesWriterService messagesWriterService        
     )
     {
-        // TODO
-        await Task.Delay(10);
-
-        return Ok(0);
+		var td = await topicsService.DescribeTopicsAsync(clusterIdx, topicName);
+		var results = await messagesWriterService.TruncateMessagesAsync(clusterIdx, td);
+        
+		
+        return Ok(results.Count);
     }
 }
