@@ -10,7 +10,7 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { BulmaField } from '@app/components/shared/bulma-field/bulma-field';
-import { TopicConfigRow } from '@app/store/topics/topic-config-row';
+import { TopicConfigRow } from '@app/store/topics/topic-config-row.model';
 
 export type TopicConfigType = 'number' | 'boolean' | 'text' | 'list';
 

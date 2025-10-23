@@ -9,7 +9,7 @@ import {
 import { TopicCustsomParameters } from '@app/components/features/topic-custsom-parameters/topic-custsom-parameters';
 import { TopicForm } from '@app/components/features/topic-form/topic-form';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
-import { CreateTopicModel } from '@app/store/topics/create-topic';
+import { CreateTopicModel } from '@app/store/topics/create-topic.model';
 
 @Component({
   selector: 'app-topics-create',

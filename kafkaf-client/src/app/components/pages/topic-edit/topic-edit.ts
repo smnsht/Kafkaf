@@ -4,7 +4,7 @@ import { TopicFormBase } from '@app/components/features/base/topic-form-base';
 import { BulmaField } from '@app/components/shared/bulma-field/bulma-field';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
-import { UpdateTopicModel } from '@app/store/topic-detais/update-topic';
+import { UpdateTopicModel } from '@app/store/topic-detais/update-topic.model';
 
 @Component({
   selector: 'app-topic-edit',

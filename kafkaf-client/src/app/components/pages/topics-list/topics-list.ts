@@ -6,8 +6,8 @@ import { DropdownMenuEvent } from '@app/components/shared/dropdown-menu/dropdown
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
 import { ConfirmationService } from '@app/services/confirmation/confirmation';
-import { CreateTopicModel } from '@app/store/topics/create-topic';
-import { TopicsListViewModel } from '@app/store/topics/topics-list-view-model';
+import { CreateTopicModel } from '@app/store/topics/create-topic.model';
+import { TopicsListViewModel } from '@app/store/topics/topics-list-view.model';
 import { TopicsStore } from '@app/store/topics/topics.service';
 import { filter, concatMap, Observable, map } from 'rxjs';
 

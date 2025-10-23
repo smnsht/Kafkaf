@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { SerdeTypes, DDLSerde } from '../ddl-serde/ddl-serde';
 import { JsonValidatorDirective } from '@app/directives/json-validator/json-validator';
 import { LoggerService } from '@app/services/logger/logger';
-import { CreateMessage } from '@app/store/topic-detais/create-message';
+import { CreateMessage } from '@app/store/topic-detais/create-message.model';
 import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
 
 const defaultPayload: CreateMessage = {

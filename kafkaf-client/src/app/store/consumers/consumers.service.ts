@@ -1,5 +1,5 @@
 import { computed, Injectable } from '@angular/core';
-import { ConsumerGroupRow } from './consumer-group-row';
+import { ConsumerGroupRow } from './consumer-group-row.model';
 import { environment } from 'environments/environment';
 import { BaseStore, ItemIdPK } from '../base-store';
 

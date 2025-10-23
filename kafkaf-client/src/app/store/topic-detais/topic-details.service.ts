@@ -1,18 +1,18 @@
 import { computed, inject, signal, WritableSignal } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { environment } from 'environments/environment';
-import { MessageRow } from './message-row';
+import { MessageRow } from './message-row.model';
 import {
   createHttpParamsFromSearchOptions,
   SearchMessagesOptions,
-} from '../../models/search-messages-options';
-import { TopicDetailsViewModel } from './topic-details-view-model';
-import { TopicSettingRow } from './topic-setting-row';
+} from './search-messages-options.model';
+import { TopicDetailsViewModel } from './topic-details-view.model';
+import { TopicSettingRow } from './topic-setting-row.model';
 import { Observable, tap } from 'rxjs';
-import { TopicConsumersRow } from './topic-consumers-row';
-import { CreateMessage } from './create-message';
+import { TopicConsumersRow } from './topic-consumers-row.model';
+import { CreateMessage } from './create-message.model';
 import { getErrorMessage } from '../base-store';
-import { UpdateTopicModel } from './update-topic';
+import { UpdateTopicModel } from './update-topic.model';
 
 export const defaultSearchMessagesOptions: SearchMessagesOptions = {
   partitions: [],

@@ -3,12 +3,12 @@ import { finalize, Observable, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { environment } from 'environments/environment';
-import { TopicConfigRow } from './topic-config-row';
-import { TopicSettingRow } from '../topic-detais/topic-setting-row';
-import { TopicsListViewModel } from './topics-list-view-model';
+import { TopicConfigRow } from './topic-config-row.model';
+import { TopicSettingRow } from '../topic-detais/topic-setting-row.model';
+import { TopicsListViewModel } from './topics-list-view.model';
 import { BaseStore } from '../base-store';
-import { CreateTopicModel } from './create-topic';
-import { RecreateTopicModel } from './recreate-topic';
+import { CreateTopicModel } from './create-topic.model';
+import { RecreateTopicModel } from './recreate-topic.model';
 
 @Injectable({
   providedIn: 'root',
