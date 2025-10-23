@@ -4,14 +4,11 @@ import {
   provideZoneChangeDetection,
 } from '@angular/core';
 import { provideRouter, TitleStrategy } from '@angular/router';
-
 import { routes } from './app.routes';
-
 import { provideHttpClient } from '@angular/common/http';
-
 import { environment } from '../environments/environment';
-import { KafkafTitleStrategy } from './shared/services/kafkaf-title-strategy/kafkaf-title-strategy';
-import { LoggerService } from './shared/services/logger/logger';
+import { KafkafTitleStrategy } from './services/kafkaf-title-strategy/kafkaf-title-strategy';
+import { LoggerService } from './services/logger/logger';
 
 export const appConfig: ApplicationConfig = {
   providers: [

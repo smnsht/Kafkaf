@@ -1,4 +1,4 @@
-import { LogLevel } from '@app/shared';
+import { LogLevel } from '@app/services/logger/logger';
 
 export const environment = {
   production: false,
