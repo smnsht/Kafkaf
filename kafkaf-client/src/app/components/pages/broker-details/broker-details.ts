@@ -20,11 +20,7 @@ export class BrokerDetails implements OnInit {
   broker = Number.NaN;
   currentTab?: BrokerTabs;
 
-  //pageState: Signal<PageState>;
-
   constructor() {
-    //this.pageState = store.pageState;
-
     this.route.paramMap.subscribe((paramMap) => {
       this.cluster = Number.parseInt(paramMap.get('cluster')!);
       this.broker = Number.parseInt(paramMap.get('broker')!);
