@@ -1,4 +1,4 @@
-import { Component, effect, input } from '@angular/core';
+import { Component, effect, inject, input } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -15,19 +15,21 @@ import { TopicConfigRow } from '@app/store/topics/topic-config-row.model';
 export type TopicConfigType = 'number' | 'boolean' | 'text' | 'list';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'topic-custsom-parameters',
   imports: [ReactiveFormsModule, BulmaField, CommonModule],
   templateUrl: './topic-custsom-parameters.html',
 })
 export class TopicCustsomParameters {
   private readonly configTypes = new Map<string, string>();
+  private readonly fb = inject(FormBuilder);
 
   topicForm = input<FormGroup>();
   customParameters = input<FormArray>();
   configs = input<TopicConfigRow[]>();
   loadingConfigRows = input(false);
 
-  constructor(private readonly fb: FormBuilder) {
+  constructor() {
     effect(() => {
       const configs = this.configs();
       if (configs && configs.length > 0) {

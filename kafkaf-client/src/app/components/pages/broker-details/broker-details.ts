@@ -1,8 +1,7 @@
-import { Component, OnInit, Signal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
-import { PageState } from '@app/store/base-store';
 import { BrokerDetailsStore } from '@app/store/broker-details/broker-details.service';
 
 type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
@@ -13,21 +12,24 @@ type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
   templateUrl: './broker-details.html',
 })
 export class BrokerDetails implements OnInit {
+  private readonly route = inject(ActivatedRoute);
+  public readonly store = inject(BrokerDetailsStore);
+
   cardItems: StatsCardItem[] = [];
   cluster = Number.NaN;
   broker = Number.NaN;
   currentTab?: BrokerTabs;
 
-  pageState: Signal<PageState>;
+  //pageState: Signal<PageState>;
 
-  constructor(route: ActivatedRoute, store: BrokerDetailsStore) {
-    this.pageState = store.pageState;
+  constructor() {
+    //this.pageState = store.pageState;
 
-    route.paramMap.subscribe((paramMap) => {
+    this.route.paramMap.subscribe((paramMap) => {
       this.cluster = Number.parseInt(paramMap.get('cluster')!);
       this.broker = Number.parseInt(paramMap.get('broker')!);
 
-      store.loadConfigs({
+      this.store.loadConfigs({
         clusterIdx: this.cluster,
         brokerId: this.broker,
       });
@@ -43,8 +45,9 @@ export class BrokerDetails implements OnInit {
     ];
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onBrokerActivate(componentRef: any) {
-    let timeoutID = setTimeout(() => {
+    const timeoutID = setTimeout(() => {
       this.currentTab = componentRef.constructor.name as BrokerTabs;
       clearTimeout(timeoutID);
     }, 100);

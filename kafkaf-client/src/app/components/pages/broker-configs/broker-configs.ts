@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Search } from '@app/components/shared/search/search/search';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
 import { BrokerDetailsStore } from '@app/store/broker-details/broker-details.service';
@@ -9,6 +9,7 @@ import { BrokerDetailsStore } from '@app/store/broker-details/broker-details.ser
   templateUrl: './broker-configs.html',
 })
 export class BrokerConfigs {
+  store = inject(BrokerDetailsStore);
   search = signal('');
 
   configs = computed(() => {
@@ -17,6 +18,4 @@ export class BrokerConfigs {
 
     return configs?.filter((cfg) => cfg.name.toLowerCase().includes(search));
   });
-
-  constructor(public store: BrokerDetailsStore) {}
 }

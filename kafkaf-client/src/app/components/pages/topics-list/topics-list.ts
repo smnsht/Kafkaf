@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TopicsDropdownMenu } from '@app/components/features/topics-dropdown-menu/topics-dropdown-menu';
@@ -17,6 +17,11 @@ import { filter, concatMap, Observable, map } from 'rxjs';
   templateUrl: './topics-list.html',
 })
 export class TopicsList {
+  public readonly store = inject(TopicsStore);
+  private readonly router = inject(Router);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly route = inject(ActivatedRoute);
+
   search = signal('');
   showInternalTopics = signal(false);
   selectedTopics: string[] = [];
@@ -39,16 +44,11 @@ export class TopicsList {
     });
   });
 
-  constructor(
-    public readonly store: TopicsStore,
-    private readonly router: Router,
-    private readonly confirmationService: ConfirmationService,
-    route: ActivatedRoute,
-  ) {
-    route.paramMap.subscribe((params) => {
+  constructor() {
+    this.route.paramMap.subscribe((params) => {
       const clusterIdx = Number.parseInt(params.get('cluster')!);
-      store.selectCluster(clusterIdx);
-      store.loadTopics();
+      this.store.selectCluster(clusterIdx);
+      this.store.loadTopics();
     });
   }
 

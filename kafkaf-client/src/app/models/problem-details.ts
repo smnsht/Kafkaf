@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface ProblemDetails {
   type?: string; // A URI reference that identifies the problem type
   title?: string; // A short, human-readable summary of the problem

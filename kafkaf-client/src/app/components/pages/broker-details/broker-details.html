@@ -16,18 +16,18 @@
   </div>
 </div>
 
-<app-page-wrapper [state]="pageState()">
+<app-page-wrapper [state]="store.pageState()">
   <app-stats-card [cardItems]="cardItems" [placeholderCount]="3" />
 
   <div class="tabs">
     <ul>
-      <li [class.is-active]="'BrokerLogDirectories' == currentTab">
+      <li [class.is-active]="'BrokerLogDirectories' === currentTab">
         <a [routerLink]="['/clusters', cluster, 'brokers', broker]">Log directories</a>
       </li>
-      <li [class.is-active]="'BrokerConfigs' == currentTab">
+      <li [class.is-active]="'BrokerConfigs' === currentTab">
         <a [routerLink]="[{ outlets: { broker: ['configs'] } }]">Configs</a>
       </li>
-      <li [class.is-active]="'BrokerMetrics' == currentTab">
+      <li [class.is-active]="'BrokerMetrics' === currentTab">
         <a [routerLink]="[{ outlets: { broker: ['metrics'] } }]">Metrics</a>
       </li>
     </ul>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { MessageForm } from '@app/components/features/message-form/message-form';
 import { TopicsDropdownMenu } from '@app/components/features/topics-dropdown-menu/topics-dropdown-menu';
@@ -41,24 +41,25 @@ function getRequiredParams(route: ActivatedRoute) {
   ],
 })
 export class TopicDetails {
+  public readonly topicsStore = inject(TopicsStore);
+  private readonly router = inject(Router);
+  readonly store = inject(TopicDetailsStore);
+  readonly route = inject(ActivatedRoute);
+
   currentTab: TopicTabs = 'TopicOverview';
   isEditSettings = false;
 
-  constructor(
-    public readonly topicsStore: TopicsStore,
-    private readonly router: Router,
-    readonly store: TopicDetailsStore,
-    readonly route: ActivatedRoute,
-  ) {
-    store.loadTopicDetails();
+  constructor() {
+    this.store.loadTopicDetails();
 
-    const { cluster } = getRequiredParams(route);
+    const { cluster } = getRequiredParams(this.route);
 
-    topicsStore.selectCluster(cluster);
+    this.topicsStore.selectCluster(cluster);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onTopicActivate(componentRef: any) {
-    let timeoutID = setTimeout(() => {
+    const timeoutID = setTimeout(() => {
       this.currentTab = componentRef.constructor.name as TopicTabs;
 
       this.isEditSettings = this.currentTab == 'TopicEdit';
@@ -67,6 +68,7 @@ export class TopicDetails {
     }, 100);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onTopicDeactivate(componentRef: any) {
     console.log('Messages outlet deactivated:', componentRef);
   }

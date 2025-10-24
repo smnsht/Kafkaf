@@ -1,34 +1,34 @@
 import { ElementRef, Renderer2 } from '@angular/core';
 import { KafkafTableDirective } from './kafkaf-table';
+import { TestBed } from '@angular/core/testing';
 
 describe('KafkafTableDirective', () => {
-  let mockRenderer: jasmine.SpyObj<Renderer2>;
   let mockLogger: { warn: jasmine.Spy };
+  let mockRenderer: jasmine.SpyObj<Renderer2>;
+  let directive: KafkafTableDirective;
+  let element: HTMLElement;
 
   beforeEach(() => {
+    mockLogger = jasmine.createSpyObj('Logger', ['warn']);
     mockRenderer = jasmine.createSpyObj<Renderer2>('Renderer2', ['addClass']);
-    mockLogger = { warn: jasmine.createSpy('warn') };
+    element = document.createElement('table');
+
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: Renderer2, useValue: mockRenderer },
+        { provide: 'Logger', useValue: mockLogger },
+        { provide: ElementRef, useValue: new ElementRef(element) },
+      ],
+    });
+
+    directive = TestBed.inject(KafkafTableDirective);
   });
 
   it('should create an instance', () => {
-    const element = document.createElement('table');
-    const directive = new KafkafTableDirective(
-      new ElementRef(element),
-      mockRenderer,
-      mockLogger as any,
-    );
-
     expect(directive).toBeTruthy();
   });
 
   it('should add classes when element is a <table>', () => {
-    const element = document.createElement('table');
-    const directive = new KafkafTableDirective(
-      new ElementRef(element),
-      mockRenderer,
-      mockLogger as any,
-    );
-
     expect(directive).toBeTruthy();
     expect(mockRenderer.addClass).toHaveBeenCalledWith(element, 'table');
     expect(mockRenderer.addClass).toHaveBeenCalledWith(element, 'is-hoverable');

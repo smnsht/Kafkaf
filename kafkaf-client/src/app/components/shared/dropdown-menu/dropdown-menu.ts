@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, output } from '@angular/core';
-import { ClickOutsideDirective } from '@app/directives/click-outside/click-outside';
 import { ConfirmationService } from '@app/services/confirmation/confirmation';
 import { LoggerService } from '@app/services/logger/logger';
 
@@ -18,9 +17,9 @@ export interface DropdownMenuEvent {
 }
 
 @Component({
-  selector: 'dropdown-menu',
+  selector: 'app-dropdown-menu',
   standalone: true,
-  imports: [CommonModule, ClickOutsideDirective],
+  imports: [CommonModule],
   templateUrl: './dropdown-menu.html',
 })
 export class DropdownMenu {
@@ -56,19 +55,17 @@ export class DropdownMenu {
     }
   }
 
-  handleKeyDown(event: KeyboardEvent) {
-    this.logger.debug('[DropdownMenu]: ', event);
-  }
-
   toggleisActive(): void {
     this.isActive = !this.isActive;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getConfirmationBody(_: DropdownMenuCommand): string {
     return '';
   }
 
   protected get confirmationTitle(): string {
-    return 'Confirm the action';
+    const text = 'Confirm the action';
+    return text;
   }
 }

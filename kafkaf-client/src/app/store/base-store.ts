@@ -183,7 +183,7 @@ export abstract class BaseStore<T> {
     clusterIdx: number,
     itemId: string | number,
     reload = false,
-    successNotice: string = 'Item deleted successfully',
+    successNotice = 'Item deleted successfully',
   ): Observable<void> {
     const url = this.resourceItemUrl(clusterIdx, itemId);
 
@@ -200,6 +200,7 @@ export abstract class BaseStore<T> {
             this.state.update((state) => {
               const { itemsMap } = state;
               const existing = (itemsMap.get(clusterIdx) as T[]) ?? [];
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const updated = existing.filter((x: any) => this.getItemKey(x) !== itemId);
 
               itemsMap.set(clusterIdx, updated);

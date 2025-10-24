@@ -14,6 +14,7 @@ export class ConsumersStore extends BaseStore<ConsumerGroupRow> {
   protected override resourceUrl(clusterIdx: number): string {
     return `${environment.apiUrl}/clusters/${clusterIdx}/consumers`;
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected override resourceItemUrl(clusterIdx: number, itemId: ItemIdPK): string {
     throw new Error('Method not implemented.');
   }

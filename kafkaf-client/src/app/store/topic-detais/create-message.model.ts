@@ -5,6 +5,6 @@ export interface CreateMessage {
   keepContents?: boolean;
   key?: string;
   value?: string;
-  headers?: { [key: string]: string };
+  headers?: Record<string, string>;
   rawJson?: string;
 }

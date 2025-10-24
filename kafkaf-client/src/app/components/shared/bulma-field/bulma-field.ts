@@ -3,6 +3,7 @@ import { Component, computed, input } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'bulma-field',
   imports: [CommonModule],
   templateUrl: './bulma-field.html',
@@ -20,6 +21,7 @@ export class BulmaField {
     const ctrl = this.control();
 
     if (ctrl?.validator) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const validator = ctrl.validator({} as any);
       return validator?.['required'];
     }

@@ -12,6 +12,7 @@ export const SortOrderOptions = Object.freeze(
 );
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'ddl-sort-order',
   imports: [FormsModule],
   template: `

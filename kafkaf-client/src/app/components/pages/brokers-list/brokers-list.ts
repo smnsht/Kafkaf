@@ -1,11 +1,11 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
 import { BrokersStore } from '@app/store/brokers/brokers.service';
 
-const defaultCardItems: ReadonlyArray<StatsCardItem> = [
+const defaultCardItems: readonly StatsCardItem[] = [
   { label: 'Broker Count', value: 0, icon: 'danger' },
   { label: 'Active Controller', value: 0, icon: 'info' },
   { label: 'Version', value: 'TODO' },
@@ -22,6 +22,10 @@ const defaultCardItems: ReadonlyArray<StatsCardItem> = [
   templateUrl: './brokers-list.html',
 })
 export class BrokersList {
+  private readonly router = inject(Router);
+  readonly store = inject(BrokersStore);
+  readonly route = inject(ActivatedRoute);
+
   cardItems = computed(() => {
     const brokers = this.store.currentItems();
     const cardItems = [...defaultCardItems];
@@ -44,15 +48,11 @@ export class BrokersList {
     return cardItems;
   });
 
-  constructor(
-    private readonly router: Router,
-    readonly store: BrokersStore,
-    route: ActivatedRoute,
-  ) {
-    route.paramMap.subscribe((params) => {
+  constructor() {
+    this.route.paramMap.subscribe((params) => {
       const cluster = Number.parseInt(params.get('cluster')!);
-      store.selectCluster(cluster);
-      store.loadCollection();
+      this.store.selectCluster(cluster);
+      this.store.loadCollection();
     });
   }
 

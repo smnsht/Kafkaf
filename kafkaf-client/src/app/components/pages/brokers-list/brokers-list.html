@@ -20,7 +20,7 @@
         >
           <td>
             {{ row.brokerID }}
-            @if (row.brokerID == row.controller) {
+            @if (row.brokerID === row.controller) {
               <span class="icon has-text-success" title="Active controller">
                 <i class="fas fa-check-square"></i>
               </span>

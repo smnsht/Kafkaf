@@ -16,7 +16,7 @@
   </div>
 
   <!-- dropdown -->
-  <div class="control" (clickOutside)="onClickedOutside()">
+  <div class="control" appClickOutside (clickOutside)="onClickedOutside()">
     <div class="dropdown" [class.is-active]="isActive()">
       <div class="dropdown-trigger">
         <button
@@ -53,7 +53,7 @@
               <input
                 type="checkbox"
                 [(ngModel)]="selectAll"
-                [disabled]="partitionsWithMessages().length == 0"
+                [disabled]="partitionsWithMessages().length === 0"
               />
               Select All
             </li>
@@ -61,7 +61,7 @@
             <!-- checkboxes for partitions-->
             @for (p of partitionsFiltered(); track $index) {
               <li>
-                @if (p.messagesCount == 0) {
+                @if (p.messagesCount === 0) {
                   Partition #{{ p.partition }}
                   <i class="is-pulled-right">empty</i>
                 } @else {

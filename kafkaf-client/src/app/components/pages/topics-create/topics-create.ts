@@ -62,6 +62,7 @@ export class TopicsCreate extends TopicFormBase {
       name: payload.name,
       numPartitions: payload.numPartitions,
       cleanupPolicy: payload.cleanupPolicy,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       customParameters: this.customParameters?.value.map((pair: { key: string; value: any }) => ({
         ...pair,
         value: String(pair.value),
@@ -77,7 +78,8 @@ export class TopicsCreate extends TopicFormBase {
     ].forEach((key) => {
       const numericValue = Number.parseInt(payload[key]);
       if (!Number.isNaN(numericValue)) {
-        (<any>createRequest)[key] = numericValue;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (createRequest as any)[key] = numericValue;
       }
     });
 

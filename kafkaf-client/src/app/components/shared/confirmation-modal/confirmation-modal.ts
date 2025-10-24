@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ConfirmationRequest, ConfirmationService } from '@app/services/confirmation/confirmation';
 
 @Component({
@@ -7,10 +7,10 @@ import { ConfirmationRequest, ConfirmationService } from '@app/services/confirma
   templateUrl: './confirmation-modal.html',
 })
 export class ConfirmationModal implements OnInit {
+  private readonly confirmationService = inject(ConfirmationService);
+
   active = false;
   request?: ConfirmationRequest;
-
-  constructor(private readonly confirmationService: ConfirmationService) {}
 
   ngOnInit(): void {
     this.confirmationService.requests$.subscribe((req) => {

@@ -5,14 +5,14 @@
     <div class="column">
       <div class="tabs">
         <ul>
-          <li [class.is-active]="selectedTab() == 'Key'">
-            <a (click)="onTabClick($event, 'Key')">Key</a>
+          <li [class.is-active]="selectedTab() === 'Key'">
+            <a href="" (click)="onTabClick($event, 'Key')">Key</a>
           </li>
-          <li [class.is-active]="selectedTab() == 'Value'">
-            <a (click)="onTabClick($event, 'Value')">Value</a>
+          <li [class.is-active]="selectedTab() === 'Value'">
+            <a href="" (click)="onTabClick($event, 'Value')">Value</a>
           </li>
-          <li [class.is-active]="selectedTab() == 'Headers'">
-            <a (click)="onTabClick($event, 'Headers')">Headers</a>
+          <li [class.is-active]="selectedTab() === 'Headers'">
+            <a href="" (click)="onTabClick($event, 'Headers')">Headers</a>
           </li>
         </ul>
       </div>

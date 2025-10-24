@@ -5,6 +5,7 @@ import {
 } from '@app/components/shared/dropdown-menu/dropdown-menu';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'topics-dropdown-menu',
   imports: [DropdownMenu],
   templateUrl: './topics-dropdown-menu.html',

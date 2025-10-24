@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { DestroyRef, effect, Injectable, signal } from '@angular/core';
+import { DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -10,17 +10,16 @@ import { ClusterInfo, tKafkaSection } from './cluster-info.model';
   providedIn: 'root',
 })
 export class ClustersStore {
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
   clusters = signal<ClusterInfo[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
   clusterIndex = signal<number>(Number.NaN);
   kafkaSection = signal<tKafkaSection>(null);
 
-  constructor(
-    private readonly http: HttpClient,
-    private readonly router: Router,
-    destroyRef: DestroyRef,
-  ) {
+  constructor() {
     effect(() => {
       if (this.loading()) {
         this.fetchClusters();
@@ -30,7 +29,7 @@ export class ClustersStore {
     this.router.events
       .pipe(
         filter((e) => e instanceof NavigationEnd),
-        takeUntilDestroyed(destroyRef),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((event) => {
         const pathParts = event.urlAfterRedirects.split('/').filter(Boolean);

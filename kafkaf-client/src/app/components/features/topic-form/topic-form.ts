@@ -3,6 +3,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { BulmaField } from '@app/components/shared/bulma-field/bulma-field';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'topic-form',
   imports: [ReactiveFormsModule, BulmaField],
   templateUrl: './topic-form.html',

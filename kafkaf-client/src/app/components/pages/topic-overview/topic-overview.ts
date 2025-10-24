@@ -1,4 +1,4 @@
-import { Component, effect } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
@@ -11,10 +11,11 @@ import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service
   templateUrl: './topic-overview.html',
 })
 export class TopicOverview {
+  readonly store = inject(TopicDetailsStore);
   cardItems: StatsCardItem[] = [];
   partitions: PartitionInfo[] = [];
 
-  constructor(readonly store: TopicDetailsStore) {
+  constructor() {
     effect(() => {
       const topicDetails = this.store.details();
 

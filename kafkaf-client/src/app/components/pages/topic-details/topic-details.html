@@ -37,19 +37,19 @@
   <!-- Tabs -->
   <div class="tabs">
     <ul>
-      <li [class.is-active]="currentTab == 'TopicOverview'">
+      <li [class.is-active]="currentTab === 'TopicOverview'">
         <a [routerLink]="[{ outlets: { topic: [] } }]">Overview</a>
       </li>
-      <li [class.is-active]="currentTab == 'TopicMessages'">
+      <li [class.is-active]="currentTab === 'TopicMessages'">
         <a [routerLink]="[{ outlets: { topic: ['messages'] } }]">Messages</a>
       </li>
-      <li [class.is-active]="currentTab == 'TopicConsumers'">
+      <li [class.is-active]="currentTab === 'TopicConsumers'">
         <a [routerLink]="[{ outlets: { topic: ['consumers'] } }]">Consumers</a>
       </li>
-      <li [class.is-active]="currentTab == 'TopicSettings'">
+      <li [class.is-active]="currentTab === 'TopicSettings'">
         <a [routerLink]="[{ outlets: { topic: ['settings'] } }]">Settings</a>
       </li>
-      <li [class.is-active]="currentTab == 'TopicStatistics'">
+      <li [class.is-active]="currentTab === 'TopicStatistics'">
         <a [routerLink]="[{ outlets: { topic: ['statistics'] } }]">Statistics</a>
       </li>
     </ul>

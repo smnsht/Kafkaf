@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { Search } from '@app/components/shared/search/search/search';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
@@ -10,6 +10,7 @@ import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service
   templateUrl: './topic-consumers.html',
 })
 export class TopicConsumers {
+  readonly store = inject(TopicDetailsStore);
   search = signal('');
 
   consumers = computed(() => {
@@ -25,7 +26,7 @@ export class TopicConsumers {
     });
   });
 
-  constructor(readonly store: TopicDetailsStore) {
-    store.loadConsumers();
+  constructor() {
+    this.store.loadConsumers();
   }
 }

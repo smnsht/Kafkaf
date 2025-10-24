@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, input, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, signal } from '@angular/core';
 import { Subject, switchMap, tap, timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TimestampPipe } from '@app/pipes/timestamp/timestamp';
@@ -8,11 +8,14 @@ import { MessageRow } from '@app/store/topic-detais/message-row.model';
 type tMessageTab = 'Key' | 'Value' | 'Headers';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'message-details',
   imports: [TimestampPipe],
   templateUrl: './message-details.html',
 })
 export class MessageDetails {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly logger = inject(LoggerService);
   private readonly hideCopiedSuccessfullySubject = new Subject<void>();
 
   message = input<MessageRow>();
@@ -39,6 +42,7 @@ export class MessageDetails {
   });
 
   messageAsJSON = computed(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const msgCopy = { ...this.message() } as any;
 
     delete msgCopy['_expanded'];
@@ -46,12 +50,9 @@ export class MessageDetails {
     return JSON.stringify(msgCopy, null, 2);
   });
 
-  constructor(
-    destroyRef: DestroyRef,
-    private readonly logger: LoggerService,
-  ) {
+  constructor() {
     this.hideCopiedSuccessfullySubject.pipe(
-      takeUntilDestroyed(destroyRef),
+      takeUntilDestroyed(this.destroyRef),
       switchMap(() => {
         return timer(2000).pipe(tap(() => (this.showCopiedSuccessfully = false)));
       }),

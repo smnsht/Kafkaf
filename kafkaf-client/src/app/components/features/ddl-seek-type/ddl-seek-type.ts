@@ -5,6 +5,7 @@ import { LoggerService } from '@app/services/logger/logger';
 export type SeekType = 'LIMIT' | 'OFFSET' | 'TIMESTAMP';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'ddl-seek-type',
   imports: [FormsModule],
   template: `

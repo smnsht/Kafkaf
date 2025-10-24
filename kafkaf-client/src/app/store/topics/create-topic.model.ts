@@ -7,5 +7,5 @@ export interface CreateTopicModel {
   timeToRetain?: number;
   retentionBytes?: number;
   maxMessageBytes?: number;
-  customParameters: Array<{ key: string; value: string }>;
+  customParameters: { key: string; value: string }[];
 }

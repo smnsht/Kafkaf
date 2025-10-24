@@ -1,4 +1,4 @@
-import { Component, computed, model, OnInit, Signal } from '@angular/core';
+import { Component, computed, inject, model, OnInit, Signal } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
@@ -15,6 +15,7 @@ import { ClustersStore } from '@app/store/clusters/clusters.service';
 })
 export class Dashboard implements OnInit {
   private readonly clusters: Signal<ClusterInfo[]>;
+  private readonly clustersStore = inject(ClustersStore);
 
   public onlyOfflineClusters = model(false);
   public loading: Signal<boolean>;
@@ -55,10 +56,10 @@ export class Dashboard implements OnInit {
     return onlyOffline ? all.filter((c) => c.isOffline) : all;
   });
 
-  constructor(private readonly clustersStore: ClustersStore) {
-    this.clusters = clustersStore.clusters.asReadonly();
-    this.loading = clustersStore.loading.asReadonly();
-    this.error = clustersStore.error.asReadonly();
+  constructor() {
+    this.clusters = this.clustersStore.clusters.asReadonly();
+    this.loading = this.clustersStore.loading.asReadonly();
+    this.error = this.clustersStore.error.asReadonly();
   }
 
   ngOnInit(): void {

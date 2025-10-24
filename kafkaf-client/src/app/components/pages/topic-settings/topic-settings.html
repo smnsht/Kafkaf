@@ -16,7 +16,7 @@
         <tr>
           <td>{{ row.name }}</td>
           <td>
-            @if ($index == selectedRowIndex) {
+            @if ($index === selectedRowIndex) {
               <div class="buttons">
                 <button class="button is-small" (click)="selectedRowIndex = -1">
                   <span class="icon is-small">

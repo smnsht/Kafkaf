@@ -1,4 +1,4 @@
-import { Component, Signal, signal } from '@angular/core';
+import { Component, inject, Signal, signal } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { Navbar } from './components/features/navbar/navbar';
 import { ClusterSideMenu } from './components/features/cluster-side-menu/cluster-side-menu';
@@ -14,6 +14,7 @@ import { ConfirmationModal } from './components/shared/confirmation-modal/confir
   styleUrl: './app.scss',
 })
 export class App {
+  private readonly clustersStore = inject(ClustersStore);
   protected readonly title = signal('kafkaf-client');
 
   public clusters: Signal<ClusterInfo[]>;
@@ -21,14 +22,14 @@ export class App {
   public cluster: Signal<number>;
   public kafkaSection: Signal<tKafkaSection>;
 
-  constructor(clustersStore: ClustersStore) {
-    this.clusters = clustersStore.clusters.asReadonly();
-    this.loading = clustersStore.loading.asReadonly();
-    this.cluster = clustersStore.clusterIndex.asReadonly();
-    this.kafkaSection = clustersStore.kafkaSection.asReadonly();
+  constructor() {
+    this.clusters = this.clustersStore.clusters.asReadonly();
+    this.loading = this.clustersStore.loading.asReadonly();
+    this.cluster = this.clustersStore.clusterIndex.asReadonly();
+    this.kafkaSection = this.clustersStore.kafkaSection.asReadonly();
 
     if (this.clusters().length == 0) {
-      clustersStore.loadClustersInfo();
+      this.clustersStore.loadClustersInfo();
     }
   }
 }

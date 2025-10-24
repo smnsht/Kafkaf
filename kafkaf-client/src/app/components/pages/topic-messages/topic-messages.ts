@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DDLPartitions } from '@app/components/features/ddl-partitions/ddl-partitions';
@@ -34,6 +34,7 @@ import {
   templateUrl: './topic-messages.html',
 })
 export class TopicMessages {
+  readonly store = inject(TopicDetailsStore);
   searchMessagesOptions = { ...defaultSearchMessagesOptions };
   expandedRows = new Map<number, boolean>();
 
@@ -52,8 +53,6 @@ export class TopicMessages {
       return true;
     });
   });
-
-  constructor(readonly store: TopicDetailsStore) {}
 
   onSubmitClick(): void {
     this.store.loadMessages(this.searchMessagesOptions);
