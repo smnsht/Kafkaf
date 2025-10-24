@@ -30,9 +30,15 @@ public class ConsumersService : IConsumersService
         var adminClient = _clientPool.GetClient(clusterIdx);
         var groups = await adminClient.ListConsumerGroupsAsync();
         var groupNames = groups.Valid.Select(group => group.GroupId);
-        var groupInfo = await adminClient.DescribeConsumerGroupsAsync(groupNames);
+        var returnValue = new List<ConsumerGroupDescription>();
 
-        return groupInfo.ConsumerGroupDescriptions;
+        if (groupNames.Any())
+        {
+            var groupInfo = await adminClient.DescribeConsumerGroupsAsync(groupNames);
+            returnValue.AddRange(groupInfo.ConsumerGroupDescriptions);
+        }
+
+        return returnValue;
     }
 
     public async Task<List<ConsumerGroupDescription>> GetConsumersAsync(
