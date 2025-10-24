@@ -1,0 +1,93 @@
+<p class="has-text-weight-bold mt-4 mb-4">Custom parameters</p>
+
+@if (topicForm() && customParameters()) {
+  <form [formGroup]="topicForm()!">
+    <ng-container formArrayName="customParameters">
+      @for (pair of customParameters()?.controls; track $index; let i = $index) {
+        @let keyCtrl = pair.get('key');
+        <div class="columns" [formGroupName]="i">
+          <div class="column is-one-fifth">
+            <bulma-field label="Custom Parameter" [for]="idForSelect($index)" [control]="keyCtrl">
+              <div class="select is-fullwidth">
+                <select
+                  [id]="idForSelect($index)"
+                  formControlName="key"
+                  (change)="onSelectChange(i)"
+                >
+                  @for (config of configs(); track $index) {
+                    <option [value]="config.key">{{ config.key }}</option>
+                  }
+                </select>
+              </div>
+            </bulma-field>
+            @if (keyCtrl?.hasError('duplicate')) {
+              <p class="help is-danger">This key is already used.</p>
+            }
+          </div>
+
+          <div class="column is-one-fifth">
+            <bulma-field label="Value" [for]="idForInput($index)" [control]="pair.get('value')">
+              @switch (configTypeForDDL(pair.get('key'))) {
+                @case ('boolean') {
+                  <div class="select">
+                    <select [id]="idForInput($index)" formControlName="value">
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </div>
+                }
+                @case ('text') {
+                  <input
+                    class="input"
+                    type="text"
+                    placeholder="Value"
+                    [id]="idForInput(i)"
+                    formControlName="value"
+                  />
+                }
+                @case ('list') {
+                  <p>list not implemented yet</p>
+                }
+                @default {
+                  <input
+                    class="input"
+                    type="number"
+                    placeholder="Value"
+                    [id]="idForInput($index)"
+                    formControlName="value"
+                  />
+                }
+              }
+            </bulma-field>
+          </div>
+
+          <div class="column is-one-fifth">
+            <div class="label">&nbsp;</div>
+            <div class="control">
+              <button
+                class="button"
+                [title]="'Delete custom parameter #' + $index"
+                (click)="removePair($index)"
+              >
+                <span class="icon is-small">
+                  <i class="fas fa-xmark-circle"></i>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </ng-container>
+  </form>
+
+  <button
+    class="button is-primary mb-4 mt-4"
+    (click)="addCustomParameter()"
+    [class.is-loading]="loadingConfigRows()"
+  >
+    <span class="icon">
+      <i class="fas fa-plus"></i>
+    </span>
+    <span>Add Custom Parameter</span>
+  </button>
+}

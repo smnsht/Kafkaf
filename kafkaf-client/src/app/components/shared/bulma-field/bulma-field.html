@@ -1,0 +1,35 @@
+@let errors = control()?.errors;
+
+<div class="field">
+  <label class="label" [for]="for()">
+    {{ label() }}
+    @if (isRequired()) {
+      <span class="has-text-danger">*</span>
+    }
+    @if (errors && control()?.pristine) {
+      <span class="icon has-text-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+      </span>
+    }
+  </label>
+  <div class="control">
+    <ng-content></ng-content>
+  </div>
+
+  @if (errors && (control()?.dirty || control()?.touched)) {
+    <div class="error-messages">
+      @if (errors?.['required']) {
+        <p class="help is-danger">{{ requiredMessage() }}</p>
+      }
+      @if (errors?.['maxlength']) {
+        <p class="help is-danger">{{ maxlengthMessage() }}</p>
+      }
+      @if (errors?.['pattern']) {
+        <p class="help is-danger">{{ patternMessage() }}</p>
+      }
+      @if (errors?.['custom']) {
+        <p class="help is-danger">{{ errors?.['custom']?.value }}</p>
+      }
+    </div>
+  }
+</div>

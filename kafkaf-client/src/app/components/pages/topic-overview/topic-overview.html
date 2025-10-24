@@ -1,0 +1,28 @@
+<app-page-wrapper [error]="store.errorDetails()" [loading]="store.loadingDetails()">
+  <app-stats-card [cardItems]="cardItems" />
+
+  <table appKafkafTable>
+    <thead>
+      <tr>
+        <th>Partition ID</th>
+        <th>Replicas</th>
+        <th>First Offset</th>
+        <th>Next Offset</th>
+        <th>Message Count</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of partitions; track $index) {
+        <tr>
+          <td>{{ row.partition }}</td>
+          <td>{{ row.replicas.length }}</td>
+          <td>{{ row.offsetMin }}</td>
+          <td>{{ row.offsetMax }}</td>
+          <td>{{ row.messagesCount }}</td>
+          <td>&nbsp;</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-page-wrapper>
