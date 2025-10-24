@@ -8,9 +8,8 @@ describe('BrokerLogDirectories', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BrokerLogDirectories]
-    })
-    .compileComponents();
+      imports: [BrokerLogDirectories],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(BrokerLogDirectories);
     component = fixture.componentInstance;

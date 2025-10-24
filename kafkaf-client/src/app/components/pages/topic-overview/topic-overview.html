@@ -14,14 +14,14 @@
     </thead>
     <tbody>
       @for (row of partitions; track $index) {
-      <tr>
-        <td>{{ row.partition }}</td>
-        <td>{{ row.replicas.length }}</td>
-        <td>{{ row.offsetMin }}</td>
-        <td>{{ row.offsetMax }}</td>
-        <td>{{ row.messagesCount }}</td>
-        <td>&nbsp;</td>
-      </tr>
+        <tr>
+          <td>{{ row.partition }}</td>
+          <td>{{ row.replicas.length }}</td>
+          <td>{{ row.offsetMin }}</td>
+          <td>{{ row.offsetMax }}</td>
+          <td>{{ row.messagesCount }}</td>
+          <td>&nbsp;</td>
+        </tr>
       }
     </tbody>
   </table>

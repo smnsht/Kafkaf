@@ -1,8 +1,8 @@
-import { Component, signal, computed } from "@angular/core";
-import { PageWrapper } from "@app/components/shared/page-wrapper/page-wrapper";
-import { Search } from "@app/components/shared/search/search/search";
-import { KafkafTableDirective } from "@app/directives/kafkaf-table/kafkaf-table";
-import { TopicDetailsStore } from "@app/store/topic-detais/topic-details.service";
+import { Component, signal, computed } from '@angular/core';
+import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
+import { Search } from '@app/components/shared/search/search/search';
+import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
+import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
 
 @Component({
   selector: 'app-topic-consumers',

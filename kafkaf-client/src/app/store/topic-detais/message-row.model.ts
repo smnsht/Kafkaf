@@ -1,5 +1,4 @@
-import { KafkaTimestamp } from "@app/pipes/timestamp/timestamp";
-
+import { KafkaTimestamp } from '@app/pipes/timestamp/timestamp';
 
 export interface MessageRow {
   offset: number;

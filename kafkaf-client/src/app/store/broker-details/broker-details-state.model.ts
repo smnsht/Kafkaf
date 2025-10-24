@@ -1,4 +1,4 @@
-import { BrokerConfigRow } from "./broker-config-row.model";
+import { BrokerConfigRow } from './broker-config-row.model';
 
 export interface BrokerDetailsState {
   configs: Map<string, BrokerConfigRow[]>;

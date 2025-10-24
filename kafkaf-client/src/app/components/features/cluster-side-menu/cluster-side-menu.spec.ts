@@ -8,9 +8,8 @@ describe('ClusterSideMenu', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ClusterSideMenu]
-    })
-    .compileComponents();
+      imports: [ClusterSideMenu],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ClusterSideMenu);
     component = fixture.componentInstance;

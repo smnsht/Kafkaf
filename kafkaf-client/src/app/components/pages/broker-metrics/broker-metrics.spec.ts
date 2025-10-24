@@ -8,9 +8,8 @@ describe('BrokerMetrics', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BrokerMetrics]
-    })
-    .compileComponents();
+      imports: [BrokerMetrics],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(BrokerMetrics);
     component = fixture.componentInstance;

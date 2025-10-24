@@ -1,5 +1,4 @@
-import { ReplicaInfo } from "./replica-info";
-
+import { ReplicaInfo } from './replica-info';
 
 export interface PartitionInfo {
   partition: number;

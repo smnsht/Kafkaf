@@ -7,11 +7,7 @@
         @let keyCtrl = pair.get('key');
         <div class="columns" [formGroupName]="i">
           <div class="column is-one-fifth">
-            <bulma-field
-              label="Custom Parameter"
-              [for]="idForSelect($index)"
-              [control]="keyCtrl"
-            >
+            <bulma-field label="Custom Parameter" [for]="idForSelect($index)" [control]="keyCtrl">
               <div class="select is-fullwidth">
                 <select
                   [id]="idForSelect($index)"

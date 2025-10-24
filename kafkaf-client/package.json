@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "prettier:check": "npx prettier --check .",
+    "prettier": "npx prettier --write ."
   },
   "prettier": {
     "printWidth": 100,

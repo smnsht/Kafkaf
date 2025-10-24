@@ -8,7 +8,6 @@ import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service
 import { TopicsStore } from '@app/store/topics/topics.service';
 import { delay, concatMap, timer } from 'rxjs';
 
-
 type TopicTabs =
   | 'TopicOverview'
   | 'TopicMessages'

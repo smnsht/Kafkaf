@@ -8,9 +8,8 @@ describe('BulmaField', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BulmaField]
-    })
-    .compileComponents();
+      imports: [BulmaField],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(BulmaField);
     component = fixture.componentInstance;

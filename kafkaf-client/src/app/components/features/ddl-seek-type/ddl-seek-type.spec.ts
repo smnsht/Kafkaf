@@ -8,9 +8,8 @@ describe('DdlSeekType', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DdlSeekType]
-    })
-    .compileComponents();
+      imports: [DdlSeekType],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DdlSeekType);
     component = fixture.componentInstance;

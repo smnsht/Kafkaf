@@ -7,33 +7,33 @@
       <div class="box">
         <a routerLink="/">Dashboard</a>
       </div>
-      @if ( cluster() >= 0 ) {
-      <div class="box">
-        <em>Cluster #{{ cluster() }}</em>
-        <app-cluster-side-menu [cluster]="cluster()" [kafkaSection]="kafkaSection()" />
-      </div>
+      @if (cluster() >= 0) {
+        <div class="box">
+          <em>Cluster #{{ cluster() }}</em>
+          <app-cluster-side-menu [cluster]="cluster()" [kafkaSection]="kafkaSection()" />
+        </div>
       }
       <div class="box cluster-details">
         @for (cfg of clusters(); track $index) {
-        <details class="mb-3">
-          @if (cfg.isOffline) {
-          <summary title="Cluster offline">
-            <span class="has-text-warning">
-              <i class="fas fa-exclamation-triangle"></i>
-            </span>
-            #{{ $index }} {{ cfg.alias }}
-          </summary>
-          } @else {
-          <summary title="Cluster online">
-            <span class="has-text-success">
-              <i class="fas fa-check-square"></i>
-            </span>
-            #{{ $index }} {{ cfg.alias }}
-          </summary>
+          <details class="mb-3">
+            @if (cfg.isOffline) {
+              <summary title="Cluster offline">
+                <span class="has-text-warning">
+                  <i class="fas fa-exclamation-triangle"></i>
+                </span>
+                #{{ $index }} {{ cfg.alias }}
+              </summary>
+            } @else {
+              <summary title="Cluster online">
+                <span class="has-text-success">
+                  <i class="fas fa-check-square"></i>
+                </span>
+                #{{ $index }} {{ cfg.alias }}
+              </summary>
 
-          <app-cluster-side-menu [cluster]="$index" />
-          }
-        </details>
+              <app-cluster-side-menu [cluster]="$index" />
+            }
+          </details>
         }
       </div>
       <div>

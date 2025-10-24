@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationRequest, ConfirmationService } from '@app/services/confirmation/confirmation';
 
-
 @Component({
   selector: 'app-confirmation-modal',
   imports: [],

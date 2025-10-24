@@ -8,9 +8,8 @@ describe('TopicOverview', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TopicDetails]
-    })
-    .compileComponents();
+      imports: [TopicDetails],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TopicDetails);
     component = fixture.componentInstance;

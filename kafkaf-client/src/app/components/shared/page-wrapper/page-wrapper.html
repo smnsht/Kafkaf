@@ -1,30 +1,31 @@
 <ng-content select="h1"></ng-content>
 
 @if (loading) {
-<div class="is-flex is-justify-content-center is-align-items-center" style="height: 40vh;">
-  <span
-    [ngClass]="{
-      'loader-mixin': true,
-      'is-size-1': spinnerFontSize == 1,
-      'is-size-2': spinnerFontSize == 2,
-      'is-size-3': spinnerFontSize == 3,
-      'is-size-4': spinnerFontSize == 4
-    }"
-  ></span>
-</div>
+  <div class="is-flex is-justify-content-center is-align-items-center" style="height: 40vh">
+    <span
+      [ngClass]="{
+        'loader-mixin': true,
+        'is-size-1': spinnerFontSize == 1,
+        'is-size-2': spinnerFontSize == 2,
+        'is-size-3': spinnerFontSize == 3,
+        'is-size-4': spinnerFontSize == 4,
+      }"
+    ></span>
+  </div>
 } @else {
-<ng-content></ng-content>
-} @if (notice) {
-
-<div class="notification is-success">
-  <button class="delete" (click)="notice = null"></button>
-  <h4 class="is-size-4">Success!</h4>
-  {{ notice }}
-</div>
-} @if ( error ) {
-<div class="notification is-danger">
-  <button class="delete" (click)="error = null"></button>
-  <h4 class="is-size-4">Error!</h4>
-  {{ error }}
-</div>
+  <ng-content></ng-content>
+}
+@if (notice) {
+  <div class="notification is-success">
+    <button class="delete" (click)="notice = null"></button>
+    <h4 class="is-size-4">Success!</h4>
+    {{ notice }}
+  </div>
+}
+@if (error) {
+  <div class="notification is-danger">
+    <button class="delete" (click)="error = null"></button>
+    <h4 class="is-size-4">Error!</h4>
+    {{ error }}
+  </div>
 }

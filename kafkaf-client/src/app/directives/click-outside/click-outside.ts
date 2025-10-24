@@ -1,10 +1,4 @@
-import {
-  Directive,
-  ElementRef,
-  Output,
-  EventEmitter,
-  OnDestroy,
-} from '@angular/core';
+import { Directive, ElementRef, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { fromEvent, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
@@ -24,7 +18,7 @@ export class ClickOutsideDirective implements OnDestroy {
           // Check if the clicked element is outside the host element
           const clickedInside = this.elementRef.nativeElement.contains(event.target);
           return !clickedInside;
-        })
+        }),
       )
       .subscribe(() => {
         this.clickOutside.emit();

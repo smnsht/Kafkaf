@@ -26,8 +26,8 @@ export type ColumnWidth = 'is-one-third' | 'is-one-quarter' | 'is-one-fifth';
     </div>
   `,
   host: {
-    'class': 'column'
-  }
+    class: 'column',
+  },
 })
 export class Search {
   width = input<ColumnWidth>('is-one-third');

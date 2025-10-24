@@ -8,9 +8,8 @@ describe('DdlSortOrder', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DdlSortOrder]
-    })
-    .compileComponents();
+      imports: [DdlSortOrder],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DdlSortOrder);
     component = fixture.componentInstance;

@@ -76,31 +76,31 @@
     </thead>
     <tbody>
       @for (topic of topics(); track $index) {
-      <tr>
-        <td>
-          <input
-            type="checkbox"
-            [ngModel]="selectedTopics.includes(topic.topicName)"
-            [disabled]="topic.isInternal"
-            (ngModelChange)="onCheckboxChange(topic.topicName, $event)"
-          />
-        </td>
-        <td>
-          <a [routerLink]="[topic.topicName]">{{ topic.topicName }}</a>
-        </td>
-        <td>{{ topic.partitionsCount }}</td>
-        <td>{{ topic.outOfSyncReplicas }}</td>
-        <td>{{ topic.replicationFactor }}</td>
-        <td>TODO</td>
-        <td>TODO</td>
-        <td>
-          <topics-dropdown-menu
-            [topicName]="topic.topicName"
-            [disabled]="topic.isInternal"
-            (commandSelected)="onCommandSelected($event, topic)"
-          />
-        </td>
-      </tr>
+        <tr>
+          <td>
+            <input
+              type="checkbox"
+              [ngModel]="selectedTopics.includes(topic.topicName)"
+              [disabled]="topic.isInternal"
+              (ngModelChange)="onCheckboxChange(topic.topicName, $event)"
+            />
+          </td>
+          <td>
+            <a [routerLink]="[topic.topicName]">{{ topic.topicName }}</a>
+          </td>
+          <td>{{ topic.partitionsCount }}</td>
+          <td>{{ topic.outOfSyncReplicas }}</td>
+          <td>{{ topic.replicationFactor }}</td>
+          <td>TODO</td>
+          <td>TODO</td>
+          <td>
+            <topics-dropdown-menu
+              [topicName]="topic.topicName"
+              [disabled]="topic.isInternal"
+              (commandSelected)="onCommandSelected($event, topic)"
+            />
+          </td>
+        </tr>
       }
     </tbody>
   </table>

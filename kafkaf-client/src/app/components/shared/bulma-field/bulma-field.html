@@ -3,13 +3,13 @@
 <div class="field">
   <label class="label" [for]="for()">
     {{ label() }}
-    @if(isRequired()) {
-    <span class="has-text-danger">*</span>
+    @if (isRequired()) {
+      <span class="has-text-danger">*</span>
     }
-    @if(errors && control()?.pristine ) {
-    <span class="icon has-text-warning">
-      <i class="fas fa-exclamation-triangle"></i>
-    </span>
+    @if (errors && control()?.pristine) {
+      <span class="icon has-text-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+      </span>
     }
   </label>
   <div class="control">

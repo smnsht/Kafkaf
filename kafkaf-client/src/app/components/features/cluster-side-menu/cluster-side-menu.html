@@ -7,9 +7,7 @@
     >
   </li>
   <li>
-    <a
-      [routerLink]="['/clusters', cluster(), 'topics']"
-      [class.active]="kafkaSection() == 'topics'"
+    <a [routerLink]="['/clusters', cluster(), 'topics']" [class.active]="kafkaSection() == 'topics'"
       >Topics</a
     >
   </li>

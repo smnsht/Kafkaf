@@ -1,5 +1,4 @@
-import { ClickOutsideDirective } from "./click-outside";
-
+import { ClickOutsideDirective } from './click-outside';
 
 describe('ClickOutside', () => {
   it('should create an instance', () => {

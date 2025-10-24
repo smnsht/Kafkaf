@@ -8,9 +8,8 @@ describe('TopicCustsomParameters', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TopicCustsomParameters]
-    })
-    .compileComponents();
+      imports: [TopicCustsomParameters],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TopicCustsomParameters);
     component = fixture.componentInstance;

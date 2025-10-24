@@ -8,9 +8,8 @@ describe('DdlPartitions', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DdlPartitions]
-    })
-    .compileComponents();
+      imports: [DdlPartitions],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DdlPartitions);
     component = fixture.componentInstance;

@@ -1,4 +1,3 @@
-
 export interface BatchItemResult {
   item: string;
   success: boolean;
