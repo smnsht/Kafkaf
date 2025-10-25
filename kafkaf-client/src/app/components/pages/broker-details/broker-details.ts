@@ -13,7 +13,7 @@ type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
 })
 export class BrokerDetails implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  public readonly store = inject(BrokerDetailsStore);
+  readonly store = inject(BrokerDetailsStore);
 
   cardItems: StatsCardItem[] = [];
   cluster = Number.NaN;
@@ -22,13 +22,11 @@ export class BrokerDetails implements OnInit {
 
   constructor() {
     this.route.paramMap.subscribe((paramMap) => {
-      this.cluster = Number.parseInt(paramMap.get('cluster')!);
-      this.broker = Number.parseInt(paramMap.get('broker')!);
+      this.store.handleParamMapChange(paramMap);
+      this.store.loadConfigs();
 
-      this.store.loadConfigs({
-        clusterIdx: this.cluster,
-        brokerId: this.broker,
-      });
+      this.cluster = this.store.clusterIndex();
+      this.broker = this.store.brokerId();
     });
   }
 

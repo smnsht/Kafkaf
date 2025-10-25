@@ -1,43 +1,19 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
-import { PageState } from '../../models/page-state';
 import { BrokerConfigRow } from './broker-config-row.model';
-import { BrokerDetailsState } from './broker-details-state.model';
-import { ClusterBroker } from './cluster-broker.model';
+import { Observable, of } from 'rxjs';
+import { ClusteredDataCollectionStore2 } from '../clustered-collection-store2';
 
-const defaultState: BrokerDetailsState = {
-  configs: new Map<string, BrokerConfigRow[]>(),
-  currentClusterId: Number.NaN,
-  currentBrokerId: Number.NaN,
-};
-
-@Injectable({
-  providedIn: 'root',
-})
-export class BrokerDetailsStore {
-  private readonly http = inject(HttpClient);
-  private readonly state = signal<BrokerDetailsState>({ ...defaultState });
-
-  readonly loading = computed(() => this.state().loading);
-  readonly error = computed(() => this.state().error);
-
-  readonly configs = computed(() => {
-    const { configs, currentClusterId, currentBrokerId } = this.state();
-    if (!Number.isNaN(currentClusterId) && !Number.isNaN(currentBrokerId)) {
-      const key = makeKey({
-        clusterIdx: currentClusterId,
-        brokerId: currentBrokerId,
-      });
-
-      return configs.get(key);
-    }
-
-    return undefined;
+@Injectable({ providedIn: 'root' })
+export class BrokerDetailsStore extends ClusteredDataCollectionStore2<BrokerConfigRow> {
+  readonly brokerId = computed(() => {
+    const broker = this.secondParam() ?? '';
+    return Number.parseInt(broker);
   });
 
   readonly logDirectores = computed(() => {
-    const allConfigs = this.configs();
+    const allConfigs = this.collection();
+
     if (allConfigs) {
       return allConfigs.filter((cfg) => cfg.name == 'log.dir');
     }
@@ -45,74 +21,25 @@ export class BrokerDetailsStore {
     return undefined;
   });
 
-  readonly configsKeys = computed(() => {
-    const keys = this.state().configs.keys();
-    return Array.from(keys).map((key) => parseConfigRowKey(key));
-  });
+  constructor() {
+    super({}, 'broker');
+  }
 
-  readonly pageState = computed<PageState>(() => {
-    const { loading, error } = this.state();
-    return { loading, error };
-  });
+  protected override fetchCollection(): Observable<BrokerConfigRow[]> {
+    const currentClusterId = this.clusterIdx();
+    const currentBrokerId = this.brokerId();
 
-  public loadConfigs(val: ClusterBroker): void {
-    const key = makeKey(val);
+    if (Number.isNaN(currentClusterId) || Number.isNaN(currentBrokerId)) {
+      return of([]);
+    }
 
-    if (!this.state().configs.has(key)) {
-      this.state.update((state) => {
-        return {
-          ...state,
-          currentClusterId: val.clusterIdx,
-          currentBrokerId: val.brokerId,
-          loading: true,
-          error: undefined,
-        };
-      });
+    const url = `${environment.apiUrl}/clusters/${currentClusterId}/brokers/${currentBrokerId}`;
+    return this.http.get<BrokerConfigRow[]>(url);
+  }
 
-      this.fetchConfigs();
+  loadConfigs(): void {
+    if (!this.hasRecords()) {
+      this.loadCollection();
     }
   }
-
-  private fetchConfigs(): void {
-    const { currentClusterId, currentBrokerId } = this.state();
-    const url = `${environment.apiUrl}/clusters/${currentClusterId}/brokers/${currentBrokerId}`;
-
-    this.http.get<BrokerConfigRow[]>(url).subscribe({
-      next: (data) => {
-        this.state.update((state) => {
-          const { configs } = state;
-          const key = makeKey({
-            clusterIdx: currentClusterId,
-            brokerId: currentBrokerId,
-          });
-          configs.set(key, data);
-
-          return {
-            ...state,
-            configs: configs,
-            loading: false,
-          };
-        });
-      },
-      error: (err: HttpErrorResponse) => {
-        this.state.update((state) => ({
-          ...state,
-          loading: false,
-          error: err.message,
-        }));
-      },
-    });
-  }
-}
-
-function makeKey(val: ClusterBroker): string {
-  return `${val.clusterIdx},${val.brokerId}`;
-}
-
-function parseConfigRowKey(str: string): ClusterBroker {
-  const [cluster, broker] = str.split(',', 2);
-  return {
-    clusterIdx: Number.parseInt(cluster),
-    brokerId: Number.parseInt(broker),
-  };
 }

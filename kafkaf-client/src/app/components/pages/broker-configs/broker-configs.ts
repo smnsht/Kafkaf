@@ -14,7 +14,7 @@ export class BrokerConfigs {
 
   configs = computed(() => {
     const search = this.search().toLowerCase();
-    const configs = this.store.configs();
+    const configs = this.store.collection();
 
     return configs?.filter((cfg) => cfg.name.toLowerCase().includes(search));
   });
