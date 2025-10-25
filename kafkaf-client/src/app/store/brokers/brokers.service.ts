@@ -1,27 +1,38 @@
-import { computed, Injectable } from '@angular/core';
+import { computed, Injectable, OnDestroy } from '@angular/core';
 import { environment } from 'environments/environment';
-import { BaseStore, ItemIdPK } from '../base-store';
 import { BrokerInfoRow } from './broker-info-row.model';
+import { ClusteredDataCollectionStore } from '../clustered-collection-store';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class BrokersStore extends BaseStore<BrokerInfoRow> {
+export class BrokersStore extends ClusteredDataCollectionStore<BrokerInfoRow> implements OnDestroy {
+
+  readonly brokers = computed(() => this.collection() );
+
   constructor() {
     super({});
   }
 
-  readonly brokers = computed(() => this.currentItems());
+  protected override fetchCollection(): Observable<BrokerInfoRow[]> {
+    const clusterIdx = this.clusterIdx();
 
-  protected override resourceUrl(clusterIdx: number): string {
-    return `${environment.apiUrl}/clusters/${clusterIdx}/brokers`;
+    if (Number.isNaN(clusterIdx)) {
+      return of([]);
+    }
+
+    const url = `${environment.apiUrl}/clusters/${clusterIdx}/brokers`;
+    return this.http.get<BrokerInfoRow[]>(url);
   }
 
-  protected override resourceItemUrl(clusterIdx: number, brokerId: ItemIdPK): string {
-    return `${this.resourceUrl(clusterIdx)}/${brokerId}`;
+  ngOnDestroy(): void {
+    this.clusterIdx$.complete();
   }
 
-  protected override getItemKey(item: BrokerInfoRow): string | number {
-    return item.brokerID;
+  loadBrokers(): void {
+    if (!this.hasRecords()) {
+      this.loadCollection();
+    }
   }
 }

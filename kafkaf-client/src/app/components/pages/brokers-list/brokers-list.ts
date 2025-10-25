@@ -16,18 +16,19 @@ const defaultCardItems: readonly StatsCardItem[] = [
 ];
 
 @Component({
-  selector: 'app-brokers-list',
+  selector: 'page-brokers-list',
   standalone: true,
   imports: [StatsCard, PageWrapper, KafkafTableDirective],
   templateUrl: './brokers-list.html',
 })
 export class BrokersList {
   private readonly router = inject(Router);
+
   readonly store = inject(BrokersStore);
   readonly route = inject(ActivatedRoute);
 
   cardItems = computed(() => {
-    const brokers = this.store.currentItems();
+    const brokers = this.store.brokers();
     const cardItems = [...defaultCardItems];
 
     if (brokers) {
@@ -50,9 +51,8 @@ export class BrokersList {
 
   constructor() {
     this.route.paramMap.subscribe((params) => {
-      const cluster = Number.parseInt(params.get('cluster')!);
-      this.store.selectCluster(cluster);
-      this.store.loadCollection();
+      this.store.handleParamMapChange(params);
+      this.store.loadBrokers();
     });
   }
 
