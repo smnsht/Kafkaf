@@ -1,14 +1,16 @@
-import { Injectable, signal } from '@angular/core';
-import { finalize, Observable, tap } from 'rxjs';
+import { Injectable, OnDestroy, signal } from '@angular/core';
+import { finalize, forkJoin, Observable, of, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { environment } from 'environments/environment';
 import { TopicConfigRow } from './topic-config-row.model';
-import { TopicSettingRow } from '../topic-detais/topic-setting-row.model';
+import { TopicSettingRow } from '../topic-settings/topic-setting-row.model';
 import { TopicsListViewModel } from './topics-list-view.model';
 import { BaseStore } from '../base-store';
 import { CreateTopicModel } from './create-topic.model';
 import { RecreateTopicModel } from './recreate-topic.model';
+import { ClusteredDataCollectionStore } from '../clustered-collection-store';
+import { getErrorMessage2 } from '../utils';
 
 @Injectable({
   providedIn: 'root',
@@ -156,4 +158,141 @@ export class TopicsStore extends BaseStore<TopicsListViewModel> {
         });
     }
   }
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class TopicsStore2
+  extends ClusteredDataCollectionStore<TopicsListViewModel>
+  implements OnDestroy
+{
+  constructor() {
+    super({});
+  }
+
+  protected override fetchCollection(): Observable<TopicsListViewModel[]> {
+    const clusterIdx = this.clusterIdx();
+
+    if (Number.isNaN(clusterIdx)) {
+      return of([]);
+    }
+
+    const url = `${environment.apiUrl}/clusters/${clusterIdx}/topics`;
+    return this.http.get<TopicsListViewModel[]>(url);
+  }
+
+  ngOnDestroy(): void {
+    this.clusterIdx$.complete();
+  }
+
+  loadTopics(): void {
+    if (!this.hasRecords()) {
+      this.loadCollection();
+    }
+  }
+
+  reloadTopics(): void {
+    this.loadCollection();
+  }
+
+  deleteTopics(topicNames: string[]): Observable<void[]> {
+    this.setPageState({
+      loading: true,
+      notice: undefined,
+      error: undefined,
+    });
+
+    const clusterIdx = this.clusterIdx();
+    const requests = topicNames.map((topic) => {
+      const url = `${environment.apiUrl}/clusters/${clusterIdx}/topics/${topic}`;
+      return this.http.delete<void>(url);
+    });
+
+    return forkJoin(requests).pipe(
+      tap({
+        next: (arr) => {
+          const notice =
+            arr.length == 1
+              ? `Topic ${topicNames[0]} deleted successfully.`
+              : `${arr.length} topics deleted successfully.`;
+
+          this.setPageState({
+            loading: false,
+            error: undefined,
+            notice,
+          });
+
+          // clean up notice after 5 seconds
+          const handle = setTimeout(() => {
+            this.setNotice(undefined);
+            clearTimeout(handle);
+          }, 5000);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.logger.errorResponse(err);
+
+          this.setPageState({
+            loading: false,
+            error: getErrorMessage2(err),
+          });
+
+          // clean up error after 5 seconds
+          const handle = setTimeout(() => {
+            this.setError(undefined);
+            clearTimeout(handle);
+          }, 5000);
+        },
+      }),
+    );
+  }
+
+  deleteTopic(topicName: string): Observable<void[]> {
+    const topicNames: string[] = [topicName];
+    return this.deleteTopics(topicNames);
+  }
+
+  recreateTopic(topicName: string, req: RecreateTopicModel): Observable<void> {
+    this.setPageState({
+      loading: true,
+      notice: undefined,
+      error: undefined,
+    });
+
+    const clusterIdx = this.clusterIdx();
+    const url = `${environment.apiUrl}/clusters/${clusterIdx}/topics/${topicName}/recreate`;
+
+    return this.http.post<void>(url, req).pipe(
+      tap({
+        next: () => {
+          this.state.update((state) => ({
+            ...state,
+            notice: `Topic ${topicName} recreated.`,
+            loading: false,
+          }));
+
+          // clean up notice after 5 seconds
+          const handle = setTimeout(() => {
+            this.setNotice(undefined);
+            clearTimeout(handle);
+          }, 5000);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.logger.errorResponse(err);
+
+          this.setPageState({
+            loading: false,
+            error: getErrorMessage2(err),
+          });
+
+          // clean up error after 5 seconds
+          const handle = setTimeout(() => {
+            this.setError(undefined);
+            clearTimeout(handle);
+          }, 5000);
+        }
+      }),
+    );
+  }
+
 }

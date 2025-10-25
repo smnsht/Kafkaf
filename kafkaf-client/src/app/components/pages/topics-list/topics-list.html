@@ -38,28 +38,28 @@
 <div class="buttons">
   <button
     class="button is-light"
-    [disabled]="selectedTopics.length === 0 || store.loading()"
+    [disabled]="selectedTopics.length === 0 || store2.loading()"
     (click)="onDeleteTopicsClick()"
   >
     Delete selected topics
   </button>
   <button
     class="button is-light"
-    [disabled]="selectedTopics.length !== 1 || store.loading()"
+    [disabled]="selectedTopics.length !== 1 || store2.loading()"
     (click)="onCopyTopicClick()"
   >
     Copy selected topic
   </button>
   <button
     class="button is-light"
-    [disabled]="selectedTopics.length === 0 || store.loading()"
+    [disabled]="selectedTopics.length === 0 || store2.loading()"
     (click)="onPurgeMessagesClick()"
   >
     Purge messages of selected topics
   </button>
 </div>
 
-<app-page-wrapper [state]="store.pageState()">
+<app-page-wrapper [state]="store2.pageState()">
   <!-- Topics table -->
   <table appKafkafTable>
     <thead>

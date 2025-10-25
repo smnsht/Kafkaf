@@ -6,9 +6,10 @@ import { DropdownMenuEvent } from '@app/components/shared/dropdown-menu/dropdown
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
 import { ConfirmationService } from '@app/services/confirmation/confirmation';
+import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings.service';
 import { CreateTopicModel } from '@app/store/topics/create-topic.model';
 import { TopicsListViewModel } from '@app/store/topics/topics-list-view.model';
-import { TopicsStore } from '@app/store/topics/topics.service';
+import { TopicsStore2 } from '@app/store/topics/topics.service';
 import { filter, concatMap, Observable, map } from 'rxjs';
 
 @Component({
@@ -17,10 +18,12 @@ import { filter, concatMap, Observable, map } from 'rxjs';
   templateUrl: './topics-list.html',
 })
 export class TopicsList {
-  public readonly store = inject(TopicsStore);
+  //public readonly store = inject(TopicsStore);
+  public readonly store2 = inject(TopicsStore2);
   private readonly router = inject(Router);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly topicSettingsStore = inject(TopicSettingsStore);
 
   search = signal('');
   showInternalTopics = signal(false);
@@ -29,7 +32,7 @@ export class TopicsList {
   topics = computed(() => {
     const searchStr = this.search().toLowerCase();
     const showInternal = this.showInternalTopics();
-    const topics = this.store.currentItems();
+    const topics = this.store2.collection();
 
     return topics?.filter((topic) => {
       if (!showInternal && topic.isInternal) {
@@ -46,9 +49,8 @@ export class TopicsList {
 
   constructor() {
     this.route.paramMap.subscribe((params) => {
-      const clusterIdx = Number.parseInt(params.get('cluster')!);
-      this.store.selectCluster(clusterIdx);
-      this.store.loadTopics();
+      this.store2.handleParamMapChange(params);
+      this.store2.loadTopics();
     });
   }
 
@@ -63,19 +65,21 @@ export class TopicsList {
       .confirm('Confirm Deletion', 'Are you sure you want to delete the selected topics?')
       .pipe(
         filter((confirmed) => confirmed),
-        concatMap(() => this.store.deleteTopics(this.selectedTopics)),
+        concatMap(() => this.store2.deleteTopics(this.selectedTopics)),
       )
       .subscribe(() => {
         this.selectedTopics = [];
+        this.store2.reloadTopics();
       });
   }
 
   onCopyTopicClick(): void {
     const topicName = this.selectedTopics[0];
-    const topic = this.store.currentItems()?.find((topic) => topic.topicName == topicName);
+    const topics = this.store2.collection();
+    const topic = topics?.find((topic) => topic.topicName == topicName);
 
     if (!topic) {
-      this.store.setError(`Can't find topic name ${topicName}!`);
+      this.store2.setError(`Can't find topic name ${topicName}!`);
       return;
     }
 
@@ -92,7 +96,8 @@ export class TopicsList {
       )
       .pipe(
         filter((confirmed) => confirmed),
-        concatMap(() => this.store.purgeMessages(this.selectedTopics)),
+        //concatMap(() => this.store.purgeMessages(this.selectedTopics)),
+        // TODO
       )
       .subscribe(() => {
         this.selectedTopics = [];
@@ -103,32 +108,41 @@ export class TopicsList {
     if (event.confirmed) {
       switch (event.command) {
         case 'ClearMessages':
-          this.store.purgeMessages([topic.topicName]).subscribe();
+          //this.store.purgeMessages([topic.topicName]).subscribe();
+          // TODO
           break;
 
         case 'RemoveTopic':
-          this.store.deleteTopic(topic.topicName).subscribe();
+          this.store2.deleteTopic(topic.topicName).subscribe(() => {
+            this.selectedTopics = [];
+            this.store2.reloadTopics();
+          });
           break;
 
         case 'RecreateTopic':
-          this.store
+          this.store2
             .recreateTopic(topic.topicName, {
               numPartitions: topic.partitionsCount,
               replicationFactor: topic.partitionsCount,
             })
             .subscribe(() => {
-              this.store.loadTopics(true);
+              this.store2.reloadTopics();
             });
           break;
 
         default:
-          this.store.setError(`unknown command ${event.command}`);
+          this.store2.setError(`unknown command ${event.command}`);
       }
     }
   }
 
   private getTopicQueryParams(topic: TopicsListViewModel): Observable<CreateTopicModel> {
-    return this.store.loadTopicSettings(topic.topicName).pipe(
+    const request$ = this.topicSettingsStore.loadTopicSettings(
+      this.store2.clusterIndex(),
+      topic.topicName,
+    );
+
+    return request$.pipe(
       map((settings) => {
         const queryParams: CreateTopicModel = {
           name: topic.topicName,

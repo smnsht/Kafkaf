@@ -7,7 +7,7 @@ import {
   SearchMessagesOptions,
 } from './search-messages-options.model';
 import { TopicDetailsViewModel } from './topic-details-view.model';
-import { TopicSettingRow } from './topic-setting-row.model';
+import { TopicSettingRow } from '../topic-settings/topic-setting-row.model';
 import { Observable, tap } from 'rxjs';
 import { TopicConsumersRow } from './topic-consumers-row.model';
 import { CreateMessage } from './create-message.model';
