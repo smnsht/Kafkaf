@@ -16,7 +16,6 @@ export const SerdeTypes = Object.freeze([
 export type SerdeType = (typeof SerdeTypes)[number];
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'ddl-serde',
   imports: [FormsModule],
   template: `

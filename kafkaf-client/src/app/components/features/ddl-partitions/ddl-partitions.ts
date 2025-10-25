@@ -4,7 +4,6 @@ import { PartitionInfo } from '@app/models/partition-info';
 import { ClickOutsideDirective } from '@app/directives/click-outside/click-outside';
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'ddl-partitions',
   imports: [FormsModule, ClickOutsideDirective],
   templateUrl: './ddl-partitions.html',
