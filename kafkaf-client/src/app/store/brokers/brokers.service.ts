@@ -8,8 +8,7 @@ import { Observable, of } from 'rxjs';
   providedIn: 'root',
 })
 export class BrokersStore extends ClusteredDataCollectionStore<BrokerInfoRow> implements OnDestroy {
-
-  readonly brokers = computed(() => this.collection() );
+  readonly brokers = computed(() => this.collection());
 
   constructor() {
     super({});

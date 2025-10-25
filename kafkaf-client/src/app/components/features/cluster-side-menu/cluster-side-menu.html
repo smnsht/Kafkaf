@@ -2,21 +2,21 @@
   <li>
     <a
       [routerLink]="['/clusters', cluster(), 'brokers']"
-      [class.active]="kafkaSection() === 'brokers'"
+      [class.active]="isLinkActive('brokers')"
       >Brokers</a
     >
   </li>
   <li>
     <a
       [routerLink]="['/clusters', cluster(), 'topics']"
-      [class.active]="kafkaSection() === 'topics'"
+      [class.active]="isLinkActive('topics')"
       >Topics</a
     >
   </li>
   <li>
     <a
       [routerLink]="['/clusters', cluster(), 'consumers']"
-      [class.active]="kafkaSection() === 'consumers'"
+      [class.active]="isLinkActive('consumers')"
       >Consumers</a
     >
   </li>

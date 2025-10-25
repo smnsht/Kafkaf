@@ -1,28 +1,28 @@
-import { Component, computed, inject, model, OnInit, Signal } from '@angular/core';
-
+import { Component, computed, inject, model, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
-import { ClusterInfo } from '@app/store/clusters/cluster-info.model';
-import { ClustersStore } from '@app/store/clusters/clusters.service';
+import { ClustersStore2 } from '@app/store/clusters/clusters.service';
+
+interface Stats {
+  online: number;
+  offline: number;
+}
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'page-dashboard',
   standalone: true,
   imports: [StatsCard, FormsModule, KafkafTableDirective, PageWrapper],
   templateUrl: './dashboard.html',
 })
 export class Dashboard implements OnInit {
-  private readonly clusters: Signal<ClusterInfo[]>;
-  private readonly clustersStore = inject(ClustersStore);
-
-  public onlyOfflineClusters = model(false);
-  public loading: Signal<boolean>;
-  public error: Signal<string | null>;
+  readonly store = inject(ClustersStore2);
+  readonly onlyOfflineClusters = model(false);
 
   public cardItems = computed(() => {
-    const stats = this.clusters().reduce(
+    const clusters = this.store.collection();
+    const stats: Stats | undefined = clusters?.reduce(
       (acc, info) => {
         if (info.isOffline) {
           acc.offline += 1;
@@ -33,6 +33,24 @@ export class Dashboard implements OnInit {
       },
       { online: 0, offline: 0 },
     );
+
+    return this.buildStatsCardItems(stats);
+  });
+
+  public clustersForDisplay = computed(() => {
+    const all = this.store.collection();
+    const onlyOffline = this.onlyOfflineClusters();
+    return onlyOffline ? all?.filter((c) => c.isOffline) : all;
+  });
+
+  ngOnInit(): void {
+    this.store.loadClusters();
+  }
+
+  private buildStatsCardItems(stats: Stats | undefined): StatsCardItem[] {
+    if (!stats) {
+      return [];
+    }
 
     const retval: StatsCardItem[] = [
       {
@@ -48,21 +66,5 @@ export class Dashboard implements OnInit {
     ];
 
     return retval;
-  });
-
-  public clustersForDisplay = computed(() => {
-    const all = this.clusters();
-    const onlyOffline = this.onlyOfflineClusters();
-    return onlyOffline ? all.filter((c) => c.isOffline) : all;
-  });
-
-  constructor() {
-    this.clusters = this.clustersStore.clusters.asReadonly();
-    this.loading = this.clustersStore.loading.asReadonly();
-    this.error = this.clustersStore.error.asReadonly();
-  }
-
-  ngOnInit(): void {
-    this.clustersStore.loadClustersInfo();
   }
 }
