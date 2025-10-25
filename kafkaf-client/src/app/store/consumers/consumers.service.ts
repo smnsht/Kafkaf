@@ -1,24 +1,37 @@
-import { computed, Injectable } from '@angular/core';
+import { computed, Injectable, OnDestroy } from '@angular/core';
 import { ConsumerGroupRow } from './consumer-group-row.model';
 import { environment } from 'environments/environment';
-import { BaseStore, ItemIdPK } from '../base-store';
+import { Observable, of } from 'rxjs';
+import { ClusteredDataCollectionStore } from '../clustered-collection-store';
+
 
 @Injectable({ providedIn: 'root' })
-export class ConsumersStore extends BaseStore<ConsumerGroupRow> {
+export class ConsumersStore extends ClusteredDataCollectionStore<ConsumerGroupRow> implements OnDestroy {
+
   constructor() {
-    super();
+    super({});
   }
 
-  readonly consumers = computed(() => this.currentItems());
+  ngOnDestroy(): void {
+    this.clusterIdx$.complete();
+  }
 
-  protected override resourceUrl(clusterIdx: number): string {
-    return `${environment.apiUrl}/clusters/${clusterIdx}/consumers`;
+  readonly consumers = computed(() => this.collection());
+
+  protected override fetchCollection(): Observable<ConsumerGroupRow[]> {
+    const clusterIdx = this.clusterIdx();
+
+    if (Number.isNaN(clusterIdx)) {
+      return of([]);
+    }
+
+    const url = `${environment.apiUrl}/clusters/${clusterIdx}/consumers`;
+    return this.http.get<ConsumerGroupRow[]>(url);
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected override resourceItemUrl(clusterIdx: number, itemId: ItemIdPK): string {
-    throw new Error('Method not implemented.');
-  }
-  protected override getItemKey(item: ConsumerGroupRow): string | number {
-    return item.groupId;
+
+  loadConsumers(): void {
+    if (!this.hasRecords()) {
+      this.loadCollection();
+    }
   }
 }

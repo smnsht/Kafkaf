@@ -3,18 +3,13 @@ import { computed, inject, signal, WritableSignal } from '@angular/core';
 import { ProblemDetails } from '@app/models/problem-details';
 import { LoggerService } from '@app/services/logger/logger';
 import { forkJoin, Observable, tap } from 'rxjs';
+import { PageState } from '../models/page-state';
 
 export type ItemIdPK = string | number;
 
 export interface BaseState<T> {
   itemsMap: Map<number, T[]>;
   clusterIdx: number;
-  loading?: boolean | null;
-  error?: string | null;
-  notice?: string | null;
-}
-
-export interface PageState {
   loading?: boolean | null;
   error?: string | null;
   notice?: string | null;
@@ -286,3 +281,5 @@ export function getErrorMessage(err: HttpErrorResponse): string {
 
   return errorMessage;
 }
+
+

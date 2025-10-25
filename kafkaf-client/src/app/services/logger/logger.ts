@@ -1,3 +1,5 @@
+import { HttpErrorResponse } from "@angular/common/http";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export enum LogLevel {
   None,
@@ -31,6 +33,10 @@ export class LoggerService {
           break;
       }
     }
+  }
+
+  errorResponse(err: HttpErrorResponse) {
+    this.log(LogLevel.Error, err.statusText, err);
   }
 
   error(message: string, ...optionalParams: any[]) {

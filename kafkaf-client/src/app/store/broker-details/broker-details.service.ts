@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from 'environments/environment';
-import { PageState } from '../base-store';
+import { PageState } from '../../models/page-state';
 import { BrokerConfigRow } from './broker-config-row.model';
 import { BrokerDetailsState } from './broker-details-state.model';
 import { ClusterBroker } from './cluster-broker.model';
