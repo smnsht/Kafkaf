@@ -1,50 +1,48 @@
-<app-page-wrapper
-  [error]="store.errorSettings()"
-  [loading]="store.loadingSettings()"
-  [notice]="store.noticeSettings()"
->
-  <table appKafkafTable>
-    <thead>
-      <tr>
-        <th>Key</th>
-        <th>Value</th>
-        <th>Default Value</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (row of store.settings(); track $index) {
+<app-page-wrapper [state]="store.pageState()">
+  <div style="overflow-y: scroll; max-height: 80vh;">
+    <table appKafkafTable>
+      <thead>
         <tr>
-          <td>{{ row.name }}</td>
-          <td>
-            @if ($index === selectedRowIndex) {
-              <div class="buttons">
-                <button class="button is-small" (click)="selectedRowIndex = -1">
-                  <span class="icon is-small">
-                    <i class="fas fa-times"></i>
-                  </span>
-                  <span>Cancel</span>
-                </button>
-                <button class="button is-small" (click)="update(row.name, ctrl.value)">
-                  <span class="icon is-small">
-                    <i class="fas fa-save"></i>
-                  </span>
-                  <span>Save</span>
-                </button>
-              </div>
-              <input type="text" [value]="row.value" #ctrl />
-            } @else {
-              <button class="button is-small mr-2" (click)="selectedRowIndex = $index">
-                <span class="icon is-small">
-                  <i class="fas fa-edit"></i>
-                </span>
-                <span>Edit</span>
-              </button>
-              {{ row.value }}
-            }
-          </td>
-          <td>{{ row.defaultValue }}</td>
+          <th>Key</th>
+          <th>Value</th>
+          <th>Default Value</th>
         </tr>
-      }
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        @for (row of store.settings(); track $index) {
+          <tr>
+            <td>{{ row.name }}</td>
+            <td>
+              @if ($index === selectedRowIndex) {
+                <div class="buttons">
+                  <button class="button is-small" (click)="selectedRowIndex = -1">
+                    <span class="icon is-small">
+                      <i class="fas fa-times"></i>
+                    </span>
+                    <span>Cancel</span>
+                  </button>
+                  <button class="button is-small" (click)="update(row.name, ctrl.value)">
+                    <span class="icon is-small">
+                      <i class="fas fa-save"></i>
+                    </span>
+                    <span>Save</span>
+                  </button>
+                </div>
+                <input type="text" [value]="row.value" #ctrl />
+              } @else {
+                <button class="button is-small mr-2" (click)="selectedRowIndex = $index">
+                  <span class="icon is-small">
+                    <i class="fas fa-edit"></i>
+                  </span>
+                  <span>Edit</span>
+                </button>
+                {{ row.value }}
+              }
+            </td>
+            <td>{{ row.defaultValue }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </app-page-wrapper>

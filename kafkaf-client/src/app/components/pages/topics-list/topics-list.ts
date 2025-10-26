@@ -19,10 +19,10 @@ import { filter, concatMap, Observable, map } from 'rxjs';
 })
 export class TopicsList {
   //public readonly store = inject(TopicsStore);
-  public readonly store2 = inject(TopicsStore2);
   private readonly router = inject(Router);
-  private readonly confirmationService = inject(ConfirmationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly confirmationService = inject(ConfirmationService);
+  public readonly topicsStore = inject(TopicsStore2);
   private readonly topicSettingsStore = inject(TopicSettingsStore);
 
   search = signal('');
@@ -32,7 +32,7 @@ export class TopicsList {
   topics = computed(() => {
     const searchStr = this.search().toLowerCase();
     const showInternal = this.showInternalTopics();
-    const topics = this.store2.collection();
+    const topics = this.topicsStore.collection();
 
     return topics?.filter((topic) => {
       if (!showInternal && topic.isInternal) {
@@ -49,8 +49,8 @@ export class TopicsList {
 
   constructor() {
     this.route.paramMap.subscribe((params) => {
-      this.store2.handleParamMapChange(params);
-      this.store2.loadTopics();
+      this.topicsStore.handleParamMapChange(params);
+      this.topicsStore.loadTopics();
     });
   }
 
@@ -65,21 +65,21 @@ export class TopicsList {
       .confirm('Confirm Deletion', 'Are you sure you want to delete the selected topics?')
       .pipe(
         filter((confirmed) => confirmed),
-        concatMap(() => this.store2.deleteTopics(this.selectedTopics)),
+        concatMap(() => this.topicsStore.deleteTopics(this.selectedTopics)),
       )
       .subscribe(() => {
         this.selectedTopics = [];
-        this.store2.reloadTopics();
+        this.topicsStore.reloadTopics();
       });
   }
 
   onCopyTopicClick(): void {
     const topicName = this.selectedTopics[0];
-    const topics = this.store2.collection();
+    const topics = this.topicsStore.collection();
     const topic = topics?.find((topic) => topic.topicName == topicName);
 
     if (!topic) {
-      this.store2.setError(`Can't find topic name ${topicName}!`);
+      this.topicsStore.setError(`Can't find topic name ${topicName}!`);
       return;
     }
 
@@ -113,32 +113,32 @@ export class TopicsList {
           break;
 
         case 'RemoveTopic':
-          this.store2.deleteTopic(topic.topicName).subscribe(() => {
+          this.topicsStore.deleteTopic(topic.topicName).subscribe(() => {
             this.selectedTopics = [];
-            this.store2.reloadTopics();
+            this.topicsStore.reloadTopics();
           });
           break;
 
         case 'RecreateTopic':
-          this.store2
+          this.topicsStore
             .recreateTopic(topic.topicName, {
               numPartitions: topic.partitionsCount,
               replicationFactor: topic.partitionsCount,
             })
             .subscribe(() => {
-              this.store2.reloadTopics();
+              this.topicsStore.reloadTopics();
             });
           break;
 
         default:
-          this.store2.setError(`unknown command ${event.command}`);
+          this.topicsStore.setError(`unknown command ${event.command}`);
       }
     }
   }
 
   private getTopicQueryParams(topic: TopicsListViewModel): Observable<CreateTopicModel> {
-    const request$ = this.topicSettingsStore.loadTopicSettings(
-      this.store2.clusterIndex(),
+    const request$ = this.topicSettingsStore.loadTopicSettings$(
+      this.topicsStore.clusterIndex(),
       topic.topicName,
     );
 

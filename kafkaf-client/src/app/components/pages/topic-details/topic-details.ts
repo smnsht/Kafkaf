@@ -5,6 +5,7 @@ import { TopicsDropdownMenu } from '@app/components/features/topics-dropdown-men
 import { DropdownMenuEvent } from '@app/components/shared/dropdown-menu/dropdown-menu';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
+import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings.service';
 import { TopicsStore } from '@app/store/topics/topics.service';
 import { delay, concatMap, timer } from 'rxjs';
 
@@ -46,6 +47,10 @@ export class TopicDetails {
   readonly store = inject(TopicDetailsStore);
   readonly route = inject(ActivatedRoute);
 
+  /////////////////////////////////////////////////////////////////////
+  readonly topicSettingsStore = inject(TopicSettingsStore);
+  /////////////////////////////////////////////////////////////////////
+
   currentTab: TopicTabs = 'TopicOverview';
   isEditSettings = false;
 
@@ -55,6 +60,10 @@ export class TopicDetails {
     const { cluster } = getRequiredParams(this.route);
 
     this.topicsStore.selectCluster(cluster);
+    ////////////////////////////////////////////////////////////
+    this.route.paramMap.subscribe(params => {
+      this.topicSettingsStore.handleParamMapChange(params);
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
