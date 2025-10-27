@@ -17,18 +17,18 @@ export abstract class BaseCollectionStore<T> {
   protected readonly logger = inject(LoggerService);
 
   protected readonly state: WritableSignal<BaseCollectionState<T>>;
-  protected readonly clusterIdx: WritableSignal<number>;
+  //protected readonly clusterIdx: WritableSignal<number>;
 
   constructor(initialState: BaseCollectionState<T>) {
     this.state = signal(initialState);
-    this.clusterIdx = signal(Number.NaN);
+    //this.clusterIdx = signal(Number.NaN);
   }
 
   // Abstract
   protected abstract fetchCollection(): Observable<T[]>;
 
   // Common getters
-  readonly clusterIndex = computed(() => this.clusterIdx());
+  //readonly clusterIndex = computed(() => this.clusterIdx());
   readonly collection = computed(() => this.state().collection);
   readonly loading = computed(() => this.state().loading);
   readonly error = computed(() => this.state().error);

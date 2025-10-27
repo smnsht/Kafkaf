@@ -15,7 +15,7 @@ export class BrokersStore extends ClusteredDataCollectionStore<BrokerInfoRow> im
   }
 
   protected override fetchCollection(): Observable<BrokerInfoRow[]> {
-    const clusterIdx = this.clusterIdx();
+    const clusterIdx = this.clusterIndex();
 
     if (Number.isNaN(clusterIdx)) {
       return of([]);

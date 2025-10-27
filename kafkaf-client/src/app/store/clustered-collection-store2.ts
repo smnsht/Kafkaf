@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable, startWith, pairwise } from 'rxjs';
 import { BaseCollectionState, BaseCollectionStore } from './base-collection-store';
 import { ParamMap } from '@angular/router';
-import { signal } from '@angular/core';
+import { computed, signal, WritableSignal } from '@angular/core';
 
 type MaybeString = string | null | undefined;
 
@@ -11,11 +11,14 @@ export abstract class ClusteredDataCollectionStore2<T> extends BaseCollectionSto
   protected readonly cacheKey$ = new BehaviorSubject<MaybeString>(null);
   protected readonly secondParamName: string;
   protected readonly clusteredData: Map<string, BaseCollectionState<T>>;
+  protected readonly clusterIdx: WritableSignal<number>;
 
   protected readonly prevAndCurrent$: Observable<[MaybeString, MaybeString]> = this.cacheKey$.pipe(
     startWith(null),
     pairwise(),
   );
+
+  readonly clusterIndex = computed(() => this.clusterIdx());
 
   constructor(initialState: BaseCollectionState<T>, secondParamName: string) {
     super(initialState);
@@ -23,6 +26,7 @@ export abstract class ClusteredDataCollectionStore2<T> extends BaseCollectionSto
     this.initialState = initialState;
     this.secondParamName = secondParamName;
     this.clusteredData = new Map();
+    this.clusterIdx = signal(Number.NaN);
     this.prevAndCurrent$.subscribe(this.handlePrevAndCurrentCluster.bind(this));
   }
 

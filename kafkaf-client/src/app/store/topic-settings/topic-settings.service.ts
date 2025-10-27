@@ -19,7 +19,7 @@ export class TopicSettingsStore extends ClusteredDataCollectionStore2<TopicSetti
     const topicName = this.secondParam();
     const clusterIdx = this.clusterIdx();
 
-    if (topicName && clusterIdx) {
+    if (topicName && Number.isInteger(clusterIdx)) {
       return this.loadTopicSettings$(clusterIdx, topicName);
     }
 

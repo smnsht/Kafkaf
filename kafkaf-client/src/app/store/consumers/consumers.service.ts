@@ -19,7 +19,7 @@ export class ConsumersStore extends ClusteredDataCollectionStore<ConsumerGroupRo
   readonly consumers = computed(() => this.collection());
 
   protected override fetchCollection(): Observable<ConsumerGroupRow[]> {
-    const clusterIdx = this.clusterIdx();
+    const clusterIdx = this.clusterIndex();
 
     if (Number.isNaN(clusterIdx)) {
       return of([]);

@@ -172,7 +172,7 @@ export class TopicsStore2
   }
 
   protected override fetchCollection(): Observable<TopicsListViewModel[]> {
-    const clusterIdx = this.clusterIdx();
+    const clusterIdx = this.clusterIndex();
 
     if (Number.isNaN(clusterIdx)) {
       return of([]);
@@ -203,7 +203,7 @@ export class TopicsStore2
       error: undefined,
     });
 
-    const clusterIdx = this.clusterIdx();
+    const clusterIdx = this.clusterIndex();
     const requests = topicNames.map((topic) => {
       const url = `${environment.apiUrl}/clusters/${clusterIdx}/topics/${topic}`;
       return this.http.delete<void>(url);
@@ -259,7 +259,7 @@ export class TopicsStore2
       error: undefined,
     });
 
-    const clusterIdx = this.clusterIdx();
+    const clusterIdx = this.clusterIndex();
     const url = `${environment.apiUrl}/clusters/${clusterIdx}/topics/${topicName}/recreate`;
 
     return this.http.post<void>(url, req).pipe(

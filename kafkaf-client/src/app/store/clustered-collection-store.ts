@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable, startWith, pairwise } from 'rxjs';
 import { BaseCollectionState, BaseCollectionStore } from './base-collection-store';
 import { ParamMap } from '@angular/router';
+import { computed } from '@angular/core';
 
 export abstract class ClusteredDataCollectionStore<T> extends BaseCollectionStore<T> {
   protected readonly initialState: BaseCollectionState<T>;
@@ -16,6 +17,8 @@ export abstract class ClusteredDataCollectionStore<T> extends BaseCollectionStor
 
   protected readonly clusteredData: Map<number, BaseCollectionState<T>>;
 
+  readonly clusterIndex = computed(() => this.clusterIdx$.value);
+
   constructor(initialState: BaseCollectionState<T>) {
     super(initialState);
     this.initialState = initialState;
@@ -25,7 +28,6 @@ export abstract class ClusteredDataCollectionStore<T> extends BaseCollectionStor
 
   handleParamMapChange(params: ParamMap): number {
     const cluster = Number.parseInt(params.get('cluster')!);
-    this.clusterIdx.set(cluster);
     this.clusterIdx$.next(cluster);
     return cluster;
   }
