@@ -1,10 +1,8 @@
 import { computed, Injectable } from '@angular/core';
 import { ClusteredDataCollectionStore2 } from '../clustered-collection-store2';
 import { TopicSettingRow } from './topic-setting-row.model';
-import { Observable, of, tap } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environment } from 'environments/environment';
-import { HttpErrorResponse } from '@angular/common/http';
-import { getErrorMessage2 } from '../utils';
 
 @Injectable({
   providedIn: 'root',
@@ -67,36 +65,9 @@ export class TopicSettingsStore extends ClusteredDataCollectionStore2<TopicSetti
   patchSetting(model: { name: string; value: string }) {
     this.setLoading(true);
 
-    const resourceUrl = this.getResourceUrl();
+    const url = `${this.getResourceUrl()}/${model.name}`;
+    const noticeHandler = this.withNoticeHandling(() => `Setting ${model.name} updated.`);
 
-    return this.http.patch<void>(`${resourceUrl}/${model.name}`, model).pipe(
-      tap({
-        next: () => {
-          this.state.update((state) => ({
-            ...state,
-            loading: false,
-            notice: `Setting ${model.name} updated.`
-          }));
-
-          const handle = setTimeout(() => {
-            this.setNotice(undefined);
-            clearTimeout(handle);
-          }, 5000);
-        },
-        error: (err: HttpErrorResponse) => {
-          this.state.update((state) => ({
-            ...state,
-            loading: false,
-            error: getErrorMessage2(err)
-          }));
-
-          const handle = setTimeout(() => {
-            this.setError(undefined);
-            clearTimeout(handle);
-          }, 5000);
-        },
-      }),
-    );
+    return this.http.patch<void>(url, model).pipe(noticeHandler);
   }
-
 }

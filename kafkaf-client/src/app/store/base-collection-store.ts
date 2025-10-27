@@ -97,4 +97,34 @@ export abstract class BaseCollectionStore<T> {
       )
       .subscribe();
   }
+
+  // Utils
+  withNoticeHandling(noticeFn: (response: unknown) => string, timeout = 5000) {
+    return tap({
+      next: (response: unknown) => {
+        this.state.update((state) => ({
+          ...state,
+          loading: false,
+          notice: noticeFn(response),
+        }));
+
+        const handle = setTimeout(() => {
+          this.setNotice(undefined);
+          clearTimeout(handle);
+        }, timeout);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.state.update((state) => ({
+          ...state,
+          loading: false,
+          error: getErrorMessage2(err),
+        }));
+
+        const handle = setTimeout(() => {
+          this.setError(undefined);
+          clearTimeout(handle);
+        }, timeout);
+      },
+    });
+  }
 }
