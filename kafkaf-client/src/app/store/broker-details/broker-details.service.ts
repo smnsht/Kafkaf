@@ -1,13 +1,12 @@
 import { computed, Injectable } from '@angular/core';
-import { environment } from 'environments/environment';
 import { BrokerConfigRow } from './broker-config-row.model';
-import { Observable, of } from 'rxjs';
-import { ClusteredDataCollectionStore2 } from '../clustered-collection-store2';
+import { Observable } from 'rxjs';
+import { SectionedDataCollectionStore } from '../sectioned-collection-store';
 
 @Injectable({ providedIn: 'root' })
-export class BrokerDetailsStore extends ClusteredDataCollectionStore2<BrokerConfigRow> {
+export class BrokerDetailsStore extends SectionedDataCollectionStore<BrokerConfigRow> {
   readonly brokerId = computed(() => {
-    const broker = this.secondParam() ?? '';
+    const broker = this.kafkaSectionValue() ?? '';
     return Number.parseInt(broker);
   });
 
@@ -22,18 +21,11 @@ export class BrokerDetailsStore extends ClusteredDataCollectionStore2<BrokerConf
   });
 
   constructor() {
-    super({}, 'broker');
+    super({});
   }
 
   protected override fetchCollection(): Observable<BrokerConfigRow[]> {
-    const currentClusterId = this.clusterIdx();
-    const currentBrokerId = this.brokerId();
-
-    if (Number.isNaN(currentClusterId) || Number.isNaN(currentBrokerId)) {
-      return of([]);
-    }
-
-    const url = `${environment.apiUrl}/clusters/${currentClusterId}/brokers/${currentBrokerId}`;
+    const url = this.getResourceUrl();
     return this.http.get<BrokerConfigRow[]>(url);
   }
 

@@ -1,4 +1,5 @@
 export type tKafkaSection = 'brokers' | 'topics' | 'consumers' | null;
+export type MaybeString = string | null | undefined;
 
 export interface ClusterInfo {
   alias: string;

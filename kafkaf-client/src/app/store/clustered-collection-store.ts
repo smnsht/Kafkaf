@@ -1,13 +1,16 @@
 import { BehaviorSubject, Observable, startWith, pairwise } from 'rxjs';
 import { BaseCollectionState, BaseCollectionStore } from './base-collection-store';
-import { ParamMap } from '@angular/router';
-import { computed } from '@angular/core';
+import { computed, effect, inject } from '@angular/core';
+import { RootStore } from './root/root.service';
+import { environment } from 'environments/environment';
 
 export abstract class ClusteredDataCollectionStore<T> extends BaseCollectionStore<T> {
+  protected readonly rootStore = inject(RootStore);
   protected readonly initialState: BaseCollectionState<T>;
+  protected readonly clusteredData: Map<number, BaseCollectionState<T>>;
 
   // holds the current cluster index
-  protected readonly clusterIdx$ = new BehaviorSubject<number>(Number.NaN);
+  public readonly clusterIdx$ = new BehaviorSubject<number>(Number.NaN);
 
   // expose prev/current as a combined stream
   protected readonly prevAndCurrent$: Observable<[number, number]> = this.clusterIdx$.pipe(
@@ -15,21 +18,29 @@ export abstract class ClusteredDataCollectionStore<T> extends BaseCollectionStor
     pairwise(),
   );
 
-  protected readonly clusteredData: Map<number, BaseCollectionState<T>>;
-
-  readonly clusterIndex = computed(() => this.clusterIdx$.value);
+  readonly clusterIndex = computed(() => this.rootStore.clusterIndex());
 
   constructor(initialState: BaseCollectionState<T>) {
     super(initialState);
+
     this.initialState = initialState;
     this.clusteredData = new Map();
     this.prevAndCurrent$.subscribe(this.handlePrevAndCurrentCluster.bind(this));
+
+    effect(() => {
+      const clusterIndex = this.clusterIndex();
+      this.clusterIdx$.next(clusterIndex);
+    });
   }
 
-  handleParamMapChange(params: ParamMap): number {
-    const cluster = Number.parseInt(params.get('cluster')!);
-    this.clusterIdx$.next(cluster);
-    return cluster;
+  getBaseResourceUrl(): string {
+    const clusterIdx = this.clusterIndex();
+
+    if (Number.isNaN(clusterIdx)) {
+      throw new Error('clusterIdx is NaN');
+    }
+
+    return `${environment.apiUrl}/clusters/${clusterIdx}`;
   }
 
   private handlePrevAndCurrentCluster(value: [number, number]): void {

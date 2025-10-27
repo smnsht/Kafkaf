@@ -61,9 +61,9 @@ export class TopicDetails {
 
     this.topicsStore.selectCluster(cluster);
     ////////////////////////////////////////////////////////////
-    this.route.paramMap.subscribe(params => {
-      this.topicSettingsStore.handleParamMapChange(params);
-    });
+    // this.route.paramMap.subscribe(params => {
+    //   this.topicSettingsStore.handleParamMapChange(params);
+    // });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

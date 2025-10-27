@@ -1,6 +1,6 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TopicsDropdownMenu } from '@app/components/features/topics-dropdown-menu/topics-dropdown-menu';
 import { DropdownMenuEvent } from '@app/components/shared/dropdown-menu/dropdown-menu';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
@@ -17,10 +17,8 @@ import { filter, concatMap, Observable, map } from 'rxjs';
   imports: [FormsModule, KafkafTableDirective, PageWrapper, RouterLink, TopicsDropdownMenu],
   templateUrl: './topics-list.html',
 })
-export class TopicsList {
-  //public readonly store = inject(TopicsStore);
+export class TopicsList implements OnInit {
   private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
   private readonly confirmationService = inject(ConfirmationService);
   public readonly topicsStore = inject(TopicsStore2);
   private readonly topicSettingsStore = inject(TopicSettingsStore);
@@ -47,11 +45,10 @@ export class TopicsList {
     });
   });
 
-  constructor() {
-    this.route.paramMap.subscribe((params) => {
-      this.topicsStore.handleParamMapChange(params);
-      this.topicsStore.loadTopics();
-    });
+  ngOnInit(): void {
+    this.topicsStore.clusterIdx$
+      .pipe(filter(Number.isInteger))
+      .subscribe((_) => this.topicsStore.loadTopics());
   }
 
   onCheckboxChange(value: string, isChecked: boolean) {

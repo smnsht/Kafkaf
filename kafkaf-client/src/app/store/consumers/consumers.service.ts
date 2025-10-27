@@ -1,7 +1,6 @@
 import { computed, Injectable, OnDestroy } from '@angular/core';
 import { ConsumerGroupRow } from './consumer-group-row.model';
-import { environment } from 'environments/environment';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ClusteredDataCollectionStore } from '../clustered-collection-store';
 
 
@@ -19,13 +18,7 @@ export class ConsumersStore extends ClusteredDataCollectionStore<ConsumerGroupRo
   readonly consumers = computed(() => this.collection());
 
   protected override fetchCollection(): Observable<ConsumerGroupRow[]> {
-    const clusterIdx = this.clusterIndex();
-
-    if (Number.isNaN(clusterIdx)) {
-      return of([]);
-    }
-
-    const url = `${environment.apiUrl}/clusters/${clusterIdx}/consumers`;
+    const url = `${this.getBaseResourceUrl()}/consumers`;
     return this.http.get<ConsumerGroupRow[]>(url);
   }
 

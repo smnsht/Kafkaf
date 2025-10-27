@@ -1,8 +1,7 @@
 import { computed, Injectable, OnDestroy } from '@angular/core';
-import { environment } from 'environments/environment';
 import { BrokerInfoRow } from './broker-info-row.model';
 import { ClusteredDataCollectionStore } from '../clustered-collection-store';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -15,13 +14,7 @@ export class BrokersStore extends ClusteredDataCollectionStore<BrokerInfoRow> im
   }
 
   protected override fetchCollection(): Observable<BrokerInfoRow[]> {
-    const clusterIdx = this.clusterIndex();
-
-    if (Number.isNaN(clusterIdx)) {
-      return of([]);
-    }
-
-    const url = `${environment.apiUrl}/clusters/${clusterIdx}/brokers`;
+    const url = `${this.getBaseResourceUrl()}/brokers`;
     return this.http.get<BrokerInfoRow[]>(url);
   }
 

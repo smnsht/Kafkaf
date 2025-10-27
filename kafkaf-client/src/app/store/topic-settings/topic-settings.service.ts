@@ -1,32 +1,24 @@
 import { computed, Injectable } from '@angular/core';
-import { ClusteredDataCollectionStore2 } from '../clustered-collection-store2';
-import { TopicSettingRow } from './topic-setting-row.model';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
+import { SectionedDataCollectionStore } from '../sectioned-collection-store';
+import { TopicSettingRow } from './topic-setting-row.model';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TopicSettingsStore extends ClusteredDataCollectionStore2<TopicSettingRow> {
-  readonly topicName = computed(() => this.secondParam());
+export class TopicSettingsStore extends SectionedDataCollectionStore<TopicSettingRow> {
+  readonly topicName = computed(() => this.kafkaSection());
   readonly settings = computed(() => this.collection());
 
   constructor() {
-    super({}, 'topic');
+    super({});
   }
 
   protected override fetchCollection(): Observable<TopicSettingRow[]> {
-    const topicName = this.secondParam();
-    const clusterIdx = this.clusterIdx();
+    const url = `${this.getResourceUrl()}/settings`;
 
-    if (topicName && Number.isInteger(clusterIdx)) {
-      return this.loadTopicSettings$(clusterIdx, topicName);
-    }
-
-    // raise warnings
-    this.getResourceUrl();
-
-    return of([]);
+    return this.http.get<TopicSettingRow[]>(url);
   }
 
   loadSettings(): void {
@@ -44,28 +36,10 @@ export class TopicSettingsStore extends ClusteredDataCollectionStore2<TopicSetti
     return this.http.get<TopicSettingRow[]>(url);
   }
 
-  private getResourceUrl(): string | undefined {
-    const topicName = this.secondParam();
-
-    if (!topicName) {
-      this.logger.warn("Can't obtain topicName (second parameter)");
-      return undefined;
-    }
-
-    const clusterIdx = this.clusterIdx();
-
-    if (Number.isNaN(clusterIdx)) {
-      this.logger.warn("Can't obtain clusterIdx");
-      return undefined;
-    }
-
-    return `${environment.apiUrl}/clusters/${clusterIdx}/topics/${topicName}/settings`;
-  }
-
   patchSetting(model: { name: string; value: string }) {
     this.setLoading(true);
 
-    const url = `${this.getResourceUrl()}/${model.name}`;
+    const url = `${this.getResourceUrl()}/settings/${model.name}`;
     const noticeHandler = this.withNoticeHandling(() => `Setting ${model.name} updated.`);
 
     return this.http.patch<void>(url, model).pipe(noticeHandler);

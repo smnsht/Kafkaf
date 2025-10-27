@@ -1,9 +1,11 @@
-import { Component, computed, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
+import { BrokerInfoRow } from '@app/store/brokers/broker-info-row.model';
 import { BrokersStore } from '@app/store/brokers/brokers.service';
+import { filter } from 'rxjs';
 
 const defaultCardItems: readonly StatsCardItem[] = [
   { label: 'Broker Count', value: 0, icon: 'danger' },
@@ -21,42 +23,48 @@ const defaultCardItems: readonly StatsCardItem[] = [
   imports: [StatsCard, PageWrapper, KafkafTableDirective],
   templateUrl: './brokers-list.html',
 })
-export class BrokersList {
+export class BrokersList implements OnInit {
   private readonly router = inject(Router);
 
   readonly store = inject(BrokersStore);
-  readonly route = inject(ActivatedRoute);
 
   cardItems = computed(() => {
     const brokers = this.store.brokers();
-    const cardItems = [...defaultCardItems];
 
     if (brokers) {
-      // Broker Count
-      cardItems[0] = {
-        ...cardItems[0],
-        value: brokers.length,
-        icon: brokers.length == 0 ? 'danger' : undefined,
-      };
-
-      // Active Controller
-      cardItems[1] = {
-        ...cardItems[1],
-        value: brokers[0]?.controller,
-        icon: undefined,
-      };
+      return this.buildCarItems(brokers);
     }
-    return cardItems;
+
+    return [...defaultCardItems];
   });
 
-  constructor() {
-    this.route.paramMap.subscribe((params) => {
-      this.store.handleParamMapChange(params);
-      this.store.loadBrokers();
-    });
+  ngOnInit(): void {
+    this.store.clusterIdx$.pipe(
+      filter(Number.isInteger)
+    ).subscribe(_ => this.store.loadBrokers())
   }
 
   navigateToBrokerDetails(brokerId: number): void {
     this.router.navigate([this.router.url, brokerId]);
+  }
+
+  private buildCarItems(brokers: BrokerInfoRow[]): StatsCardItem[] {
+    const cardItems = [...defaultCardItems];
+
+    // Broker Count
+    cardItems[0] = {
+      ...cardItems[0],
+      value: brokers.length,
+      icon: brokers.length == 0 ? 'danger' : undefined,
+    };
+
+    // Active Controller
+    cardItems[1] = {
+      ...cardItems[1],
+      value: brokers[0]?.controller,
+      icon: undefined,
+    };
+
+    return cardItems;
   }
 }

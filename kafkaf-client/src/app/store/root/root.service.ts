@@ -1,6 +1,6 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { tKafkaSection } from '../clusters/cluster-info.model';
+import { MaybeString, tKafkaSection } from '../clusters/cluster-info.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 
@@ -9,8 +9,9 @@ export class RootStore {
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
 
-  clusterIndex = signal<number>(Number.NaN);
-  kafkaSection = signal<tKafkaSection>(null);
+  readonly clusterIndex = signal<number>(Number.NaN);
+  readonly kafkaSection = signal<tKafkaSection>(null);
+  readonly kafkaSectionValue = signal<MaybeString>(undefined);
 
   constructor() {
     this.router.events
@@ -23,6 +24,7 @@ export class RootStore {
 
         this.clusterIndex.set(this.getCluster(pathParts));
         this.kafkaSection.set(this.getKafkaSection(pathParts));
+        this.kafkaSectionValue.set(pathParts[3]);
       });
   }
 

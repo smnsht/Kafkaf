@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
+import { Component, effect, inject, OnInit } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
 import { BrokerDetailsStore } from '@app/store/broker-details/broker-details.service';
@@ -12,7 +12,6 @@ type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
   templateUrl: './broker-details.html',
 })
 export class BrokerDetails implements OnInit {
-  private readonly route = inject(ActivatedRoute);
   readonly store = inject(BrokerDetailsStore);
 
   cardItems: StatsCardItem[] = [];
@@ -21,16 +20,19 @@ export class BrokerDetails implements OnInit {
   currentTab?: BrokerTabs;
 
   constructor() {
-    this.route.paramMap.subscribe((paramMap) => {
-      this.store.handleParamMapChange(paramMap);
-      this.store.loadConfigs();
+    effect(() => {
+      const clusterIndex = this.store.clusterIndex();
+      const brokerId = this.store.brokerId();
 
-      this.cluster = this.store.clusterIndex();
-      this.broker = this.store.brokerId();
+      if (Number.isInteger(clusterIndex) && Number.isInteger(brokerId)) {
+        console.log('asdfkasdfasd ');
+        this.store.loadConfigs();
+      }
     });
   }
-
   ngOnInit(): void {
+    this.cluster = this.store.clusterIndex();
+    this.broker = this.store.brokerId();
     this.cardItems = [
       { label: 'Segment Size', value: 'TODO KB' },
       { label: 'Segment Count', value: 'TODO' },
