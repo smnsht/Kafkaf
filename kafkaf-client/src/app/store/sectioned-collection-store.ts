@@ -22,6 +22,16 @@ export abstract class SectionedDataCollectionStore<T> extends BaseCollectionStor
   readonly clusterIndex = computed(() => this.rootStore.clusterIndex());
   readonly kafkaSection = computed(() => this.rootStore.kafkaSection());
   readonly kafkaSectionValue = computed(() => this.rootStore.kafkaSectionValue());
+  readonly currentCacheKey = computed(() => {
+    const clusterIndex = this.clusterIndex();
+    const kafkaSectionValue = this.kafkaSectionValue();
+
+    if (Number.isInteger(clusterIndex) && kafkaSectionValue) {
+      return `${clusterIndex}/${kafkaSectionValue}`;
+    }
+
+    return null;
+  });
 
   constructor(initialState: BaseCollectionState<T>) {
     super(initialState);
@@ -30,11 +40,10 @@ export abstract class SectionedDataCollectionStore<T> extends BaseCollectionStor
     this.clusteredData = new Map();
 
     effect(() => {
-      const clusterIndex = this.clusterIndex();
-      const kafkaSectionValue = this.kafkaSectionValue();
+      const key = this.currentCacheKey();
 
-      if (Number.isInteger(clusterIndex) && kafkaSectionValue) {
-        this.cacheKey$.next(`${clusterIndex}/${kafkaSectionValue}`);
+      if (key) {
+        this.cacheKey$.next(key);
       }
     });
 

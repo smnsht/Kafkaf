@@ -5,8 +5,8 @@ import { TopicsDropdownMenu } from '@app/components/features/topics-dropdown-men
 import { DropdownMenuEvent } from '@app/components/shared/dropdown-menu/dropdown-menu';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
-import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings.service';
-import { TopicsStore } from '@app/store/topics/topics.service';
+import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
+import { TopicsStore } from '@app/store/topics/topics-store';
 import { delay, concatMap, timer } from 'rxjs';
 
 type TopicTabs =

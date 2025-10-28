@@ -21,18 +21,15 @@ export class BrokerDetails implements OnInit {
 
   constructor() {
     effect(() => {
-      const clusterIndex = this.store.clusterIndex();
-      const brokerId = this.store.brokerId();
-
-      if (Number.isInteger(clusterIndex) && Number.isInteger(brokerId)) {
-        console.log('asdfkasdfasd ');
+      if (this.store.currentCacheKey()) {
         this.store.loadConfigs();
+        this.cluster = this.store.clusterIndex();
+        this.broker = this.store.brokerId();
       }
     });
   }
+
   ngOnInit(): void {
-    this.cluster = this.store.clusterIndex();
-    this.broker = this.store.brokerId();
     this.cardItems = [
       { label: 'Segment Size', value: 'TODO KB' },
       { label: 'Segment Count', value: 'TODO' },

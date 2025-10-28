@@ -1,7 +1,7 @@
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { inject } from '@angular/core';
-import { TopicsStore } from '@app/store/topics/topics.service';
+import { TopicsStore } from '@app/store/topics/topics-store';
 
 export const TopicFormFieldNames = [
   'name',

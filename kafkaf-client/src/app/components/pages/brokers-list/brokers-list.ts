@@ -39,9 +39,9 @@ export class BrokersList implements OnInit {
   });
 
   ngOnInit(): void {
-    this.store.clusterIdx$.pipe(
-      filter(Number.isInteger)
-    ).subscribe(_ => this.store.loadBrokers())
+    this.store.clusterIdx$.pipe(filter(Number.isInteger)).subscribe((_) => {
+      this.store.loadBrokers();
+    });
   }
 
   navigateToBrokerDetails(brokerId: number): void {

@@ -1,7 +1,28 @@
+import { KafkaTimestamp } from '@app/pipes/timestamp/timestamp';
 import { HttpParams } from '@angular/common/http';
 import { SeekType } from '@app/components/features/ddl-seek-type/ddl-seek-type';
 import { SerdeType } from '@app/components/features/ddl-serde/ddl-serde';
 import { SortOrderType } from '@app/components/features/ddl-sort-order/ddl-sort-order';
+
+export interface CreateMessage {
+  partition?: number;
+  keySerde: string;
+  valueSerde: string;
+  keepContents?: boolean;
+  key?: string;
+  value?: string;
+  headers?: Record<string, string>;
+  rawJson?: string;
+}
+
+export interface MessageRow {
+  offset: number;
+  partition: number;
+  timestamp: KafkaTimestamp;
+  key?: string | null;
+  value?: string | null;
+  headers?: string | null;
+}
 
 export interface SearchMessagesOptions {
   seekType: SeekType;

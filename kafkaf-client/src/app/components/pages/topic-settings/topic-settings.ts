@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
-import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings.service';
+import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
 
 @Component({
   selector: 'app-topic-settings',

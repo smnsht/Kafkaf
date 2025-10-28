@@ -1,8 +1,13 @@
 import { computed, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from 'environments/environment';
 import { SectionedDataCollectionStore } from '../sectioned-collection-store';
-import { TopicSettingRow } from './topic-setting-row.model';
+
+
+export interface TopicSettingRow {
+  name: string;
+  value: string;
+  defaultValue?: string | null;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -29,11 +34,6 @@ export class TopicSettingsStore extends SectionedDataCollectionStore<TopicSettin
 
   reloadSettings(): void {
     this.loadCollection();
-  }
-
-  loadTopicSettings$(clusterIdx: number, topicName: string): Observable<TopicSettingRow[]> {
-    const url = `${environment.apiUrl}/clusters/${clusterIdx}/topics/${topicName}/settings`;
-    return this.http.get<TopicSettingRow[]>(url);
   }
 
   patchSetting(model: { name: string; value: string }) {

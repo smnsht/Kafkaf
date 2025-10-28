@@ -6,31 +6,38 @@ import { DropdownMenuEvent } from '@app/components/shared/dropdown-menu/dropdown
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
 import { ConfirmationService } from '@app/services/confirmation/confirmation';
-import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings.service';
-import { CreateTopicModel } from '@app/store/topics/create-topic.model';
+import { HttpTopicsService } from '@app/services/http-topics/http-topics';
 import { TopicsListViewModel } from '@app/store/topics/topics-list-view.model';
-import { TopicsStore2 } from '@app/store/topics/topics.service';
-import { filter, concatMap, Observable, map } from 'rxjs';
+import { TopicsStore2 } from '@app/store/topics/topics-store';
+import { filter, concatMap } from 'rxjs';
 
 @Component({
-  selector: 'app-topics-list',
-  imports: [FormsModule, KafkafTableDirective, PageWrapper, RouterLink, TopicsDropdownMenu],
+  selector: 'page-topics-list',
+  // prettier-ignore
+  imports: [
+    FormsModule,
+    KafkafTableDirective,
+    PageWrapper,
+    RouterLink,
+    TopicsDropdownMenu
+  ],
   templateUrl: './topics-list.html',
 })
 export class TopicsList implements OnInit {
   private readonly router = inject(Router);
   private readonly confirmationService = inject(ConfirmationService);
-  public readonly topicsStore = inject(TopicsStore2);
-  private readonly topicSettingsStore = inject(TopicSettingsStore);
+  private readonly topicsService = inject(HttpTopicsService);
 
-  search = signal('');
-  showInternalTopics = signal(false);
+  readonly store = inject(TopicsStore2);
+  readonly search = signal('');
+  readonly showInternalTopics = signal(false);
+
   selectedTopics: string[] = [];
 
   topics = computed(() => {
     const searchStr = this.search().toLowerCase();
     const showInternal = this.showInternalTopics();
-    const topics = this.topicsStore.collection();
+    const topics = this.store.collection();
 
     return topics?.filter((topic) => {
       if (!showInternal && topic.isInternal) {
@@ -46,9 +53,9 @@ export class TopicsList implements OnInit {
   });
 
   ngOnInit(): void {
-    this.topicsStore.clusterIdx$
+    this.store.clusterIdx$
       .pipe(filter(Number.isInteger))
-      .subscribe((_) => this.topicsStore.loadTopics());
+      .subscribe((_) => this.store.loadTopics());
   }
 
   onCheckboxChange(value: string, isChecked: boolean) {
@@ -62,27 +69,29 @@ export class TopicsList implements OnInit {
       .confirm('Confirm Deletion', 'Are you sure you want to delete the selected topics?')
       .pipe(
         filter((confirmed) => confirmed),
-        concatMap(() => this.topicsStore.deleteTopics(this.selectedTopics)),
+        concatMap(() => this.store.deleteTopics(this.selectedTopics)),
       )
       .subscribe(() => {
         this.selectedTopics = [];
-        this.topicsStore.reloadTopics();
+        this.store.reloadTopics();
       });
   }
 
   onCopyTopicClick(): void {
     const topicName = this.selectedTopics[0];
-    const topics = this.topicsStore.collection();
+    const topics = this.store.collection();
     const topic = topics?.find((topic) => topic.topicName == topicName);
 
     if (!topic) {
-      this.topicsStore.setError(`Can't find topic name ${topicName}!`);
+      this.store.setError(`Can't find topic name ${topicName}!`);
       return;
     }
 
-    this.getTopicQueryParams(topic).subscribe((queryParams) => {
-      this.router.navigate([this.router.url, 'create'], { queryParams });
-    });
+    this.topicsService
+      .getTopicQueryParams(this.store.clusterIndex(), topic)
+      .subscribe((queryParams) => {
+        this.router.navigate([this.router.url, 'create'], { queryParams });
+      });
   }
 
   onPurgeMessagesClick(): void {
@@ -93,8 +102,7 @@ export class TopicsList implements OnInit {
       )
       .pipe(
         filter((confirmed) => confirmed),
-        //concatMap(() => this.store.purgeMessages(this.selectedTopics)),
-        // TODO
+        concatMap(() => this.store.purgeMessages(this.selectedTopics)),
       )
       .subscribe(() => {
         this.selectedTopics = [];
@@ -105,70 +113,30 @@ export class TopicsList implements OnInit {
     if (event.confirmed) {
       switch (event.command) {
         case 'ClearMessages':
-          //this.store.purgeMessages([topic.topicName]).subscribe();
-          // TODO
+          this.store.purgeMessages([topic.topicName]).subscribe();
           break;
 
         case 'RemoveTopic':
-          this.topicsStore.deleteTopic(topic.topicName).subscribe(() => {
+          this.store.deleteTopic(topic.topicName).subscribe(() => {
             this.selectedTopics = [];
-            this.topicsStore.reloadTopics();
+            this.store.reloadTopics();
           });
           break;
 
         case 'RecreateTopic':
-          this.topicsStore
+          this.store
             .recreateTopic(topic.topicName, {
               numPartitions: topic.partitionsCount,
               replicationFactor: topic.partitionsCount,
             })
             .subscribe(() => {
-              this.topicsStore.reloadTopics();
+              this.store.reloadTopics();
             });
           break;
 
         default:
-          this.topicsStore.setError(`unknown command ${event.command}`);
+          this.store.setError(`unknown command ${event.command}`);
       }
     }
-  }
-
-  private getTopicQueryParams(topic: TopicsListViewModel): Observable<CreateTopicModel> {
-    const request$ = this.topicSettingsStore.loadTopicSettings$(
-      this.topicsStore.clusterIndex(),
-      topic.topicName,
-    );
-
-    return request$.pipe(
-      map((settings) => {
-        const queryParams: CreateTopicModel = {
-          name: topic.topicName,
-          numPartitions: topic.partitionsCount,
-          customParameters: [],
-        };
-
-        settings.forEach((setting) => {
-          switch (setting.name) {
-            case 'cleanup.policy':
-              queryParams.cleanupPolicy = setting.value;
-              break;
-
-            case 'min.insync.replicas':
-              queryParams.minInSyncReplicas = Number.parseInt(setting.value);
-              break;
-
-            case 'retention.ms':
-              queryParams.timeToRetain = Number.parseInt(setting.value);
-              break;
-
-            case 'max.message.bytes':
-              queryParams.maxMessageBytes = Number.parseInt(setting.value);
-              break;
-          }
-        });
-
-        return queryParams;
-      }),
-    );
   }
 }

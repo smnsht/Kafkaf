@@ -1,16 +1,16 @@
-import { Injectable, OnDestroy, signal } from '@angular/core';
-import { finalize, forkJoin, Observable, of, tap } from 'rxjs';
+import { inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { finalize, Observable, of, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { environment } from 'environments/environment';
 import { TopicConfigRow } from './topic-config-row.model';
-import { TopicSettingRow } from '../topic-settings/topic-setting-row.model';
 import { TopicsListViewModel } from './topics-list-view.model';
 import { BaseStore } from '../base-store';
 import { CreateTopicModel } from './create-topic.model';
 import { RecreateTopicModel } from './recreate-topic.model';
 import { ClusteredDataCollectionStore } from '../clustered-collection-store';
-import { getErrorMessage2 } from '../utils';
+import { HttpTopicsService } from '@app/services/http-topics/http-topics';
+import { TopicSettingRow } from '../topic-settings/topic-settings-store';
 
 @Injectable({
   providedIn: 'root',
@@ -167,6 +167,8 @@ export class TopicsStore2
   extends ClusteredDataCollectionStore<TopicsListViewModel>
   implements OnDestroy
 {
+  private topicsService = inject(HttpTopicsService);
+
   constructor() {
     super({});
   }
@@ -196,7 +198,7 @@ export class TopicsStore2
     this.loadCollection();
   }
 
-  deleteTopics(topicNames: string[]): Observable<void[]> {
+  deleteTopics(topicNames: string[]): Observable<unknown> {
     this.setPageState({
       loading: true,
       notice: undefined,
@@ -204,95 +206,53 @@ export class TopicsStore2
     });
 
     const clusterIdx = this.clusterIndex();
-    const requests = topicNames.map((topic) => {
-      const url = `${environment.apiUrl}/clusters/${clusterIdx}/topics/${topic}`;
-      return this.http.delete<void>(url);
+    const noticeHandler = this.withNoticeHandling((res) => {
+      const arr = res as void[];
+      const notice =
+        arr.length == 1
+          ? `Topic ${topicNames[0]} deleted successfully.`
+          : `${arr.length} topics deleted successfully.`;
+
+      return notice;
     });
 
-    return forkJoin(requests).pipe(
-      tap({
-        next: (arr) => {
-          const notice =
-            arr.length == 1
-              ? `Topic ${topicNames[0]} deleted successfully.`
-              : `${arr.length} topics deleted successfully.`;
-
-          this.setPageState({
-            loading: false,
-            error: undefined,
-            notice,
-          });
-
-          // clean up notice after 5 seconds
-          const handle = setTimeout(() => {
-            this.setNotice(undefined);
-            clearTimeout(handle);
-          }, 5000);
-        },
-        error: (err: HttpErrorResponse) => {
-          this.logger.errorResponse(err);
-
-          this.setPageState({
-            loading: false,
-            error: getErrorMessage2(err),
-          });
-
-          // clean up error after 5 seconds
-          const handle = setTimeout(() => {
-            this.setError(undefined);
-            clearTimeout(handle);
-          }, 5000);
-        },
-      }),
-    );
+    // prettier-ignore
+    return this.topicsService
+      .deleteTopics(clusterIdx, topicNames)
+      .pipe(noticeHandler);
   }
 
-  deleteTopic(topicName: string): Observable<void[]> {
-    const topicNames: string[] = [topicName];
-    return this.deleteTopics(topicNames);
+  deleteTopic(topicName: string): Observable<unknown> {
+    return this.deleteTopics([topicName]);
   }
 
-  recreateTopic(topicName: string, req: RecreateTopicModel): Observable<void> {
+  recreateTopic(topicName: string, req: RecreateTopicModel): Observable<unknown> {
     this.setPageState({
       loading: true,
       notice: undefined,
       error: undefined,
     });
 
-    const clusterIdx = this.clusterIndex();
-    const url = `${environment.apiUrl}/clusters/${clusterIdx}/topics/${topicName}/recreate`;
+    const noticeHandler = this.withNoticeHandling(() => `Topic ${topicName} recreated.`);
 
-    return this.http.post<void>(url, req).pipe(
-      tap({
-        next: () => {
-          this.state.update((state) => ({
-            ...state,
-            notice: `Topic ${topicName} recreated.`,
-            loading: false,
-          }));
-
-          // clean up notice after 5 seconds
-          const handle = setTimeout(() => {
-            this.setNotice(undefined);
-            clearTimeout(handle);
-          }, 5000);
-        },
-        error: (err: HttpErrorResponse) => {
-          this.logger.errorResponse(err);
-
-          this.setPageState({
-            loading: false,
-            error: getErrorMessage2(err),
-          });
-
-          // clean up error after 5 seconds
-          const handle = setTimeout(() => {
-            this.setError(undefined);
-            clearTimeout(handle);
-          }, 5000);
-        }
-      }),
-    );
+    return this.topicsService
+      .recreateTopic(this.clusterIndex(), topicName, req)
+      .pipe(noticeHandler);
   }
 
+  // Messages handling
+  purgeMessages(topicNames: string[]): Observable<unknown> {
+    const noticeHandler = this.withNoticeHandling((res) => {
+      const arr = res as void[];
+      return (
+        'Successfully purged messages from ' +
+        (arr.length === 1 ? `${topicNames[0]} topic.` : `${arr.length} topics.`)
+      );
+    });
+
+    // prettier-ignore
+    return this.topicsService
+      .purgeMessages(this.clusterIndex(), topicNames)
+      .pipe(noticeHandler);
+  }
 }
