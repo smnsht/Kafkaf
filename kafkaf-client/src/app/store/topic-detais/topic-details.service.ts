@@ -3,7 +3,6 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { TopicDetailsViewModel } from './topic-details-view.model';
 import { Observable, tap } from 'rxjs';
-import { TopicConsumersRow } from './topic-consumers-row.model';
 import {
   CreateMessage,
 } from '../../models/message.models';
@@ -18,17 +17,17 @@ interface TopicDetailsState {
   showMessageForm: boolean;
   details?: TopicDetailsViewModel;
   settings?: TopicSettingRow[];
-  consumers?: TopicConsumersRow[];
+  //consumers?: TopicConsumersRow[];
   //messages?: MessageRow[];
   // loading...
   loadingDetails?: boolean;
   //loadingSettings?: boolean;
-  loadingConsumers?: boolean;
+  //loadingConsumers?: boolean;
   loadingMessages?: boolean;
   // error...
   errorDetails?: string;
   //errorSettings?: string;
-  errorConsumers?: string;
+  //errorConsumers?: string;
   //errorMessages?: string;
   // notice
   noticeDetails?: string;
@@ -56,20 +55,20 @@ export class TopicDetailsStore {
   readonly showMessageForm = computed(() => this.state().showMessageForm);
   readonly details = computed(() => this.state().details);
   //readonly settings = computed(() => this.state().settings);
-  readonly consumers = computed(() => this.state().consumers);
+  //readonly consumers = computed(() => this.state().consumers);
   //readonly messages = computed(() => this.state().messages);
   readonly partitions = computed(() => this.state().details?.partitions);
 
   // loading...
   readonly loadingDetails = computed(() => this.state().loadingDetails);
   //readonly loadingSettings = computed(() => this.state().loadingSettings);
-  readonly loadingConsumers = computed(() => this.state().loadingConsumers);
+  //readonly loadingConsumers = computed(() => this.state().loadingConsumers);
   readonly loadingMessages = computed(() => this.state().loadingMessages);
 
   // error...
   readonly errorDetails = computed(() => this.state().errorDetails);
   //readonly errorSettings = computed(() => this.state().errorSettings);
-  readonly errorConsumers = computed(() => this.state().errorConsumers);
+  //readonly errorConsumers = computed(() => this.state().errorConsumers);
   //readonly errorMessages = computed(() => this.state().errorMessages);
 
   // notice
@@ -105,17 +104,17 @@ export class TopicDetailsStore {
   //   }
   // }
 
-  loadConsumers(): void {
-    if (!this.consumers() && !this.loadingConsumers()) {
-      this.state.update((state) => ({
-        ...state,
-        loadingConsumers: true,
-        errorConsumers: undefined,
-      }));
+  // loadConsumers(): void {
+  //   if (!this.consumers() && !this.loadingConsumers()) {
+  //     this.state.update((state) => ({
+  //       ...state,
+  //       loadingConsumers: true,
+  //       errorConsumers: undefined,
+  //     }));
 
-      this.fetchConsumers();
-    }
-  }
+  //     this.fetchConsumers();
+  //   }
+  // }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -271,22 +270,22 @@ export class TopicDetailsStore {
   //   });
   // }
 
-  private fetchConsumers(): void {
-    this.http.get<TopicConsumersRow[]>(`${this.url}/consumers`).subscribe({
-      next: (consumers) =>
-        this.state.update((state) => ({
-          ...state,
-          consumers,
-          loadingConsumers: false,
-        })),
-      error: (err: HttpErrorResponse) =>
-        this.state.update((state) => ({
-          ...state,
-          loadingConsumers: false,
-          errorConsumers: getErrorMessage(err),
-        })),
-    });
-  }
+  // private fetchConsumers(): void {
+  //   this.http.get<TopicConsumersRow[]>(`${this.url}/consumers`).subscribe({
+  //     next: (consumers) =>
+  //       this.state.update((state) => ({
+  //         ...state,
+  //         consumers,
+  //         loadingConsumers: false,
+  //       })),
+  //     error: (err: HttpErrorResponse) =>
+  //       this.state.update((state) => ({
+  //         ...state,
+  //         loadingConsumers: false,
+  //         errorConsumers: getErrorMessage(err),
+  //       })),
+  //   });
+  // }
 
 
 }
