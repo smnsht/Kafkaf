@@ -5,6 +5,7 @@ import { BulmaField } from '@app/components/shared/bulma-field/bulma-field';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
 import { UpdateTopicModel } from '@app/store/topic-detais/update-topic.model';
+import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
 
 @Component({
   selector: 'app-topic-edit',
@@ -13,20 +14,21 @@ import { UpdateTopicModel } from '@app/store/topic-detais/update-topic.model';
 })
 export class TopicEdit extends TopicFormBase {
   readonly topicDetailsStore = inject(TopicDetailsStore);
+  readonly topicSettingsStore = inject(TopicSettingsStore);
 
   constructor() {
     super();
 
     effect(() => {
       const topic = this.topicDetailsStore.details();
-      const settings = this.topicDetailsStore.settings();
+      const settings = this.topicSettingsStore.settings();
 
       if (!topic) {
         this.topicDetailsStore.loadTopicDetails();
       }
 
       if (!settings) {
-        this.topicDetailsStore.loadSettings();
+        this.topicSettingsStore.loadSettings();
       }
 
       if (topic && settings) {

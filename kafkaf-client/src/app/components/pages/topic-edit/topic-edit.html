@@ -1,5 +1,5 @@
 <app-page-wrapper
-  [loading]="topicDetailsStore.loadingDetails() || topicDetailsStore.loadingSettings()"
+  [loading]="topicDetailsStore.loadingDetails() || topicSettingsStore.loading()"
   [error]="topicDetailsStore.errorDetails()"
   [notice]="topicDetailsStore.noticeDetails()"
 >

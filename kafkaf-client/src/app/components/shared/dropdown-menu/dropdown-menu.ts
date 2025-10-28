@@ -60,7 +60,6 @@ export class DropdownMenu {
     this.isActive = !this.isActive;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getConfirmationBody(_: DropdownMenuCommand): string {
     return '';
   }

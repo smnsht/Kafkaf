@@ -25,20 +25,6 @@ export class HttpTopicsService {
     return this.http.post<void>(url, req);
   }
 
-  purgeMessages(clusterIdx: number, topicNames: string[]): Observable<void[]> {
-    const baseUrl = `${environment.apiUrl}/clusters/${clusterIdx}/topics`;
-    const requests$ = topicNames
-      .map((topic) => `${baseUrl}/${topic}/messages`)
-      .map((path) => this.http.delete<void>(path));
-
-    return forkJoin(requests$);
-  }
-
-  fetchTopicSettings$(clusterIdx: number, topicName: string): Observable<TopicSettingRow[]> {
-    const url = `${environment.apiUrl}/clusters/${clusterIdx}/topics/${topicName}/settings`;
-    return this.http.get<TopicSettingRow[]>(url);
-  }
-
   getTopicQueryParams(
     clusterIdx: number,
     topic: TopicsListViewModel,
@@ -77,4 +63,21 @@ export class HttpTopicsService {
       }),
     );
   }
+
+  // Topic setting
+  fetchTopicSettings$(clusterIdx: number, topicName: string): Observable<TopicSettingRow[]> {
+    const url = `${environment.apiUrl}/clusters/${clusterIdx}/topics/${topicName}/settings`;
+    return this.http.get<TopicSettingRow[]>(url);
+  }
+
+  // Messages
+  purgeMessages(clusterIdx: number, topicNames: string[]): Observable<void[]> {
+    const baseUrl = `${environment.apiUrl}/clusters/${clusterIdx}/topics`;
+    const requests$ = topicNames
+      .map((topic) => `${baseUrl}/${topic}/messages`)
+      .map((path) => this.http.delete<void>(path));
+
+    return forkJoin(requests$);
+  }
+
 }

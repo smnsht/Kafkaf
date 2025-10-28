@@ -5,6 +5,7 @@ import { TopicsDropdownMenu } from '@app/components/features/topics-dropdown-men
 import { DropdownMenuEvent } from '@app/components/shared/dropdown-menu/dropdown-menu';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
+import { TopicMessagesStore } from '@app/store/topic-messages/topic-messages-store';
 import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
 import { TopicsStore } from '@app/store/topics/topics-store';
 import { delay, concatMap, timer } from 'rxjs';
@@ -49,6 +50,7 @@ export class TopicDetails {
 
   /////////////////////////////////////////////////////////////////////
   readonly topicSettingsStore = inject(TopicSettingsStore);
+  readonly topicMessagesStore = inject(TopicMessagesStore);
   /////////////////////////////////////////////////////////////////////
 
   currentTab: TopicTabs = 'TopicOverview';
@@ -105,7 +107,7 @@ export class TopicDetails {
             .pipe(delay(2000))
             .subscribe(() => {
               this.topicsStore.setNotice(undefined);
-              this.store.clearMessages();
+              this.topicMessagesStore.clearAll();
               this.store.loadTopicDetails(true);
             });
           break;

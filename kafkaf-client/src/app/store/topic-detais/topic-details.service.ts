@@ -1,26 +1,16 @@
 import { computed, inject, signal, WritableSignal } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { TopicDetailsViewModel } from './topic-details-view.model';
 import { Observable, tap } from 'rxjs';
 import { TopicConsumersRow } from './topic-consumers-row.model';
 import {
-  createHttpParamsFromSearchOptions,
   CreateMessage,
-  MessageRow,
-  SearchMessagesOptions,
 } from '../../models/message.models';
 import { getErrorMessage } from '../base-store';
 import { UpdateTopicModel } from './update-topic.model';
 import { TopicSettingRow } from '../topic-settings/topic-settings-store';
 
-export const defaultSearchMessagesOptions: SearchMessagesOptions = {
-  partitions: [],
-  seekType: 'LIMIT',
-  sortOrder: 'FORWARD',
-  keySerde: 'String',
-  valueSerde: 'String',
-};
 
 interface TopicDetailsState {
   topic: string;
@@ -29,21 +19,21 @@ interface TopicDetailsState {
   details?: TopicDetailsViewModel;
   settings?: TopicSettingRow[];
   consumers?: TopicConsumersRow[];
-  messages?: MessageRow[];
+  //messages?: MessageRow[];
   // loading...
   loadingDetails?: boolean;
-  loadingSettings?: boolean;
+  //loadingSettings?: boolean;
   loadingConsumers?: boolean;
   loadingMessages?: boolean;
   // error...
   errorDetails?: string;
-  errorSettings?: string;
+  //errorSettings?: string;
   errorConsumers?: string;
-  errorMessages?: string;
+  //errorMessages?: string;
   // notice
   noticeDetails?: string;
-  noticeSettings?: string;
-  noticeMessages?: string;
+  //noticeSettings?: string;
+  //noticeMessages?: string;
 }
 
 export class TopicDetailsStore {
@@ -65,27 +55,27 @@ export class TopicDetailsStore {
   // data
   readonly showMessageForm = computed(() => this.state().showMessageForm);
   readonly details = computed(() => this.state().details);
-  readonly settings = computed(() => this.state().settings);
+  //readonly settings = computed(() => this.state().settings);
   readonly consumers = computed(() => this.state().consumers);
-  readonly messages = computed(() => this.state().messages);
+  //readonly messages = computed(() => this.state().messages);
   readonly partitions = computed(() => this.state().details?.partitions);
 
   // loading...
   readonly loadingDetails = computed(() => this.state().loadingDetails);
-  readonly loadingSettings = computed(() => this.state().loadingSettings);
+  //readonly loadingSettings = computed(() => this.state().loadingSettings);
   readonly loadingConsumers = computed(() => this.state().loadingConsumers);
   readonly loadingMessages = computed(() => this.state().loadingMessages);
 
   // error...
   readonly errorDetails = computed(() => this.state().errorDetails);
-  readonly errorSettings = computed(() => this.state().errorSettings);
+  //readonly errorSettings = computed(() => this.state().errorSettings);
   readonly errorConsumers = computed(() => this.state().errorConsumers);
-  readonly errorMessages = computed(() => this.state().errorMessages);
+  //readonly errorMessages = computed(() => this.state().errorMessages);
 
   // notice
   readonly noticeDetails = computed(() => this.state().noticeDetails);
-  readonly noticeSettings = computed(() => this.state().noticeSettings);
-  readonly noticeMessages = computed(() => this.state().noticeMessages);
+  //readonly noticeSettings = computed(() => this.state().noticeSettings);
+  //readonly noticeMessages = computed(() => this.state().noticeMessages);
 
   setShowMessageForm(showMessageForm: boolean): void {
     this.state.update((state) => ({ ...state, showMessageForm }));
@@ -103,17 +93,17 @@ export class TopicDetailsStore {
     }
   }
 
-  loadSettings(): void {
-    if (!this.settings() && !this.loadingSettings()) {
-      this.state.update((state) => ({
-        ...state,
-        loadingSettings: true,
-        errorSettings: undefined,
-      }));
+  // loadSettings(): void {
+  //   if (!this.settings() && !this.loadingSettings()) {
+  //     this.state.update((state) => ({
+  //       ...state,
+  //       loadingSettings: true,
+  //       errorSettings: undefined,
+  //     }));
 
-      this.fetchSettings();
-    }
-  }
+  //     this.fetchSettings();
+  //   }
+  // }
 
   loadConsumers(): void {
     if (!this.consumers() && !this.loadingConsumers()) {
@@ -127,21 +117,24 @@ export class TopicDetailsStore {
     }
   }
 
-  loadMessages(options: SearchMessagesOptions): void {
-    this.state.update((state) => ({
-      ...state,
-      loadingMessages: true,
-      errorMessages: undefined,
-    }));
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    const params = createHttpParamsFromSearchOptions(options);
+  // loadMessages(options: SearchMessagesOptions): void {
+  //   this.state.update((state) => ({
+  //     ...state,
+  //     loadingMessages: true,
+  //     errorMessages: undefined,
+  //   }));
 
-    this.fetchMessages(params);
-  }
+  //   const params = createHttpParamsFromSearchOptions(options);
 
-  clearMessages(): void {
-    this.state.update((state) => ({ ...state, messages: undefined }));
-  }
+  //   this.fetchMessages(params);
+  // }
+
+  // clearMessages(): void {
+  //   this.state.update((state) => ({ ...state, messages: undefined }));
+  // }
 
   produceMessage(msg: CreateMessage): Observable<object> {
     this.state.update((state) => ({
@@ -168,6 +161,26 @@ export class TopicDetailsStore {
       }),
     );
   }
+
+  // private fetchMessages(params: HttpParams): void {
+  //   this.http.get<MessageRow[]>(`${this.url}/messages`, { params }).subscribe({
+  //     next: (messages) =>
+  //       this.state.update((state) => ({
+  //         ...state,
+  //         messages,
+  //         loadingMessages: false,
+  //       })),
+  //     error: (err: HttpErrorResponse) =>
+  //       this.state.update((state) => ({
+  //         ...state,
+  //         loadingMessages: false,
+  //         errorMessages: getErrorMessage(err),
+  //       })),
+  //   });
+  // }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   updateTopic(model: UpdateTopicModel) {
     this.state.update((state) => ({
@@ -196,36 +209,36 @@ export class TopicDetailsStore {
     });
   }
 
-  patchSetting(model: { name: string; value: string }) {
-    this.state.update((state) => ({
-      ...state,
-      loadingSettings: true,
-      errorSettings: undefined,
-      noticeSettings: undefined,
-    }));
+  // patchSetting(model: { name: string; value: string }) {
+  //   this.state.update((state) => ({
+  //     ...state,
+  //     loadingSettings: true,
+  //     errorSettings: undefined,
+  //     noticeSettings: undefined,
+  //   }));
 
-    return this.http.patch<void>(`${this.url}/settings/${model.name}`, model).pipe(
-      tap({
-        next: () => {
-          this.state.update((state) => ({
-            ...state,
-            settings: undefined,
-            loadingSettings: false,
-            noticeSettings: `Setting ${model.name} updated.`,
-          }));
+  //   return this.http.patch<void>(`${this.url}/settings/${model.name}`, model).pipe(
+  //     tap({
+  //       next: () => {
+  //         this.state.update((state) => ({
+  //           ...state,
+  //           settings: undefined,
+  //           loadingSettings: false,
+  //           noticeSettings: `Setting ${model.name} updated.`,
+  //         }));
 
-          this.fetchSettings();
-        },
-        error: (err: HttpErrorResponse) => {
-          this.state.update((state) => ({
-            ...state,
-            loadingSettings: false,
-            errorSettings: getErrorMessage(err),
-          }));
-        },
-      }),
-    );
-  }
+  //         this.fetchSettings();
+  //       },
+  //       error: (err: HttpErrorResponse) => {
+  //         this.state.update((state) => ({
+  //           ...state,
+  //           loadingSettings: false,
+  //           errorSettings: getErrorMessage(err),
+  //         }));
+  //       },
+  //     }),
+  //   );
+  // }
 
   private fetchTopicDetails() {
     this.http.get<TopicDetailsViewModel>(this.url).subscribe({
@@ -245,18 +258,18 @@ export class TopicDetailsStore {
     });
   }
 
-  private fetchSettings(): void {
-    this.http.get<TopicSettingRow[]>(`${this.url}/settings`).subscribe({
-      next: (settings) =>
-        this.state.update((state) => ({ ...state, settings, loadingSettings: false })),
-      error: (err: HttpErrorResponse) =>
-        this.state.update((state) => ({
-          ...state,
-          loadingSettings: false,
-          errorSettings: getErrorMessage(err),
-        })),
-    });
-  }
+  // private fetchSettings(): void {
+  //   this.http.get<TopicSettingRow[]>(`${this.url}/settings`).subscribe({
+  //     next: (settings) =>
+  //       this.state.update((state) => ({ ...state, settings, loadingSettings: false })),
+  //     error: (err: HttpErrorResponse) =>
+  //       this.state.update((state) => ({
+  //         ...state,
+  //         loadingSettings: false,
+  //         errorSettings: getErrorMessage(err),
+  //       })),
+  //   });
+  // }
 
   private fetchConsumers(): void {
     this.http.get<TopicConsumersRow[]>(`${this.url}/consumers`).subscribe({
@@ -275,20 +288,5 @@ export class TopicDetailsStore {
     });
   }
 
-  private fetchMessages(params: HttpParams): void {
-    this.http.get<MessageRow[]>(`${this.url}/messages`, { params }).subscribe({
-      next: (messages) =>
-        this.state.update((state) => ({
-          ...state,
-          messages,
-          loadingMessages: false,
-        })),
-      error: (err: HttpErrorResponse) =>
-        this.state.update((state) => ({
-          ...state,
-          loadingMessages: false,
-          errorMessages: getErrorMessage(err),
-        })),
-    });
-  }
+
 }
