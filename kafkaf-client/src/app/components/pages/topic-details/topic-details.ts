@@ -7,7 +7,7 @@ import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
 import { TopicMessagesStore } from '@app/store/topic-messages/topic-messages-store';
 import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
-import { TopicsStore2 } from '@app/store/topics/topics-store';
+import { TopicsStore } from '@app/store/topics/topics-store';
 import { delay, concatMap, timer } from 'rxjs';
 
 type TopicTabs =
@@ -43,7 +43,7 @@ function getRequiredParams(route: ActivatedRoute) {
   ],
 })
 export class TopicDetails {
-  public readonly topicsStore = inject(TopicsStore2);
+  public readonly topicsStore = inject(TopicsStore);
   private readonly router = inject(Router);
   readonly topicDetailsStore = inject(TopicDetailsStore);
   readonly route = inject(ActivatedRoute);

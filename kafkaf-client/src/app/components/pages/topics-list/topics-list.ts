@@ -8,7 +8,7 @@ import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table'
 import { ConfirmationService } from '@app/services/confirmation/confirmation';
 import { HttpTopicsService } from '@app/services/http-topics/http-topics';
 import { TopicsListViewModel } from '@app/store/topics/topics-list-view.model';
-import { TopicsStore2 } from '@app/store/topics/topics-store';
+import { TopicsStore } from '@app/store/topics/topics-store';
 import { filter, concatMap } from 'rxjs';
 
 @Component({
@@ -28,7 +28,7 @@ export class TopicsList implements OnInit {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly topicsService = inject(HttpTopicsService);
 
-  readonly store = inject(TopicsStore2);
+  readonly store = inject(TopicsStore);
   readonly search = signal('');
   readonly showInternalTopics = signal(false);
 
