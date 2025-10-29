@@ -53,10 +53,7 @@ export class TopicMessagesStore extends SectionedDataCollectionStore<MessageRow>
   }
 
   produceMessage(msg: CreateMessage): Observable<unknown> {
-    this.state.update((state) => ({
-      ...state,
-      loading: undefined,
-    }));
+    this.setLoading(true);
 
     const url = `${this.getResourceUrl()}/messages`;
     const noticeHandler = this.withNoticeHandling(() => 'Message created.');

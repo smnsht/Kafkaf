@@ -4,10 +4,10 @@ using Confluent.Kafka;
 namespace Kafkaf.API.Models;
 
 public record CreateMessageModel(
-	int? Partition,
+    int? Partition,
     string? key,
     string? value,
-    Dictionary<string, string> headers
+    Dictionary<string, string>? headers
 )
 {
     public byte[]? KeyBytes =>
@@ -15,12 +15,14 @@ public record CreateMessageModel(
     public byte[]? ValueBytes =>
         string.IsNullOrEmpty(value) ? null : Encoding.UTF8.GetBytes(value);
     public Headers MessageHeaders =>
-        headers.Aggregate(
-            new Headers(),
-            (h, pair) =>
-            {
-                h.Add(pair.Key, Encoding.UTF8.GetBytes(pair.Value));
-                return h;
-            }
-        );
+        headers == null
+            ? new Headers()
+            : headers.Aggregate(
+                new Headers(),
+                (h, pair) =>
+                {
+                    h.Add(pair.Key, Encoding.UTF8.GetBytes(pair.Value));
+                    return h;
+                }
+            );
 }

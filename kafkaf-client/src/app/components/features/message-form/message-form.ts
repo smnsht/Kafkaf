@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SerdeTypes, DDLSerde } from '../ddl-serde/ddl-serde';
 import { JsonValidatorDirective } from '@app/directives/json-validator/json-validator';
@@ -21,23 +21,13 @@ export class MessageForm {
   readonly topicOverviewStore = inject(TopicOverviewStore);
   readonly messagesStore = inject(TopicMessagesStore);
 
-  payload: CreateMessage;
-
-  constructor() {
-    this.payload = { ...defaultPayload };
-
-    effect(() => {
-      const visible = this.messagesStore.showMessageForm();
-      if (!visible) {
-        this.payload = { ...defaultPayload };
-      }
-    });
-  }
+  payload = { ...defaultPayload };
 
   onProduceMessageClick(): void {
     this.messagesStore.produceMessage(this.payload).subscribe(() => {
       this.messagesStore.setShowMessageForm(false);
-      this.topicOverviewStore.loadTopicDetails();
+      this.topicOverviewStore.reloadTopicDetails();
+      this.payload = { ...defaultPayload };
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { MessageForm } from '@app/components/features/message-form/message-form';
 import { TopicsDropdownMenu } from '@app/components/features/topics-dropdown-menu/topics-dropdown-menu';
@@ -8,7 +8,7 @@ import { TopicMessagesStore } from '@app/store/topic-messages/topic-messages-sto
 import { TopicOverviewStore } from '@app/store/topic-overview/topic-overview-store';
 import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
 import { TopicsStore } from '@app/store/topics/topics-store';
-import { delay, concatMap, timer } from 'rxjs';
+import { concatMap, timer } from 'rxjs';
 
 type TopicTabs =
   | 'TopicOverview'
@@ -18,7 +18,6 @@ type TopicTabs =
   | 'TopicStatistics'
   | 'TopicEdit';
 
-
 @Component({
   selector: 'app-topic-overview',
   imports: [RouterLink, RouterOutlet, MessageForm, TopicsDropdownMenu, PageWrapper],
@@ -26,18 +25,20 @@ type TopicTabs =
 })
 export class TopicDetails implements OnInit {
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly topicsStore = inject(TopicsStore);
-  readonly topicOverviewStore = inject(TopicOverviewStore);
-  readonly topicSettingsStore = inject(TopicSettingsStore);
-  readonly topicMessagesStore = inject(TopicMessagesStore);
-  readonly route = inject(ActivatedRoute);
+  readonly overviewStore = inject(TopicOverviewStore);
+  readonly settingsStore = inject(TopicSettingsStore);
+  readonly messagesStore = inject(TopicMessagesStore);
+
+  readonly topicName = computed(() => this.overviewStore.topicDetails()?.name);
 
   currentTab: TopicTabs = 'TopicOverview';
   isEditSettings = false;
 
   ngOnInit(): void {
-    this.topicOverviewStore.loadTopicDetails();
+    this.overviewStore.loadTopicDetails();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,20 +52,15 @@ export class TopicDetails implements OnInit {
     }, 100);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onTopicDeactivate(componentRef: any) {
-    console.log('Messages outlet deactivated:', componentRef);
-  }
-
   onCommandSelected(event: DropdownMenuEvent): void {
-    const topic = this.topicOverviewStore.topicDetails();
+    const topic = this.overviewStore.topicDetails();
 
     if (event.confirmed && topic) {
       switch (event.command) {
         case 'EditSettings':
           this.router.navigate([
             'clusters',
-            this.topicOverviewStore.clusterIndex(),
+            this.overviewStore.clusterIndex(),
             'topics',
             topic.name,
             { outlets: { topic: ['edit'] } },
@@ -73,13 +69,10 @@ export class TopicDetails implements OnInit {
           break;
 
         case 'ClearMessages':
-          //
           this.topicsStore
             .purgeMessages([topic.name])
-            .pipe(delay(2000))
             .subscribe(() => {
-              this.topicMessagesStore.clearAll();
-              this.topicOverviewStore.reloadTopicDetails();
+              this.overviewStore.reloadTopicDetails();
             });
           break;
 
