@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TopicDetailsStore } from './topic-details-store';
+import { TopicOverviewStore } from './topic-overview-store';
 
-describe('TopicStore', () => {
-  let service: TopicDetailsStore;
+describe('TopicOverviewStore', () => {
+  let service: TopicOverviewStore;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(TopicDetailsStore);
+    service = TestBed.inject(TopicOverviewStore);
   });
 
   it('should be created', () => {

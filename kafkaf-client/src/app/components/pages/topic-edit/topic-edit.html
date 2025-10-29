@@ -1,10 +1,10 @@
 <app-page-wrapper
-  [loading]="topicDetailsStore.loadingDetails() || topicSettingsStore.loading()"
-  [error]="topicDetailsStore.errorDetails()"
-  [notice]="topicDetailsStore.noticeDetails()"
+  [loading]="topicOverviewStore.loading() || topicSettingsStore.loading()"
+  [error]="topicOverviewStore.error()"
+  [notice]="topicOverviewStore.notice()"
 >
-  @if (topicForm && topicDetailsStore.details()) {
-    @let topic = topicDetailsStore.details();
+  @if (topicForm && topicOverviewStore.topicDetails()) {
+    @let topic = topicOverviewStore.topicDetails();
 
     <form [formGroup]="topicForm">
       <!-- topic name read-only -->

@@ -3,8 +3,8 @@ import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { TopicFormBase } from '@app/components/features/base/topic-form-base';
 import { BulmaField } from '@app/components/shared/bulma-field/bulma-field';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
-import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
 import { UpdateTopicModel } from '@app/store/topic-detais/update-topic.model';
+import { TopicOverviewStore } from '@app/store/topic-overview/topic-overview-store';
 import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
 
 @Component({
@@ -13,23 +13,15 @@ import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-sto
   templateUrl: './topic-edit.html',
 })
 export class TopicEdit extends TopicFormBase {
-  readonly topicDetailsStore = inject(TopicDetailsStore);
+  readonly topicOverviewStore = inject(TopicOverviewStore);
   readonly topicSettingsStore = inject(TopicSettingsStore);
 
   constructor() {
     super();
 
     effect(() => {
-      const topic = this.topicDetailsStore.details();
+      const topic = this.topicOverviewStore.topicDetails();
       const settings = this.topicSettingsStore.settings();
-
-      if (!topic) {
-        this.topicDetailsStore.loadTopicDetails();
-      }
-
-      if (!settings) {
-        this.topicSettingsStore.loadSettings();
-      }
 
       if (topic && settings) {
         this.topicForm = this.fb.group({
@@ -75,6 +67,7 @@ export class TopicEdit extends TopicFormBase {
       [key]: this.topicForm.get(key)?.value,
     };
 
-    this.topicDetailsStore.updateTopic(updateModel);
+    console.log(updateModel);
+    //this.topicDetailsStore.updateTopic(updateModel);
   }
 }

@@ -1,11 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { MessageForm } from '@app/components/features/message-form/message-form';
 import { TopicsDropdownMenu } from '@app/components/features/topics-dropdown-menu/topics-dropdown-menu';
 import { DropdownMenuEvent } from '@app/components/shared/dropdown-menu/dropdown-menu';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
-import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
 import { TopicMessagesStore } from '@app/store/topic-messages/topic-messages-store';
+import { TopicOverviewStore } from '@app/store/topic-overview/topic-overview-store';
 import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
 import { TopicsStore } from '@app/store/topics/topics-store';
 import { delay, concatMap, timer } from 'rxjs';
@@ -18,54 +18,26 @@ type TopicTabs =
   | 'TopicStatistics'
   | 'TopicEdit';
 
-function getRequiredParams(route: ActivatedRoute) {
-  const { paramMap } = route.snapshot;
-  const cluster = Number.parseInt(paramMap.get('cluster')!);
-  const topic = paramMap.get('topic')!;
-
-  return { cluster, topic };
-}
 
 @Component({
   selector: 'app-topic-overview',
   imports: [RouterLink, RouterOutlet, MessageForm, TopicsDropdownMenu, PageWrapper],
   templateUrl: './topic-details.html',
-  providers: [
-    {
-      provide: TopicDetailsStore,
-      deps: [ActivatedRoute],
-      useFactory: (route: ActivatedRoute) => {
-        const { cluster, topic } = getRequiredParams(route);
-
-        return new TopicDetailsStore(cluster, topic);
-      },
-    },
-  ],
 })
-export class TopicDetails {
-  public readonly topicsStore = inject(TopicsStore);
+export class TopicDetails implements OnInit {
   private readonly router = inject(Router);
-  readonly topicDetailsStore = inject(TopicDetailsStore);
-  readonly route = inject(ActivatedRoute);
 
-  /////////////////////////////////////////////////////////////////////
+  readonly topicsStore = inject(TopicsStore);
+  readonly topicOverviewStore = inject(TopicOverviewStore);
   readonly topicSettingsStore = inject(TopicSettingsStore);
   readonly topicMessagesStore = inject(TopicMessagesStore);
-  /////////////////////////////////////////////////////////////////////
+  readonly route = inject(ActivatedRoute);
 
   currentTab: TopicTabs = 'TopicOverview';
   isEditSettings = false;
 
-  constructor() {
-    this.topicDetailsStore.loadTopicDetails();
-
-    //const { cluster } = getRequiredParams(this.route);
-
-    //this.topicsStore.selectCluster(cluster);
-    ////////////////////////////////////////////////////////////
-    // this.route.paramMap.subscribe(params => {
-    //   this.topicSettingsStore.handleParamMapChange(params);
-    // });
+  ngOnInit(): void {
+    this.topicOverviewStore.loadTopicDetails();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,16 +57,16 @@ export class TopicDetails {
   }
 
   onCommandSelected(event: DropdownMenuEvent): void {
-    const topic = this.topicDetailsStore.details();
+    const topic = this.topicOverviewStore.topicDetails();
 
     if (event.confirmed && topic) {
       switch (event.command) {
         case 'EditSettings':
           this.router.navigate([
             'clusters',
-            this.topicDetailsStore.clusterIdx(),
+            this.topicOverviewStore.clusterIndex(),
             'topics',
-            this.topicDetailsStore.topic(),
+            topic.name,
             { outlets: { topic: ['edit'] } },
           ]);
 
@@ -107,7 +79,7 @@ export class TopicDetails {
             .pipe(delay(2000))
             .subscribe(() => {
               this.topicMessagesStore.clearAll();
-              this.topicDetailsStore.loadTopicDetails(true);
+              this.topicOverviewStore.reloadTopicDetails();
             });
           break;
 

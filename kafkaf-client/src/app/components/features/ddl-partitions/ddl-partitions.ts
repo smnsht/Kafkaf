@@ -1,8 +1,8 @@
-import { Component, computed, effect, inject, model, signal } from '@angular/core';
+import { Component, computed, effect, inject, model, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PartitionInfo } from '@app/models/partition-info';
 import { ClickOutsideDirective } from '@app/directives/click-outside/click-outside';
-import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
+import { TopicOverviewStore } from '@app/store/topic-overview/topic-overview-store';
 
 @Component({
   selector: 'ddl-partitions',
@@ -10,8 +10,8 @@ import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service
   templateUrl: './ddl-partitions.html',
   styleUrl: './ddl-partitions.scss',
 })
-export class DDLPartitions {
-  private readonly store = inject(TopicDetailsStore);
+export class DDLPartitions implements OnInit {
+  private readonly store = inject(TopicOverviewStore);
 
   // signals
   isActive = signal(false);
@@ -63,6 +63,10 @@ export class DDLPartitions {
         this.selected.set([]);
       }
     });
+  }
+
+  ngOnInit(): void {
+    this.store.loadTopicDetails();
   }
 
   toggleIsActive(): void {

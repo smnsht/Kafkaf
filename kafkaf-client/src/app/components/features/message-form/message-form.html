@@ -15,7 +15,7 @@
                 <div class="select is-fullwidth">
                   <select id="partition" [(ngModel)]="payload.partition" name="partition">
                     <option [value]="undefined">--not specified--</option>
-                    @for (p of topicDetailsStore.partitions(); track $index) {
+                    @for (p of topicOverviewStore.partitions(); track $index) {
                       <option [value]="p.partition">{{ p.partition }}</option>
                     }
                   </select>

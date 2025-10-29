@@ -4,10 +4,10 @@
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li>
-          <a [routerLink]="['/clusters', topicDetailsStore.clusterIdx(), 'topics']">Topics</a>
+          <a [routerLink]="['/clusters', topicOverviewStore.clusterIndex(), 'topics']">Topics</a>
         </li>
         <li class="is-active">
-          <a href="#" aria-current="page" class="has-text-black">Topic #{{ topicDetailsStore.topic() }}</a>
+          <a href="#" aria-current="page" class="has-text-black">Topic #{{ topicOverviewStore.topicDetails() }}</a>
         </li>
       </ul>
     </nav>
@@ -26,7 +26,7 @@
     </button>
     <topics-dropdown-menu
       [showEditSettings]="!isEditSettings"
-      [topicName]="topicDetailsStore.topic()"
+      [topicName]="topicOverviewStore.topicDetails()?.name"
       [disabled]="!!topicsStore.loading()"
       (commandSelected)="onCommandSelected($event)"
     ></topics-dropdown-menu>
