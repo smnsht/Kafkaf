@@ -1,7 +1,8 @@
-import { computed, Injectable } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { SectionedDataCollectionStore } from '../sectioned-collection-store';
 import {
   createHttpParamsFromSearchOptions,
+  CreateMessage,
   MessageRow,
   SearchMessagesOptions,
 } from '@app/models/message.models';
@@ -20,8 +21,10 @@ export const defaultSearchMessagesOptions: SearchMessagesOptions = {
 })
 export class TopicMessagesStore extends SectionedDataCollectionStore<MessageRow> {
   private searchContext: SearchMessagesOptions | undefined;
+  private showMessage = signal(false);
 
   readonly messages = computed(() => this.collection());
+  readonly showMessageForm = computed(() => this.showMessage());
 
   constructor() {
     super({});
@@ -47,5 +50,23 @@ export class TopicMessagesStore extends SectionedDataCollectionStore<MessageRow>
 
   clearAll(): void {
     this.state.update((state) => ({ ...state, collection: undefined }));
+  }
+
+  produceMessage(msg: CreateMessage): Observable<unknown> {
+    this.state.update((state) => ({
+      ...state,
+      loading: undefined,
+    }));
+
+    const url = `${this.getResourceUrl()}/messages`;
+    const noticeHandler = this.withNoticeHandling(() => 'Message created.');
+
+    // prettier-ignore
+    return this.http.post(url, msg)
+        .pipe(noticeHandler);
+  }
+
+  setShowMessageForm(value: boolean) {
+    this.showMessage.set(value);
   }
 }

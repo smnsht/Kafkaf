@@ -1,4 +1,4 @@
-import { Component, effect, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -10,7 +10,8 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { BulmaField } from '@app/components/shared/bulma-field/bulma-field';
-import { TopicConfigRow } from '@app/store/topics/topic-config-row.model';
+import { TopicConfigsStore } from '@app/store/topic-configs/topic-configs-store';
+
 
 export type TopicConfigType = 'number' | 'boolean' | 'text' | 'list';
 
@@ -21,17 +22,20 @@ export type TopicConfigType = 'number' | 'boolean' | 'text' | 'list';
   templateUrl: './topic-custsom-parameters.html',
 })
 export class TopicCustsomParameters {
-  private readonly configTypes = new Map<string, string>();
+  private readonly store = inject(TopicConfigsStore);
   private readonly fb = inject(FormBuilder);
+  private readonly configTypes = new Map<string, string>();
+
+  readonly configs = computed(() => this.store.configs()) //input<TopicConfigRow[]>();
+  readonly loadingConfigRows = computed(() => this.store.loading());
 
   topicForm = input<FormGroup>();
   customParameters = input<FormArray>();
-  configs = input<TopicConfigRow[]>();
-  loadingConfigRows = input(false);
 
   constructor() {
+    this.store.loadConfigs();
     effect(() => {
-      const configs = this.configs();
+      const configs = this.store.configs(); //this.configs();
       if (configs && configs.length > 0) {
         configs.forEach((cfg) => this.configTypes.set(cfg.key, cfg.type));
       }

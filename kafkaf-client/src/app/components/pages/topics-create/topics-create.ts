@@ -28,7 +28,7 @@ export class TopicsCreate extends TopicFormBase {
     super();
 
     const query = this.route.snapshot.queryParamMap;
-    const topicNames = this.topicsStore.currentItems()?.map((topic) => topic.topicName);
+    const topicNames = this.topicsStore.collection()?.map((topic) => topic.topicName);
 
     this.topicForm = this.fb.group({
       name: [
@@ -86,7 +86,7 @@ export class TopicsCreate extends TopicFormBase {
     this.topicsStore.createTopic(createRequest).subscribe(() => {
       this.topicForm.reset();
       this.customParametersAsFormArray?.clear();
-      this.topicsStore.clearCurrentCluster();
+      //this.topicsStore.clearCurrentCluster();
     });
   }
 }

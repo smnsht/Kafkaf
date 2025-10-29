@@ -4,6 +4,7 @@ import { SerdeTypes, DDLSerde } from '../ddl-serde/ddl-serde';
 import { JsonValidatorDirective } from '@app/directives/json-validator/json-validator';
 import { CreateMessage } from '@app/models/message.models';
 import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
+import { TopicMessagesStore } from '@app/store/topic-messages/topic-messages-store';
 
 const defaultPayload: CreateMessage = {
   rawJson: '{}',
@@ -12,13 +13,13 @@ const defaultPayload: CreateMessage = {
 };
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'message-form',
+  selector: 'app-message-form',
   imports: [DDLSerde, FormsModule, JsonValidatorDirective],
   templateUrl: './message-form.html',
 })
 export class MessageForm {
-  readonly store = inject(TopicDetailsStore);
+  readonly topicDetailsStore = inject(TopicDetailsStore);
+  readonly messagesStore = inject(TopicMessagesStore);
 
   payload: CreateMessage;
 
@@ -26,7 +27,7 @@ export class MessageForm {
     this.payload = { ...defaultPayload };
 
     effect(() => {
-      const visible = this.store.showMessageForm();
+      const visible = this.messagesStore.showMessageForm();
       if (!visible) {
         this.payload = { ...defaultPayload };
       }
@@ -34,20 +35,9 @@ export class MessageForm {
   }
 
   onProduceMessageClick(): void {
-    try {
-      const obj = JSON.parse(this.payload.rawJson ?? '{}');
-      const map = new Map<string, string>(Object.entries(obj).map(([k, v]) => [k, String(v)]));
-      this.payload.headers = Object.fromEntries(map);
-    } catch {
-      alert('Error! Invalid JSON in headers.');
-      return;
-    }
-
-    this.store.produceMessage(this.payload).subscribe(() => {
-      this.store.loadTopicDetails();
-      this.store.setShowMessageForm(false);
-      this.store.loadTopicDetails(true);
-      alert('Message created!');
+    this.messagesStore.produceMessage(this.payload).subscribe(() => {
+      this.messagesStore.setShowMessageForm(false);
+      this.topicDetailsStore.loadTopicDetails(true);
     });
   }
 }

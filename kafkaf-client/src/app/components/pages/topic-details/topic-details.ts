@@ -7,7 +7,7 @@ import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
 import { TopicMessagesStore } from '@app/store/topic-messages/topic-messages-store';
 import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
-import { TopicsStore } from '@app/store/topics/topics-store';
+import { TopicsStore2 } from '@app/store/topics/topics-store';
 import { delay, concatMap, timer } from 'rxjs';
 
 type TopicTabs =
@@ -43,9 +43,9 @@ function getRequiredParams(route: ActivatedRoute) {
   ],
 })
 export class TopicDetails {
-  public readonly topicsStore = inject(TopicsStore);
+  public readonly topicsStore = inject(TopicsStore2);
   private readonly router = inject(Router);
-  readonly store = inject(TopicDetailsStore);
+  readonly topicDetailsStore = inject(TopicDetailsStore);
   readonly route = inject(ActivatedRoute);
 
   /////////////////////////////////////////////////////////////////////
@@ -57,11 +57,11 @@ export class TopicDetails {
   isEditSettings = false;
 
   constructor() {
-    this.store.loadTopicDetails();
+    this.topicDetailsStore.loadTopicDetails();
 
-    const { cluster } = getRequiredParams(this.route);
+    //const { cluster } = getRequiredParams(this.route);
 
-    this.topicsStore.selectCluster(cluster);
+    //this.topicsStore.selectCluster(cluster);
     ////////////////////////////////////////////////////////////
     // this.route.paramMap.subscribe(params => {
     //   this.topicSettingsStore.handleParamMapChange(params);
@@ -85,16 +85,16 @@ export class TopicDetails {
   }
 
   onCommandSelected(event: DropdownMenuEvent): void {
-    const topic = this.store.details();
+    const topic = this.topicDetailsStore.details();
 
     if (event.confirmed && topic) {
       switch (event.command) {
         case 'EditSettings':
           this.router.navigate([
             'clusters',
-            this.store.clusterIdx(),
+            this.topicDetailsStore.clusterIdx(),
             'topics',
-            this.store.topic(),
+            this.topicDetailsStore.topic(),
             { outlets: { topic: ['edit'] } },
           ]);
 
@@ -106,9 +106,8 @@ export class TopicDetails {
             .purgeMessages([topic.name])
             .pipe(delay(2000))
             .subscribe(() => {
-              this.topicsStore.setNotice(undefined);
               this.topicMessagesStore.clearAll();
-              this.store.loadTopicDetails(true);
+              this.topicDetailsStore.loadTopicDetails(true);
             });
           break;
 
