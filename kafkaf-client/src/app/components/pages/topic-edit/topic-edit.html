@@ -90,13 +90,7 @@
         >
           <div class="field has-addons">
             <div class="control">
-              <div class="select">
-                <select id="cleanupPolicy" formControlName="cleanupPolicy">
-                  <option value="delete">Delete</option>
-                  <option value="compact">Compact</option>
-                  <option value="compact,delete">Compact,Delete</option>
-                </select>
-              </div>
+              <ddl-cleanup-policy formControlName="cleanupPolicy"/>
             </div>
             <div class="control">
               <button

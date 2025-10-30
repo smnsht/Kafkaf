@@ -1,4 +1,6 @@
 <app-page-wrapper [state]="store.pageState()">
+  <app-search placeholder="Search by key or value" [search]="search" />
+
   <div style="overflow-y: scroll; max-height: 80vh;">
     <table appKafkafTable>
       <thead>
@@ -9,7 +11,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (row of store.settings(); track $index) {
+        @for (row of filteredSettings(); track $index) {
           <tr>
             <td>{{ row.name }}</td>
             <td>

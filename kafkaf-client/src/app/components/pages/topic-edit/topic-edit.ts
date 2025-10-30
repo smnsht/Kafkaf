@@ -6,10 +6,11 @@ import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { UpdateTopicModel } from '@app/store/topic-detais/update-topic.model';
 import { TopicOverviewStore } from '@app/store/topic-overview/topic-overview-store';
 import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
+import { DdlCleanupPolicy } from "@app/components/features/ddl-cleanup-policy/ddl-cleanup-policy";
 
 @Component({
   selector: 'app-topic-edit',
-  imports: [PageWrapper, ReactiveFormsModule, BulmaField],
+  imports: [PageWrapper, ReactiveFormsModule, BulmaField, DdlCleanupPolicy],
   templateUrl: './topic-edit.html',
 })
 export class TopicEdit extends TopicFormBase {

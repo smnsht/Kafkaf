@@ -1,15 +1,38 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
 import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
+import { Search } from "@app/components/shared/search/search/search";
 
 @Component({
   selector: 'app-topic-settings',
-  imports: [KafkafTableDirective, PageWrapper],
+  imports: [KafkafTableDirective, PageWrapper, Search],
   templateUrl: './topic-settings.html',
 })
 export class TopicSettings {
   readonly store = inject(TopicSettingsStore);
+  readonly search = signal('');
+
+  readonly filteredSettings = computed(() => {
+    const settings = this.store.settings();
+    const search = this.search().toLowerCase();
+
+    return settings?.filter(s => {
+      if (search) {
+        if (s.name.toLowerCase().includes(search)) {
+          return true;
+        }
+
+        if (s.value.toLocaleLowerCase().includes(search)) {
+          return true;
+        }
+
+        return false;
+      }
+
+      return true;
+    });
+  });
 
   selectedRowIndex = -1;
 
