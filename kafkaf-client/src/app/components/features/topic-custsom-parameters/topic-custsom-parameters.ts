@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input } from '@angular/core';
+import { Component, computed, inject, input, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -12,34 +12,32 @@ import { CommonModule } from '@angular/common';
 import { BulmaField } from '@app/components/shared/bulma-field/bulma-field';
 import { TopicConfigsStore } from '@app/store/topic-configs/topic-configs-store';
 
-
 export type TopicConfigType = 'number' | 'boolean' | 'text' | 'list';
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'topic-custsom-parameters',
+  selector: 'app-topic-custsom-parameters',
   imports: [ReactiveFormsModule, BulmaField, CommonModule],
   templateUrl: './topic-custsom-parameters.html',
 })
-export class TopicCustsomParameters {
+export class TopicCustsomParameters implements OnInit {
   private readonly store = inject(TopicConfigsStore);
   private readonly fb = inject(FormBuilder);
-  private readonly configTypes = new Map<string, string>();
+  private readonly configTypes = computed<Map<string, string>>(() => {
+    const configs = this.store.configs() ?? [];
 
-  readonly configs = computed(() => this.store.configs()) //input<TopicConfigRow[]>();
+    return configs.reduce((acc, cfg) => {
+      acc.set(cfg.key, cfg.type);
+      return acc;
+    }, new Map<string, string>());
+  });
+
+  readonly configs = computed(() => this.store.configs());
   readonly loadingConfigRows = computed(() => this.store.loading());
+  readonly topicForm = input<FormGroup>();
+  readonly customParameters = input<FormArray>();
 
-  topicForm = input<FormGroup>();
-  customParameters = input<FormArray>();
-
-  constructor() {
+  ngOnInit(): void {
     this.store.loadConfigs();
-    effect(() => {
-      const configs = this.store.configs(); //this.configs();
-      if (configs && configs.length > 0) {
-        configs.forEach((cfg) => this.configTypes.set(cfg.key, cfg.type));
-      }
-    });
   }
 
   idForSelect(index: number): string {
@@ -74,7 +72,7 @@ export class TopicCustsomParameters {
   configTypeForDDL(ddl: AbstractControl | null): TopicConfigType | undefined {
     const cfgKey = ddl?.value;
 
-    switch (this.configTypes.get(cfgKey)) {
+    switch (this.configTypes().get(cfgKey)) {
       case 'int':
       case 'long':
       case 'double':

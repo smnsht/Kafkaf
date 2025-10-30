@@ -19,9 +19,9 @@
 </div>
 
 <app-page-wrapper [state]="topicsStore.pageState()">
-  <topic-form [topicForm]="topicForm" />
+  <app-topic-form [topicForm]="topicForm" />
 
-  <topic-custsom-parameters
+  <app-topic-custsom-parameters
     [topicForm]="topicForm"
     [customParameters]="customParametersAsFormArray"
   />

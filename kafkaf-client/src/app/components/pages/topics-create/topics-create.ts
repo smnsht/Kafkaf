@@ -41,7 +41,7 @@ export class TopicsCreate extends TopicFormBase {
         ],
       ],
       numPartitions: [query.get('numPartitions'), Validators.required],
-      cleanupPolicy: [query.get('cleanupPolicy'), Validators.required],
+      cleanupPolicy: [query.get('cleanupPolicy') ?? 'delete', Validators.required],
       minInSyncReplicas: [query.get('minInSyncReplicas')],
       replicationFactor: [query.get('replicationFactor')],
       timeToRetain: [query.get('timeToRetain')],
@@ -85,8 +85,8 @@ export class TopicsCreate extends TopicFormBase {
 
     this.topicsStore.createTopic(createRequest).subscribe(() => {
       this.topicForm.reset();
+      this.topicsStore.reloadTopics();
       this.customParametersAsFormArray?.clear();
-      //this.topicsStore.clearCurrentCluster();
     });
   }
 }

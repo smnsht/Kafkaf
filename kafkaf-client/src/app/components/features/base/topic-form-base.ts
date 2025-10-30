@@ -24,14 +24,6 @@ export abstract class TopicFormBase {
   protected readonly fb = inject(FormBuilder);
   protected readonly route = inject(ActivatedRoute);
 
-  // constructor() {
-  //   this.route.paramMap.subscribe((params) => {
-  //     const cluster = Number.parseInt(params.get('cluster')!);
-  //     this.topicsStore.selectCluster(cluster);
-  //     this.topicsStore.loadTopicConfigRows();
-  //   });
-  // }
-
   get customParameters() {
     const customParametersField: TopicFormFieldName = 'customParameters';
     return this.topicForm?.get(customParametersField);

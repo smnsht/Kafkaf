@@ -19,8 +19,7 @@ export class TopicConfigsStore extends ClusteredDataCollectionStore<TopicConfigR
   }
 
   protected override fetchCollection(): Observable<TopicConfigRow[]> {
-    const url = this.getBaseResourceUrl();
-    console.log(url);
+    const url = `${this.getBaseResourceUrl()}/topics/configs`;
     return this.http.get<TopicConfigRow[]>(url);
   }
 
