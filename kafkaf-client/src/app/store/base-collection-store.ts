@@ -50,19 +50,33 @@ export abstract class BaseCollectionStore<T> {
     }));
   }
 
-  setError(error?: string): void {
+  setError(error?: string, timeout = -1): void {
     this.state.update((state) => ({
       ...state,
       error,
       loading: false,
     }));
+
+    if (timeout > 100) {
+      const handle = setTimeout(() => {
+        this.setError(undefined);
+        clearTimeout(handle);
+      }, timeout);
+    }
   }
 
-  setNotice(notice?: string): void {
+  setNotice(notice?: string, timeout = -1): void {
     this.state.update((state) => ({
       ...state,
       notice,
     }));
+
+    if (timeout > 100) {
+      const handle = setTimeout(() => {
+        this.setNotice(undefined);
+        clearTimeout(handle);
+      }, timeout);
+    }
   }
 
   setPageState(pageState: PageState): void {

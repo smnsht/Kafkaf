@@ -41,7 +41,11 @@ export class TopicSettingsStore extends SectionedDataCollectionStore<TopicSettin
 
     const url = `${this.getResourceUrl()}/settings/${model.name}`;
     const noticeHandler = this.withNoticeHandling(() => `Setting ${model.name} updated.`);
+    const payload = {
+      ...model,
+      value: String(model.value)
+    };
 
-    return this.http.patch<void>(url, model).pipe(noticeHandler);
+    return this.http.patch<void>(url, payload).pipe(noticeHandler);
   }
 }

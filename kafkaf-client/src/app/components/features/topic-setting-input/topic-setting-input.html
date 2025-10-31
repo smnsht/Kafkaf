@@ -1,0 +1,37 @@
+@switch (configType() ?? configKey()) {
+  @case ('boolean') {
+    <select [ngClass]="selectInputClass()" [(ngModel)]="value">
+      <option value="true">True</option>
+      <option value="false">False</option>
+    </select>
+  }
+  @case ('text') {
+    <input [ngClass]="textInputClass()" [(ngModel)]="value" type="text" placeholder="Value" />
+  }
+  @case ('list') {
+    <p>list not implemented yet</p>
+  }
+  @case ('number') {
+    <input
+      [ngClass]="numberInputClass()"
+      [(ngModel)]="value"
+      #numInput="ngModel"
+      type="text"
+      inputmode="numeric"
+      pattern="\d*"
+      placeholder="Value"
+    />
+    @if(numInput.invalid && numInput.dirty) {
+      <span class="has-text-danger">
+        <i class="fas fa-exclamation-triangle"></i>
+        Invalid input!
+      </span>
+    }
+  }
+  @case ('cleanup.policy') {
+    <ddl-cleanup-policy [(ngModel)]="value" />
+  }
+  @default {
+    <i>unknown config</i>
+  }
+}

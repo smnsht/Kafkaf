@@ -3,10 +3,11 @@ import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
 import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
 import { Search } from "@app/components/shared/search/search/search";
+import { TopicSettingInput } from "@app/components/features/topic-setting-input/topic-setting-input";
 
 @Component({
   selector: 'app-topic-settings',
-  imports: [KafkafTableDirective, PageWrapper, Search],
+  imports: [KafkafTableDirective, PageWrapper, Search, TopicSettingInput],
   templateUrl: './topic-settings.html',
 })
 export class TopicSettings {
@@ -40,8 +41,12 @@ export class TopicSettings {
     this.store.loadSettings();
   }
 
-  update(name: string, value: string): void {
-    console.log('name & value: ', name, value);
+  update(name: string, value: string | undefined): void {
+    if(!value) {
+      this.store.setError('Value is empyt!', 5000);
+      return;
+    }
+
     this.store.patchSetting({ name: name, value: value }).subscribe(() => {
       this.selectedRowIndex = -1;
       this.store.reloadSettings();

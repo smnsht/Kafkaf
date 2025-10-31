@@ -11,8 +11,9 @@ import {
 import { CommonModule } from '@angular/common';
 import { BulmaField } from '@app/components/shared/bulma-field/bulma-field';
 import { TopicConfigsStore } from '@app/store/topic-configs/topic-configs-store';
+import { TopicConfigType } from '../topic-setting-input/topic-setting-input';
 
-export type TopicConfigType = 'number' | 'boolean' | 'text' | 'list';
+
 
 @Component({
   selector: 'app-topic-custsom-parameters',

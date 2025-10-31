@@ -20,6 +20,9 @@ export class TopicEdit extends TopicFormBase {
   constructor() {
     super();
 
+    this.topicOverviewStore.loadTopicDetails();
+    this.topicSettingsStore.loadSettings();
+
     effect(() => {
       const topic = this.topicOverviewStore.topicDetails();
       const settings = this.topicSettingsStore.settings();

@@ -1,7 +1,7 @@
 <app-page-wrapper [state]="store.pageState()">
   <app-search placeholder="Search by key or value" [search]="search" />
 
-  <div style="overflow-y: scroll; max-height: 80vh;">
+  <div style="overflow-y: scroll; max-height: 80vh">
     <table appKafkafTable>
       <thead>
         <tr>
@@ -23,14 +23,19 @@
                     </span>
                     <span>Cancel</span>
                   </button>
-                  <button class="button is-small" (click)="update(row.name, ctrl.value)">
+                  <button
+                    class="button is-small"
+                    [class.loading]="store.loading()"
+                    [disabled]="!ctrl.isValid()"
+                    (click)="update(row.name, ctrl.value())"
+                  >
                     <span class="icon is-small">
                       <i class="fas fa-save"></i>
                     </span>
                     <span>Save</span>
                   </button>
                 </div>
-                <input type="text" [value]="row.value" #ctrl />
+                <app-topic-setting-input [configKey]="row.name" [value]="row.value" #ctrl />
               } @else {
                 <button class="button is-small mr-2" (click)="selectedRowIndex = $index">
                   <span class="icon is-small">
