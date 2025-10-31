@@ -6,6 +6,7 @@ import { CreateTopicModel } from './create-topic.model';
 import { RecreateTopicModel } from './recreate-topic.model';
 import { ClusteredDataCollectionStore } from '../clustered-collection-store';
 import { HttpTopicsService } from '@app/services/http-topics/http-topics';
+import { UpdateTopicModel } from '../topic-detais/update-topic.model';
 
 @Injectable({
   providedIn: 'root',
@@ -51,6 +52,16 @@ export class TopicsStore
     return this.http
       .post<void>(`${this.getBaseResourceUrl()}/topics`, req)
       .pipe(this.withNoticeHandling(() => 'New Topic Created.'));
+  }
+
+  updateTopic(topicName: string, req: UpdateTopicModel): Observable<unknown> {
+    this.setLoading(true);
+
+    const url = `${this.getBaseResourceUrl()}/topics/${topicName}`;
+
+    return this.http
+      .put<void>(url, req)
+      .pipe(this.withNoticeHandling(() => `Topic ${topicName} Updated.`));
   }
 
   deleteTopics(topicNames: string[]): Observable<unknown> {

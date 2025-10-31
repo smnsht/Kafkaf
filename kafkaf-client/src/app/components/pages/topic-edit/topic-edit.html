@@ -1,6 +1,6 @@
 <app-page-wrapper
   [loading]="topicOverviewStore.loading() || topicSettingsStore.loading()"
-  [error]="topicOverviewStore.error()"
+  [error]="topicOverviewStore.error() || topicsStore.error()"
   [notice]="topicOverviewStore.notice()"
 >
   @if (topicForm && topicOverviewStore.topicDetails()) {
@@ -20,27 +20,15 @@
           for="numPartitions"
           [control]="topicForm.get('numPartitions')"
         >
-          <div class="field has-addons">
-            <div class="control">
-              <input
-                class="input"
-                type="number"
-                id="numPartitions"
-                [min]="topic!.partitionCount"
-                formControlName="numPartitions"
-                placeholder="Number of Partitions"
-              />
-            </div>
-            <div class="control">
-              <button
-                class="button"
-                [class.is-success]="topicForm.get('numPartitions')?.valid"
-                [disabled]="topicForm.get('numPartitions')?.invalid"
-                (click)="onUpdatePartitionsClick()"
-              >
-                Update
-              </button>
-            </div>
+          <div class="control">
+            <input
+              class="input"
+              type="number"
+              id="numPartitions"
+              [min]="topic!.partitionCount"
+              formControlName="numPartitions"
+              placeholder="Number of Partitions"
+            />
           </div>
         </bulma-field>
         @if (topicForm.get('numPartitions')?.errors?.['min']) {
@@ -57,26 +45,14 @@
           for="timeToRetain"
           [control]="topicForm.get('timeToRetain')"
         >
-          <div class="field has-addons">
-            <div class="control">
-              <input
-                class="input"
-                type="number"
-                id="timeToRetain"
-                formControlName="timeToRetain"
-                placeholder="Time to retain data (in ms)"
-              />
-            </div>
-            <div class="control">
-              <button
-                class="button"
-                [class.is-success]="topicForm.get('timeToRetain')?.valid"
-                [disabled]="topicForm.get('timeToRetain')?.invalid"
-                (click)="onUpdateTimeToRetain()"
-              >
-                Update
-              </button>
-            </div>
+          <div class="control">
+            <input
+              class="input"
+              type="number"
+              id="timeToRetain"
+              formControlName="timeToRetain"
+              placeholder="Time to retain data (in ms)"
+            />
           </div>
         </bulma-field>
       </div>
@@ -88,21 +64,7 @@
           for="cleanupPolicy"
           [control]="topicForm.get('cleanupPolicy')"
         >
-          <div class="field has-addons">
-            <div class="control">
-              <ddl-cleanup-policy formControlName="cleanupPolicy"/>
-            </div>
-            <div class="control">
-              <button
-                class="button"
-                [class.is-success]="topicForm.get('cleanupPolicy')?.valid"
-                [disabled]="topicForm.get('cleanupPolicy')?.invalid"
-                (click)="onUpdateCleanupPolicy()"
-              >
-                Update
-              </button>
-            </div>
-          </div>
+          <ddl-cleanup-policy formControlName="cleanupPolicy" />
         </bulma-field>
       </div>
 
@@ -113,30 +75,25 @@
           for="minInSyncReplicas"
           [control]="topicForm.get('minInSyncReplicas')"
         >
-          <div class="field has-addons">
-            <div class="control">
-              <input
-                class="input"
-                type="number"
-                id="minInSyncReplicas"
-                min="1"
-                formControlName="minInSyncReplicas"
-                placeholder="Min In Sync Replicas"
-              />
-            </div>
-            <div class="control">
-              <button
-                class="button"
-                [class.is-success]="topicForm.get('cleanupPolicy')?.valid"
-                [disabled]="topicForm.get('cleanupPolicy')?.invalid"
-                (click)="onUpateMinInSyncReplicas()"
-              >
-                Update
-              </button>
-            </div>
+          <div class="control">
+            <input
+              class="input"
+              type="number"
+              id="minInSyncReplicas"
+              min="1"
+              formControlName="minInSyncReplicas"
+              placeholder="Min In Sync Replicas"
+            />
           </div>
         </bulma-field>
       </div>
     </form>
+
+    <button class="button is-success" [disabled]="topicForm.invalid" (click)="onUpdateTopicClick()">
+      <span class="icon">
+        <i class="fas fa-save"></i>
+      </span>
+      <span>Update Topic</span>
+    </button>
   }
 </app-page-wrapper>

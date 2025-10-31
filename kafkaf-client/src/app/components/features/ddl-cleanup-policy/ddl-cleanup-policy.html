@@ -1,0 +1,7 @@
+<div class="select is-fullwidth">
+  <select [id]="id()" [value]="cleanupPolicy" (change)="onChangeValue($event)">
+    @for (option of options; track $index) {
+      <option [value]="option[0]">{{ option[1] }}</option>
+    }
+  </select>
+</div>

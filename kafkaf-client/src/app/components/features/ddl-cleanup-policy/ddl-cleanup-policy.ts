@@ -15,15 +15,8 @@ export const DefaultTopicCleanupPolicy: TopicCleanupPolicy = 'delete';
       multi: true,
     },
   ],
-  template: `
-    <div class="select">
-      <select [id]="id()" [value]="cleanupPolicy" (change)="onChangeValue($event)">
-        @for (option of options; track $index) {
-          <option [value]="option[0]">{{ option[1] }}</option>
-        }
-      </select>
-    </div>
-  `,
+  templateUrl: './ddl-cleanup-policy.html',
+  styleUrl: './ddl-cleanup-policy.scss'
 })
 export class DdlCleanupPolicy implements ControlValueAccessor {
   readonly id = input('cleanupPolicy');

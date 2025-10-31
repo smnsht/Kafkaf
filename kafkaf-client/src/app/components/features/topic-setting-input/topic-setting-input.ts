@@ -1,9 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, computed, inject, input, model, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  inject,
+  input,
+  model,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { MaybeString } from '@app/store/clusters/cluster-info.model';
 import { TopicConfigsStore } from '@app/store/topic-configs/topic-configs-store';
-import { DdlCleanupPolicy } from "../ddl-cleanup-policy/ddl-cleanup-policy";
+import { DdlCleanupPolicy } from '../ddl-cleanup-policy/ddl-cleanup-policy';
 import { Subscription } from 'rxjs';
 
 export type TopicConfigType = 'number' | 'boolean' | 'text' | 'list';
@@ -46,7 +57,7 @@ export class TopicSettingInput implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.sub = this.numInput?.statusChanges?.subscribe(status => {
+    this.sub = this.numInput?.statusChanges?.subscribe((status) => {
       this.isValid.set(status === 'VALID');
     });
   }
