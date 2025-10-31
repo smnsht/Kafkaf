@@ -65,7 +65,7 @@ Accept: application/json
 
 ###
 
-GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/topic.666
+GET {{Kafkaf.API_HostAddress}}/api/clusters/0/topics/teestt
 Accept: application/json
 
 ###

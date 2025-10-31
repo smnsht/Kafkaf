@@ -1,16 +1,15 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { Search } from '@app/components/shared/search/search/search';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
 import { TopicConsumersStore } from '@app/store/topic-consumers/topic-consumers-store';
-
 
 @Component({
   selector: 'app-topic-consumers',
   imports: [KafkafTableDirective, PageWrapper, Search],
   templateUrl: './topic-consumers.html',
 })
-export class TopicConsumers {
+export class TopicConsumers implements OnInit {
   readonly store = inject(TopicConsumersStore);
   search = signal('');
 
@@ -27,7 +26,7 @@ export class TopicConsumers {
     });
   });
 
-  constructor() {
+  ngOnInit(): void {
     this.store.loadConsumers();
   }
 }

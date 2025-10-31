@@ -39,10 +39,8 @@ export class TopicSettingInput implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('numInput') numInput!: NgModel;
 
+  readonly id = input<string>();
   readonly configKey = input<MaybeString>();
-  readonly selectInputClass = input<MaybeString>();
-  readonly textInputClass = input<MaybeString>();
-  readonly numberInputClass = input<MaybeString>();
   readonly value = model<string>();
 
   readonly configType = computed(() => {

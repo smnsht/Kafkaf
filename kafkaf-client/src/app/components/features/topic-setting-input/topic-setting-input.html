@@ -1,19 +1,20 @@
 @switch (configType() ?? configKey()) {
   @case ('boolean') {
-    <select [ngClass]="selectInputClass()" [(ngModel)]="value">
+    <select class="select" [id]="id()" [(ngModel)]="value">
       <option value="true">True</option>
       <option value="false">False</option>
     </select>
   }
   @case ('text') {
-    <input [ngClass]="textInputClass()" [(ngModel)]="value" type="text" placeholder="Value" />
+    <input class="input" [(ngModel)]="value" type="text" placeholder="Value" />
   }
   @case ('list') {
     <p>list not implemented yet</p>
   }
   @case ('number') {
     <input
-      [ngClass]="numberInputClass()"
+      class="input"
+      [id]="id()"
       [(ngModel)]="value"
       #numInput="ngModel"
       type="text"

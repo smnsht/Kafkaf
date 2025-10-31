@@ -35,7 +35,7 @@
                     <span>Save</span>
                   </button>
                 </div>
-                <app-topic-setting-input [configKey]="row.name" [value]="row.value" #ctrl />
+                <app-topic-setting-input [configKey]="row.name" [value]="row.value" id="edit-setting" #ctrl />
               } @else {
                 <button class="button is-small mr-2" (click)="selectedRowIndex = $index">
                   <span class="icon is-small">
