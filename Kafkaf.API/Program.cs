@@ -24,7 +24,7 @@ namespace Kafkaf.API
 			builder.Services.AddSingleton<WatermarkOffsetsClientPool>();
 			builder.Services.AddSingleton<ProducersPool>();
 			builder.Services.AddSingleton<MessagesConsumerPool>();
-
+			builder.Services.AddSingleton<ConsumerGroupRowBuilder>();
 
 			builder.Services.AddSingleton<IClusterService, ClusterService>();
 			builder.Services.AddSingleton<IBrokersService, BrokersService>();

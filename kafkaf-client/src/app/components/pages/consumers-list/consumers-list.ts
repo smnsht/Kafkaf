@@ -1,5 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { Search } from '@app/components/shared/search/search/search';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
@@ -8,7 +9,7 @@ import { filter } from 'rxjs';
 
 @Component({
   selector: 'page-consumers-list',
-  imports: [PageWrapper, KafkafTableDirective, FormsModule, Search],
+  imports: [PageWrapper, KafkafTableDirective, FormsModule, Search, RouterLink],
   templateUrl: './consumers-list.html',
 })
 export class ConsumersList implements OnInit {

@@ -2,7 +2,7 @@ import { computed, Injectable } from '@angular/core';
 import { TopicConsumersRow } from '../topic-detais/topic-consumers-row.model';
 import { Observable } from 'rxjs';
 import { SectionedDataCollectionStore } from '../sectioned-collection-store';
-
+// TODO TopicConsumersRow deleted, replaced with ConsumerGroupRow
 @Injectable({
   providedIn: 'root'
 })

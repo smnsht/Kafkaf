@@ -145,14 +145,27 @@ public class TopicController : ControllerBase
     /// <summary>
     /// GET api/clusters/{clusterIdx}/topics/{topicName}/consumers
     /// </summary>
-    /// <param name="consumersService"></param>
+    /// <param name="builder"></param>
     /// <returns></returns>
     [HttpGet("consumers")]
-    public async Task<IEnumerable<TopicConsumersRow>> GetTopicConsumersAsync(
-        [FromServices] IConsumersService consumersService
-    )
-    {
-        var groups = await consumersService.GetConsumersAsync(ClusterIdx, TopicName);
-        return TopicConsumersRow.FromConsumerGroupDescription(groups);
-    }
+    public async Task<IEnumerable<ConsumerGroupRow>> GetTopicConsumersAsync(
+        [FromServices] ConsumerGroupRowBuilder builder,
+		CancellationToken cancellationToken
+    ) =>
+        await builder.BuildAsync(
+            ClusterIdx,
+			cancellationToken,
+            row =>
+            {
+                var filtered = row with
+                {
+                    Partitions = row
+                        .Partitions.Where(p =>
+                            p.Topic.Equals(TopicName, StringComparison.OrdinalIgnoreCase)
+                        )
+                        .ToList(),
+                };
+                return filtered.Partitions.Any() ? filtered : null;
+            }
+        );
 }

@@ -60,20 +60,17 @@ public class ClustersController : ControllerBase
     }
 
     /// <summary>
-    /// GET api/clusters/{cluserIdx}/consumers"
+    /// GET api/clusters/{clusterIdx}/consumers"
     /// </summary>
-    /// <param name="cluserIdx"></param>
-    /// <param name="consumersService"></param>
+    /// <param name="clusterIdx"></param>
+    /// <param name="builder"></param>
     /// <returns></returns>
-    [HttpGet("{cluserIdx:clusterIndex}/consumers")]
+    [HttpGet("{clusterIdx:clusterIndex}/consumers")]
     public async Task<IEnumerable<ConsumerGroupRow>> GetConsumersAsync(
-        [FromRoute] int cluserIdx,
-        [FromServices] IConsumersService consumersService
-    )
-    {
-        var groups = await consumersService.GetConsumersAsync(cluserIdx);
-        return ConsumerGroupRow.FromConsumerGroupDescription(groups);
-    }
+        [FromRoute] int clusterIdx,
+        [FromServices] ConsumerGroupRowBuilder builder,
+        CancellationToken cancellationToken
+    ) => await builder.BuildAsync(clusterIdx, cancellationToken, row => row);
 
     /// <summary>
     /// GET api/clusters/{cluserIdx}/brokers

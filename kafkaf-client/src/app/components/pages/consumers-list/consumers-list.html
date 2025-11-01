@@ -17,10 +17,10 @@
     <tbody>
       @for (row of consumers(); track $index) {
         <tr>
-          <td>{{ row.groupId }}</td>
+          <td><a [routerLink]="row.groupId">{{ row.groupId }}</a></td>
           <td>{{ row.numberOfMembers }}</td>
           <td>{{ row.numberOfTopics }}</td>
-          <td>TODO</td>
+          <td>{{ row.consumerLag }}</td>
           <td>{{ row.numberOfTopics }}</td>
           <td>{{ row.state }}</td>
         </tr>

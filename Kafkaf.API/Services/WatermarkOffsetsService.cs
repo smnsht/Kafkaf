@@ -12,6 +12,11 @@ public interface IWatermarkOffsetsService
         string topicName,
         int[] partitions
     );
+
+    Dictionary<TopicPartition, WatermarkOffsets?> GetWatermarkOffsets(
+        int clusterNo,
+        IEnumerable<TopicPartition> partitions
+    );
 }
 
 public class WatermarkOffsetsService : IWatermarkOffsetsService
@@ -61,5 +66,41 @@ public class WatermarkOffsetsService : IWatermarkOffsetsService
                 return new KeyValuePair<int, WatermarkOffsets?>(partition, offsets);
             })
             .ToDictionary(pair => pair.Key, pair => pair.Value);
+    }
+
+    public Dictionary<TopicPartition, WatermarkOffsets?> GetWatermarkOffsets(
+        int clusterNo,
+        IEnumerable<TopicPartition> partitions
+    )
+    {
+        var result = new Dictionary<TopicPartition, WatermarkOffsets?>();
+
+        // 1. Group partitions by topic
+        var grouped = partitions
+            .GroupBy(tp => tp.Topic)
+            .ToDictionary(g => g.Key, g => g.Select(tp => tp.Partition.Value).ToArray());
+
+        // 2. For each topic, invoke the existing method
+        foreach (var kvp in grouped)
+        {
+            var topic = kvp.Key;
+            var partitionIds = kvp.Value;
+
+            // existing method returns Dictionary<int, WatermarkOffsets?>
+            var topicOffsets = GetWatermarkOffsets(clusterNo, topic, partitionIds);
+
+            // 3. Build result dictionary keyed by TopicPartition
+            foreach (var p in partitionIds)
+            {
+                var tp = new TopicPartition(topic, new Partition(p));
+
+                if (topicOffsets.TryGetValue(p, out var wm))
+                    result[tp] = wm;
+                else
+                    result[tp] = null;
+            }
+        }
+
+        return result;
     }
 }
