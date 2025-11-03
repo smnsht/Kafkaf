@@ -1,4 +1,4 @@
-<app-page-wrapper [spinnerFontSize]="1" [loading]="loading()" [error]="error()">
+<app-page-wrapper [spinnerFontSize]="1" [state]="store.pageState()">
   <h1 class="title is-size-4">Dashboard</h1>
 
   <app-stats-card [cardItems]="cardItems()" [placeholderCount]="7"></app-stats-card>

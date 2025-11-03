@@ -1,7 +1,7 @@
-<app-page-wrapper [state]="store.pageState()">
+<app-page-wrapper [state]="brokersStore.pageState()">
   <h1 class="title is-size-4">Brokers</h1>
 
-  <app-stats-card [cardItems]="cardItems()" [placeholderCount]="1" />
+  <app-stats-card [cardItems]="cardItems()" [placeholderCount]="2" />
 
   <table appKafkafTable>
     <thead>
@@ -12,7 +12,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (row of store.brokers(); track $index) {
+      @for (row of brokersStore.brokers(); track $index) {
         <tr
           (click)="navigateToBrokerDetails(row.brokerID)"
           (keydown.escape)="navigateToBrokerDetails(row.brokerID)"

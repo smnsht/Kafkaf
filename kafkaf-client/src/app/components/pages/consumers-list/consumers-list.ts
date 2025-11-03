@@ -1,35 +1,34 @@
-import { Component, computed, inject, signal } from '@angular/core';
-
-import { ActivatedRoute } from '@angular/router';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { Search } from '@app/components/shared/search/search/search';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
-import { ConsumersStore } from '@app/store/consumers/consumers.service';
+import { ConsumersStore } from '@app/store/consumers/consumers-store';
+import { filter } from 'rxjs';
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'page-consumers-list',
-  imports: [PageWrapper, KafkafTableDirective, FormsModule, Search],
+  imports: [PageWrapper, KafkafTableDirective, FormsModule, Search, RouterLink],
   templateUrl: './consumers-list.html',
 })
-export class ConsumersList {
-  private readonly route = inject(ActivatedRoute);
-  public readonly store = inject(ConsumersStore);
-  search = signal('');
+export class ConsumersList implements OnInit {
+  readonly store = inject(ConsumersStore);
+  readonly search = signal('');
 
   consumers = computed(() => {
     const searchStr = this.search().toLowerCase();
-    const allConsumers = this.store.consumers();
+    const allConsumers = this.store.collection();
 
-    return allConsumers?.filter((consumer) => consumer.groupId.toLowerCase().includes(searchStr));
+    return allConsumers?.filter((consumer) => {
+      const group = consumer.groupId.toLowerCase();
+      return group.includes(searchStr);
+    });
   });
 
-  constructor() {
-    this.route.paramMap.subscribe((params) => {
-      const cluster = Number.parseInt(params.get('cluster')!);
-      this.store.selectCluster(cluster);
-      this.store.loadCollection();
-    });
+  ngOnInit(): void {
+    this.store.clusterIdx$
+      .pipe(filter(Number.isInteger))
+      .subscribe((_) => this.store.loadConsumers());
   }
 }

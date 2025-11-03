@@ -140,19 +140,5 @@ public class TopicController : ControllerBase
 
         await svc.UpdatePartialAsync(ClusterIdx, TopicName, model);
         return NoContent();
-    }
-
-    /// <summary>
-    /// GET api/clusters/{clusterIdx}/topics/{topicName}/consumers
-    /// </summary>
-    /// <param name="consumersService"></param>
-    /// <returns></returns>
-    [HttpGet("consumers")]
-    public async Task<IEnumerable<TopicConsumersRow>> GetTopicConsumersAsync(
-        [FromServices] IConsumersService consumersService
-    )
-    {
-        var groups = await consumersService.GetConsumersAsync(ClusterIdx, TopicName);
-        return TopicConsumersRow.FromConsumerGroupDescription(groups);
-    }
+    }    
 }

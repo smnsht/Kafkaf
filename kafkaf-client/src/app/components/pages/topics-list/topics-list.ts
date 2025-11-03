@@ -1,35 +1,43 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TopicsDropdownMenu } from '@app/components/features/topics-dropdown-menu/topics-dropdown-menu';
 import { DropdownMenuEvent } from '@app/components/shared/dropdown-menu/dropdown-menu';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
+import { TopicsListViewModel } from '@app/models/topic.models';
 import { ConfirmationService } from '@app/services/confirmation/confirmation';
-import { CreateTopicModel } from '@app/store/topics/create-topic.model';
-import { TopicsListViewModel } from '@app/store/topics/topics-list-view.model';
-import { TopicsStore } from '@app/store/topics/topics.service';
-import { filter, concatMap, Observable, map } from 'rxjs';
+import { HttpTopicsService } from '@app/services/http-topics/http-topics';
+import { TopicsStore } from '@app/store/topics/topics-store';
+import { filter, concatMap } from 'rxjs';
 
 @Component({
-  selector: 'app-topics-list',
-  imports: [FormsModule, KafkafTableDirective, PageWrapper, RouterLink, TopicsDropdownMenu],
+  selector: 'page-topics-list',
+  // prettier-ignore
+  imports: [
+    FormsModule,
+    KafkafTableDirective,
+    PageWrapper,
+    RouterLink,
+    TopicsDropdownMenu
+  ],
   templateUrl: './topics-list.html',
 })
-export class TopicsList {
-  public readonly store = inject(TopicsStore);
+export class TopicsList implements OnInit {
   private readonly router = inject(Router);
   private readonly confirmationService = inject(ConfirmationService);
-  private readonly route = inject(ActivatedRoute);
+  private readonly topicsService = inject(HttpTopicsService);
 
-  search = signal('');
-  showInternalTopics = signal(false);
+  readonly store = inject(TopicsStore);
+  readonly search = signal('');
+  readonly showInternalTopics = signal(false);
+
   selectedTopics: string[] = [];
 
   topics = computed(() => {
     const searchStr = this.search().toLowerCase();
     const showInternal = this.showInternalTopics();
-    const topics = this.store.currentItems();
+    const topics = this.store.collection();
 
     return topics?.filter((topic) => {
       if (!showInternal && topic.isInternal) {
@@ -44,12 +52,8 @@ export class TopicsList {
     });
   });
 
-  constructor() {
-    this.route.paramMap.subscribe((params) => {
-      const clusterIdx = Number.parseInt(params.get('cluster')!);
-      this.store.selectCluster(clusterIdx);
-      this.store.loadTopics();
-    });
+  ngOnInit(): void {
+    this.store.clusterIdx$.pipe(filter(Number.isInteger)).subscribe((_) => this.store.loadTopics());
   }
 
   onCheckboxChange(value: string, isChecked: boolean) {
@@ -67,21 +71,25 @@ export class TopicsList {
       )
       .subscribe(() => {
         this.selectedTopics = [];
+        this.store.reloadTopics();
       });
   }
 
   onCopyTopicClick(): void {
     const topicName = this.selectedTopics[0];
-    const topic = this.store.currentItems()?.find((topic) => topic.topicName == topicName);
+    const topics = this.store.collection();
+    const topic = topics?.find((topic) => topic.topicName == topicName);
 
     if (!topic) {
       this.store.setError(`Can't find topic name ${topicName}!`);
       return;
     }
 
-    this.getTopicQueryParams(topic).subscribe((queryParams) => {
-      this.router.navigate([this.router.url, 'create'], { queryParams });
-    });
+    this.topicsService
+      .getTopicQueryParams(this.store.clusterIndex(), topic)
+      .subscribe((queryParams) => {
+        this.router.navigate([this.router.url, 'create'], { queryParams });
+      });
   }
 
   onPurgeMessagesClick(): void {
@@ -107,7 +115,10 @@ export class TopicsList {
           break;
 
         case 'RemoveTopic':
-          this.store.deleteTopic(topic.topicName).subscribe();
+          this.store.deleteTopic(topic.topicName).subscribe(() => {
+            this.selectedTopics = [];
+            this.store.reloadTopics();
+          });
           break;
 
         case 'RecreateTopic':
@@ -117,7 +128,7 @@ export class TopicsList {
               replicationFactor: topic.partitionsCount,
             })
             .subscribe(() => {
-              this.store.loadTopics(true);
+              this.store.reloadTopics();
             });
           break;
 
@@ -125,39 +136,5 @@ export class TopicsList {
           this.store.setError(`unknown command ${event.command}`);
       }
     }
-  }
-
-  private getTopicQueryParams(topic: TopicsListViewModel): Observable<CreateTopicModel> {
-    return this.store.loadTopicSettings(topic.topicName).pipe(
-      map((settings) => {
-        const queryParams: CreateTopicModel = {
-          name: topic.topicName,
-          numPartitions: topic.partitionsCount,
-          customParameters: [],
-        };
-
-        settings.forEach((setting) => {
-          switch (setting.name) {
-            case 'cleanup.policy':
-              queryParams.cleanupPolicy = setting.value;
-              break;
-
-            case 'min.insync.replicas':
-              queryParams.minInSyncReplicas = Number.parseInt(setting.value);
-              break;
-
-            case 'retention.ms':
-              queryParams.timeToRetain = Number.parseInt(setting.value);
-              break;
-
-            case 'max.message.bytes':
-              queryParams.maxMessageBytes = Number.parseInt(setting.value);
-              break;
-          }
-        });
-
-        return queryParams;
-      }),
-    );
   }
 }

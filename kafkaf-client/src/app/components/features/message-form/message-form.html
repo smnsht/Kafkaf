@@ -1,9 +1,13 @@
-<div class="modal" [class.is-active]="store.showMessageForm()">
+<div class="modal" [class.is-active]="messagesStore.showMessageForm()">
   <div class="modal-background"></div>
   <div class="modal-card">
     <header class="modal-card-head">
       <p class="modal-card-title">Produce Message</p>
-      <button class="delete" aria-label="close" (click)="store.setShowMessageForm(false)"></button>
+      <button
+        class="delete"
+        aria-label="close"
+        (click)="messagesStore.setShowMessageForm(false)"
+      ></button>
     </header>
     <section class="modal-card-body">
       <form #form="ngForm">
@@ -15,7 +19,7 @@
                 <div class="select is-fullwidth">
                   <select id="partition" [(ngModel)]="payload.partition" name="partition">
                     <option [value]="undefined">--not specified--</option>
-                    @for (p of store.partitions(); track $index) {
+                    @for (p of topicOverviewStore.partitions(); track $index) {
                       <option [value]="p.partition">{{ p.partition }}</option>
                     }
                   </select>
@@ -96,13 +100,13 @@
       <div class="buttons">
         <button
           class="button is-success"
-          [class.is-loading]="store.loadingMessages()"
+          [class.is-loading]="messagesStore.loading()"
           (click)="onProduceMessageClick()"
           [disabled]="form.invalid"
         >
           Produce Message
         </button>
-        <button class="button" (click)="store.setShowMessageForm(false)">Cancel</button>
+        <button class="button" (click)="messagesStore.setShowMessageForm(false)">Cancel</button>
       </div>
     </footer>
   </div>

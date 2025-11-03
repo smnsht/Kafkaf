@@ -49,13 +49,7 @@
           for="cleanupPolicy"
           [control]="form.get('cleanupPolicy')"
         >
-          <div class="select">
-            <select id="cleanupPolicy" formControlName="cleanupPolicy">
-              <option value="delete">Delete</option>
-              <option value="compact">Compact</option>
-              <option value="compact,delete">Compact,Delete</option>
-            </select>
-          </div>
+          <ddl-cleanup-policy id="cleanupPolicy" formControlName="cleanupPolicy" />
         </bulma-field>
       </div>
     </div>

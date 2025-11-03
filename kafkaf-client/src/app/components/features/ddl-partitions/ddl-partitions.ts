@@ -1,23 +1,22 @@
-import { Component, computed, effect, input, model, signal } from '@angular/core';
+import { Component, computed, effect, inject, model, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PartitionInfo } from '@app/models/partition-info';
 import { ClickOutsideDirective } from '@app/directives/click-outside/click-outside';
+import { TopicOverviewStore } from '@app/store/topic-overview/topic-overview-store';
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'ddl-partitions',
   imports: [FormsModule, ClickOutsideDirective],
   templateUrl: './ddl-partitions.html',
   styleUrl: './ddl-partitions.scss',
 })
-export class DDLPartitions {
+export class DDLPartitions implements OnInit {
+  private readonly store = inject(TopicOverviewStore);
+
   // signals
   isActive = signal(false);
   search = signal('');
   selectAll = signal(false);
-
-  // inputs
-  src = input<PartitionInfo[] | undefined>();
 
   // model
   selected = model<number[]>();
@@ -33,7 +32,7 @@ export class DDLPartitions {
   });
 
   partitionsFiltered = computed(() => {
-    const all = this.src();
+    const all = this.store.partitions(); //this.src();
     const searchTopic = Number.parseInt(this.search());
 
     if (Number.isNaN(searchTopic)) {
@@ -51,7 +50,7 @@ export class DDLPartitions {
   });
 
   partitionsWithMessages = computed(() => {
-    const partitions = this.src() || [];
+    const partitions = this.store.partitions() || [];
     return partitions?.filter((p) => p.messagesCount > 0);
   });
 
@@ -64,6 +63,10 @@ export class DDLPartitions {
         this.selected.set([]);
       }
     });
+  }
+
+  ngOnInit(): void {
+    this.store.loadTopicDetails();
   }
 
   toggleIsActive(): void {

@@ -1,15 +1,10 @@
-﻿using Confluent.Kafka.Admin;
+﻿using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Kafkaf.API.ClientPools;
 using Kafkaf.API.Config;
 using Microsoft.Extensions.Options;
 
 namespace Kafkaf.API.Services;
-
-public interface IConsumersService
-{
-    Task<List<ConsumerGroupDescription>> GetConsumersAsync(int clusterIdx);
-    Task<List<ConsumerGroupDescription>> GetConsumersAsync(int clusterIdx, string topic);
-}
 
 public class ConsumersService : IConsumersService
 {
@@ -25,53 +20,52 @@ public class ConsumersService : IConsumersService
         _options = options.Value;
     }
 
-    public async Task<List<ConsumerGroupDescription>> GetConsumersAsync(int clusterIdx)
+    /// <summary>
+    /// Retrieves all consumer groups for a given Kafka cluster,
+    /// along with their committed offsets. Each group's offset
+    /// query is executed in parallel for efficiency.
+    /// </summary>
+    public async Task<List<ConsumerGroupInfo>> GetConsumersAsync(int clusterIdx, CancellationToken ct)
     {
         var adminClient = _clientPool.GetClient(clusterIdx);
+
+        // 1. List all groups
         var groups = await adminClient.ListConsumerGroupsAsync();
-        var groupNames = groups.Valid.Select(group => group.GroupId);
-        var returnValue = new List<ConsumerGroupDescription>();
+        var groupNames = groups.Valid.Select(group => group.GroupId).ToList();
 
-        if (groupNames.Any())
+        if (!groupNames.Any())
+            return new List<ConsumerGroupInfo>();
+
+        // 2. Describe all groups
+        var groupInfo = await adminClient.DescribeConsumerGroupsAsync(groupNames);
+
+        // 3. For each group, start a task to fetch its committed offsets
+        var offsetTasks = groupInfo.ConsumerGroupDescriptions.Select(async g =>
         {
-            var groupInfo = await adminClient.DescribeConsumerGroupsAsync(groupNames);
-            returnValue.AddRange(groupInfo.ConsumerGroupDescriptions);
-        }
+            // one ConsumerGroupTopicPartitions per group
+            var partitions = new ConsumerGroupTopicPartitions(g.GroupId, null);
 
-        return returnValue;
-    }
-
-    public async Task<List<ConsumerGroupDescription>> GetConsumersAsync(
-        int clusterIdx,
-        string topic
-    )
-    {
-        var adminClient = _clientPool.GetClient(clusterIdx);
-        var timeout = TimeSpan.FromSeconds(_options.RequestTimeout);
-        var groups = await adminClient.ListConsumerGroupsAsync(
-            new ListConsumerGroupsOptions() { RequestTimeout = timeout }
-        );
-
-        var retval = new List<ConsumerGroupDescription>();
-
-        foreach (var g in groups.Valid)
-        {
-            var groupInfo = await adminClient.DescribeConsumerGroupsAsync(
-                [g.GroupId],
-                new DescribeConsumerGroupsOptions() { RequestTimeout = timeout }
+            // must call per group
+            var result = await adminClient.ListConsumerGroupOffsetsAsync(
+                new[] { partitions } // wrap in a single-element array
             );
 
-            var assignedToTopic = groupInfo
-                .ConsumerGroupDescriptions.SelectMany(desc => desc.Members)
-                .SelectMany(member => member.Assignment.TopicPartitions)
-                .Any(tp => tp.Topic == topic);
+			ct.ThrowIfCancellationRequested();
 
-            if (assignedToTopic)
-            {
-                retval.AddRange(groupInfo.ConsumerGroupDescriptions);
-            }
-        }
+            // result is a List<ListConsumerGroupOffsetsResult>, but with one element
+            var offsetsResult = result[0];
 
-        return retval;
+            var offsetsDict = offsetsResult.Partitions.ToDictionary(
+                p => p.TopicPartition,
+                p => p.Offset
+            );
+
+            return new ConsumerGroupInfo(g, offsetsDict);
+        });
+
+        // 4. Run them all in parallel
+        var consumerGroups = await Task.WhenAll(offsetTasks);
+
+        return consumerGroups.ToList();
     }
 }

@@ -1,33 +1,35 @@
 import { Component, effect, inject } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { concatMap, filter, map } from 'rxjs';
 import { TopicFormBase } from '@app/components/features/base/topic-form-base';
 import { BulmaField } from '@app/components/shared/bulma-field/bulma-field';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
-import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
-import { UpdateTopicModel } from '@app/store/topic-detais/update-topic.model';
+import { UpdateTopicModel } from '@app/models/topic.models';
+import { TopicOverviewStore } from '@app/store/topic-overview/topic-overview-store';
+import { TopicSettingsStore } from '@app/store/topic-settings/topic-settings-store';
+import { DdlCleanupPolicy } from '@app/components/features/ddl-cleanup-policy/ddl-cleanup-policy';
+import { ConfirmationService } from '@app/services/confirmation/confirmation';
 
 @Component({
   selector: 'app-topic-edit',
-  imports: [PageWrapper, ReactiveFormsModule, BulmaField],
+  imports: [PageWrapper, ReactiveFormsModule, BulmaField, DdlCleanupPolicy],
   templateUrl: './topic-edit.html',
 })
 export class TopicEdit extends TopicFormBase {
-  readonly topicDetailsStore = inject(TopicDetailsStore);
+  private readonly confirmationService = inject(ConfirmationService);
+
+  readonly topicOverviewStore = inject(TopicOverviewStore);
+  readonly topicSettingsStore = inject(TopicSettingsStore);
 
   constructor() {
     super();
 
+    this.topicOverviewStore.loadTopicDetails();
+    this.topicSettingsStore.loadSettings();
+
     effect(() => {
-      const topic = this.topicDetailsStore.details();
-      const settings = this.topicDetailsStore.settings();
-
-      if (!topic) {
-        this.topicDetailsStore.loadTopicDetails();
-      }
-
-      if (!settings) {
-        this.topicDetailsStore.loadSettings();
-      }
+      const topic = this.topicOverviewStore.topicDetails();
+      const settings = this.topicSettingsStore.settings();
 
       if (topic && settings) {
         this.topicForm = this.fb.group({
@@ -52,27 +54,29 @@ export class TopicEdit extends TopicFormBase {
     });
   }
 
-  onUpdatePartitionsClick(): void {
-    this.update('numPartitions');
-  }
+  onUpdateTopicClick(): void {
+    this.confirmationService
+      .confirm(
+        'Update Kafka Topic',
+        'Are you sure you want to update this Kafka topic? This action may affect producers and consumers.',
+      )
+      .pipe(
+        filter((confirmed) => confirmed),
+        map(() => {
+          const updateModel: UpdateTopicModel = {
+            timeToRetain: this.topicForm.get('timeToRetain')?.value,
+            cleanupPolicy: this.topicForm.get('cleanupPolicy')?.value,
+            minInSyncReplicas: this.topicForm.get('minInSyncReplicas')?.value,
+            numPartitions: this.topicForm.get('numPartitions')?.value,
+          };
 
-  onUpdateTimeToRetain(): void {
-    this.update('timeToRetain');
-  }
-
-  onUpdateCleanupPolicy(): void {
-    this.update('cleanupPolicy');
-  }
-
-  onUpateMinInSyncReplicas(): void {
-    this.update('minInSyncReplicas');
-  }
-
-  private update(key: keyof UpdateTopicModel): void {
-    const updateModel: UpdateTopicModel = {
-      [key]: this.topicForm.get(key)?.value,
-    };
-
-    this.topicDetailsStore.updateTopic(updateModel);
+          return updateModel;
+        }),
+        concatMap((updateModel) => {
+          const topic = this.topicOverviewStore.topicDetails();
+          return this.topicsStore.updateTopic(topic.name, updateModel);
+        }),
+      )
+      .subscribe(() => this.topicOverviewStore.reloadTopicDetails());
   }
 }

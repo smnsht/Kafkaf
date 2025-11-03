@@ -4,10 +4,10 @@
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li>
-          <a [routerLink]="['/clusters', store.clusterIdx(), 'topics']">Topics</a>
+          <a [routerLink]="['/clusters', overviewStore.clusterIndex(), 'topics']">Topics</a>
         </li>
         <li class="is-active">
-          <a href="#" aria-current="page" class="has-text-black">Topic #{{ store.topic() }}</a>
+          <a href="#" aria-current="page" class="has-text-black">{{ topicName() }}</a>
         </li>
       </ul>
     </nav>
@@ -16,7 +16,7 @@
   <div class="column is-flex is-justify-content-flex-end is-align-items-center">
     <button
       class="button is-primary ml-2"
-      (click)="store.setShowMessageForm(true)"
+      (click)="messagesStore.setShowMessageForm(true)"
       [class.is-loading]="topicsStore.loading()"
     >
       <span class="icon is-small">
@@ -26,7 +26,7 @@
     </button>
     <topics-dropdown-menu
       [showEditSettings]="!isEditSettings"
-      [topicName]="store.topic()"
+      [topicName]="topicName()"
       [disabled]="!!topicsStore.loading()"
       (commandSelected)="onCommandSelected($event)"
     ></topics-dropdown-menu>
@@ -55,11 +55,7 @@
     </ul>
   </div>
 
-  <router-outlet
-    name="topic"
-    (activate)="onTopicActivate($event)"
-    (deactivate)="onTopicDeactivate($event)"
-  ></router-outlet>
+  <router-outlet name="topic" (activate)="onTopicActivate($event)"></router-outlet>
 
-  <message-form />
+  <app-message-form />
 </app-page-wrapper>

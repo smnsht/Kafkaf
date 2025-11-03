@@ -60,19 +60,31 @@ public class ClustersController : ControllerBase
     }
 
     /// <summary>
-    /// GET api/clusters/{cluserIdx}/consumers"
+    /// GET api/clusters/{clusterIdx}/consumers"
     /// </summary>
-    /// <param name="cluserIdx"></param>
-    /// <param name="consumersService"></param>
+    /// <param name="clusterIdx"></param>
+    /// <param name="builder"></param>
     /// <returns></returns>
-    [HttpGet("{cluserIdx:clusterIndex}/consumers")]
+    [HttpGet("{clusterIdx:clusterIndex}/consumers")]
     public async Task<IEnumerable<ConsumerGroupRow>> GetConsumersAsync(
-        [FromRoute] int cluserIdx,
-        [FromServices] IConsumersService consumersService
+        [FromRoute] int clusterIdx,
+        [FromServices] IConsumersService consumersService,
+        [FromServices] IWatermarkOffsetsService watermarksService,
+        CancellationToken ct
     )
     {
-        var groups = await consumersService.GetConsumersAsync(cluserIdx);
-        return ConsumerGroupRow.FromConsumerGroupDescription(groups);
+        var groups = await consumersService.GetConsumersAsync(clusterIdx, ct);
+
+        var allPartitions = groups.SelectMany(g => g.Offsets.Keys).Distinct().ToList();
+
+        var watermarkResults = watermarksService.GetWatermarkOffsets(
+            clusterIdx,
+            allPartitions
+        );
+
+        return groups
+            .Select(g => ConsumerGroupRow.FromConsumerGroupInfo(g, watermarkResults))
+            .Where(r => r != null)!;
     }
 
     /// <summary>

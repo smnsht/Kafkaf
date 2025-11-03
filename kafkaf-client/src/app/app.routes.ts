@@ -6,6 +6,7 @@ import {
   BrokerLogDirectories,
   BrokerMetrics,
   BrokersList,
+  ConsumerDetails,
   ConsumersList,
   Dashboard,
   TopicConsumers,
@@ -117,5 +118,10 @@ export const routes: Routes = [
     component: ConsumersList,
     canMatch: [clusterGuardFn],
     title: 'Cluster %cluster% > Consumers',
+  },
+  {
+    path: 'clusters/:cluster/consumers/:consumer',
+    component: ConsumerDetails,
+    title: 'Cluster %cluster% > Consumers > %consumer%',
   },
 ];

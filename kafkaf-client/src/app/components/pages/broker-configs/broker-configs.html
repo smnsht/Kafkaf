@@ -1,26 +1,29 @@
-@if (!store.loading()) {
+<app-page-wrapper [state]="store.pageState()">
   <app-search placeholder="Search by config key" [search]="search" />
 
-  <table appKafkafTable>
-    <thead>
-      <tr>
-        <th>Key</th>
-        <th>Value</th>
-        <th>Source</th>
-        <th>&nbsp;</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (cfg of configs(); track $index) {
+  <!-- TODO: wrap with Bulma panel -->
+  <div style="overflow-y: scroll; max-height: 60vh">
+    <table appKafkafTable>
+      <thead>
         <tr>
-          <td>{{ cfg.name }}</td>
-          <td>{{ cfg.value }}</td>
-          <td>{{ cfg.source }}</td>
-          <td>
-            <button type="button" class="btn btn-primary" disabled>Edit</button>
-          </td>
+          <th>Key</th>
+          <th>Value</th>
+          <th>Source</th>
+          <th>&nbsp;</th>
         </tr>
-      }
-    </tbody>
-  </table>
-}
+      </thead>
+      <tbody>
+        @for (cfg of configs(); track $index) {
+          <tr>
+            <td>{{ cfg.name }}</td>
+            <td>{{ cfg.value }}</td>
+            <td>{{ cfg.source }}</td>
+            <td>
+              <button type="button" class="btn btn-primary" disabled>Edit</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</app-page-wrapper>

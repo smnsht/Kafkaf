@@ -3,7 +3,7 @@ import { Subject, switchMap, tap, timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TimestampPipe } from '@app/pipes/timestamp/timestamp';
 import { LoggerService } from '@app/services/logger/logger';
-import { MessageRow } from '@app/store/topic-detais/message-row.model';
+import { MessageRow } from '@app/models/message.models';
 
 type tMessageTab = 'Key' | 'Value' | 'Headers';
 

@@ -4,6 +4,7 @@ export { BrokerLogDirectories } from './broker-log-directories/broker-log-direct
 export { BrokerMetrics } from './broker-metrics/broker-metrics';
 export { BrokersList } from './brokers-list/brokers-list';
 export { ConsumersList } from './consumers-list/consumers-list';
+export { ConsumerDetails } from './consumer-details/consumer-details';
 export { Dashboard } from './dashboard/dashboard';
 export { TopicConsumers } from './topic-consumers/topic-consumers';
 export { TopicDetails } from './topic-details/topic-details';

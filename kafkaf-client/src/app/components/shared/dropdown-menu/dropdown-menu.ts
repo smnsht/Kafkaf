@@ -4,6 +4,7 @@ import { ConfirmationService } from '@app/services/confirmation/confirmation';
 import { LoggerService } from '@app/services/logger/logger';
 
 import { of } from 'rxjs';
+import { ClickOutsideDirective } from '@app/directives/click-outside/click-outside';
 
 export type DropdownMenuCommand =
   | 'ClearMessages'
@@ -19,7 +20,7 @@ export interface DropdownMenuEvent {
 @Component({
   selector: 'app-dropdown-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ClickOutsideDirective],
   templateUrl: './dropdown-menu.html',
 })
 export class DropdownMenu {
@@ -55,11 +56,10 @@ export class DropdownMenu {
     }
   }
 
-  toggleisActive(): void {
+  toggleIsActive(): void {
     this.isActive = !this.isActive;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getConfirmationBody(_: DropdownMenuCommand): string {
     return '';
   }

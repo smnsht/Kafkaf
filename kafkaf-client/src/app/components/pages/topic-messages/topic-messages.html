@@ -40,7 +40,7 @@
     </div>
   </div>
   <div class="column">
-    <ddl-partitions [src]="store.partitions()" [(selected)]="searchMessagesOptions.partitions" />
+    <ddl-partitions [(selected)]="searchMessagesOptions.partitions" />
   </div>
   <div class="column">
     <ddl-serde label="Key Serde" [(serde)]="searchMessagesOptions.keySerde" />
@@ -83,7 +83,7 @@
     <button
       class="button is-primary"
       (click)="onSubmitClick()"
-      [disabled]="store.loadingMessages() || searchMessagesOptions.partitions.length === 0"
+      [disabled]="store.loading() || searchMessagesOptions.partitions.length === 0"
     >
       <span class="icon">
         <i class="fa-solid fa-search"></i>
@@ -93,7 +93,7 @@
   </div>
 </div>
 
-<app-page-wrapper [loading]="store.loadingMessages()" [error]="store.errorMessages()">
+<app-page-wrapper [state]="store.pageState()">
   <table appKafkafTable>
     <thead>
       <tr>

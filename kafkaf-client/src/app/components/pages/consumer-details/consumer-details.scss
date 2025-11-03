@@ -1,0 +1,27 @@
+summary {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  list-style: none; /* remove default marker */
+}
+
+summary::-webkit-details-marker {
+  display: none; /* hide Chrome/Safari marker */
+}
+
+/* custom marker */
+summary::before {
+  content: '▶'; /* closed state arrow */
+  margin-right: 0.5em;
+  transition: transform 0.2s ease;
+}
+
+/* rotate arrow when <details> is open */
+details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+summary .columns {
+  flex: 1; /* allow it to grow and fill remaining space */
+  min-width: 0; /* prevent overflow issues in flexbox */
+}

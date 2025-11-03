@@ -9,7 +9,7 @@ import {
 import { TopicCustsomParameters } from '@app/components/features/topic-custsom-parameters/topic-custsom-parameters';
 import { TopicForm } from '@app/components/features/topic-form/topic-form';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
-import { CreateTopicModel } from '@app/store/topics/create-topic.model';
+import { CreateTopicModel } from '@app/models/topic.models';
 
 @Component({
   selector: 'app-topics-create',
@@ -28,7 +28,7 @@ export class TopicsCreate extends TopicFormBase {
     super();
 
     const query = this.route.snapshot.queryParamMap;
-    const topicNames = this.topicsStore.currentItems()?.map((topic) => topic.topicName);
+    const topicNames = this.topicsStore.collection()?.map((topic) => topic.topicName);
 
     this.topicForm = this.fb.group({
       name: [
@@ -41,7 +41,7 @@ export class TopicsCreate extends TopicFormBase {
         ],
       ],
       numPartitions: [query.get('numPartitions'), Validators.required],
-      cleanupPolicy: [query.get('cleanupPolicy'), Validators.required],
+      cleanupPolicy: [query.get('cleanupPolicy') ?? 'delete', Validators.required],
       minInSyncReplicas: [query.get('minInSyncReplicas')],
       replicationFactor: [query.get('replicationFactor')],
       timeToRetain: [query.get('timeToRetain')],
@@ -85,8 +85,8 @@ export class TopicsCreate extends TopicFormBase {
 
     this.topicsStore.createTopic(createRequest).subscribe(() => {
       this.topicForm.reset();
+      this.topicsStore.reloadTopics();
       this.customParametersAsFormArray?.clear();
-      this.topicsStore.clearCurrentCluster();
     });
   }
 }

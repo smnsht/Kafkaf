@@ -1,6 +1,5 @@
-<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
-<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
 <div
+  appClickOutside
   (clickOutside)="onClickedOutside()"
   [ngClass]="{
     dropdown: true,
@@ -8,11 +7,11 @@
     'is-right': true,
   }"
 >
-  <div class="dropdown-trigger" onkeypress="javascript;;" (click)="toggleisActive()">
+  <button class="dropdown-trigger" (keypress)="toggleIsActive()" (click)="toggleIsActive()">
     <span class="icon">
       <i class="fas fa-ellipsis-vertical"></i>
     </span>
-  </div>
+  </button>
   <div class="dropdown-menu" id="dropdown-menu" role="menu">
     <div class="dropdown-content">
       <ng-content></ng-content>

@@ -1,4 +1,4 @@
-import { Component, effect, inject, input } from '@angular/core';
+import { Component, computed, inject, input, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -10,32 +10,33 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { BulmaField } from '@app/components/shared/bulma-field/bulma-field';
-import { TopicConfigRow } from '@app/store/topics/topic-config-row.model';
-
-export type TopicConfigType = 'number' | 'boolean' | 'text' | 'list';
+import { TopicConfigsStore } from '@app/store/topic-configs/topic-configs-store';
+import { TopicConfigType } from '../topic-setting-input/topic-setting-input';
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'topic-custsom-parameters',
+  selector: 'app-topic-custsom-parameters',
   imports: [ReactiveFormsModule, BulmaField, CommonModule],
   templateUrl: './topic-custsom-parameters.html',
 })
-export class TopicCustsomParameters {
-  private readonly configTypes = new Map<string, string>();
+export class TopicCustsomParameters implements OnInit {
+  private readonly store = inject(TopicConfigsStore);
   private readonly fb = inject(FormBuilder);
+  private readonly configTypes = computed<Map<string, string>>(() => {
+    const configs = this.store.configs() ?? [];
 
-  topicForm = input<FormGroup>();
-  customParameters = input<FormArray>();
-  configs = input<TopicConfigRow[]>();
-  loadingConfigRows = input(false);
+    return configs.reduce((acc, cfg) => {
+      acc.set(cfg.key, cfg.type);
+      return acc;
+    }, new Map<string, string>());
+  });
 
-  constructor() {
-    effect(() => {
-      const configs = this.configs();
-      if (configs && configs.length > 0) {
-        configs.forEach((cfg) => this.configTypes.set(cfg.key, cfg.type));
-      }
-    });
+  readonly configs = computed(() => this.store.configs());
+  readonly loadingConfigRows = computed(() => this.store.loading());
+  readonly topicForm = input<FormGroup>();
+  readonly customParameters = input<FormArray>();
+
+  ngOnInit(): void {
+    this.store.loadConfigs();
   }
 
   idForSelect(index: number): string {
@@ -70,7 +71,7 @@ export class TopicCustsomParameters {
   configTypeForDDL(ddl: AbstractControl | null): TopicConfigType | undefined {
     const cfgKey = ddl?.value;
 
-    switch (this.configTypes.get(cfgKey)) {
+    switch (this.configTypes().get(cfgKey)) {
       case 'int':
       case 'long':
       case 'double':

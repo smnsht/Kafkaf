@@ -7,14 +7,14 @@
       <div class="box">
         <a routerLink="/">Dashboard</a>
       </div>
-      @if (cluster() >= 0) {
+      @if (rootStore.clusterIndex() >= 0) {
         <div class="box">
-          <em>Cluster #{{ cluster() }}</em>
-          <app-cluster-side-menu [cluster]="cluster()" [kafkaSection]="kafkaSection()" />
+          <em>Cluster #{{ rootStore.clusterIndex() }}</em>
+          <app-cluster-side-menu [cluster]="rootStore.clusterIndex()" />
         </div>
       }
       <div class="box cluster-details">
-        @for (cfg of clusters(); track $index) {
+        @for (cfg of clustersStore.clusters(); track $index) {
           <details class="mb-3">
             @if (cfg.isOffline) {
               <summary title="Cluster offline">

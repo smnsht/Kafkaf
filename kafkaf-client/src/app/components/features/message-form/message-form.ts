@@ -1,9 +1,10 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SerdeTypes, DDLSerde } from '../ddl-serde/ddl-serde';
 import { JsonValidatorDirective } from '@app/directives/json-validator/json-validator';
-import { CreateMessage } from '@app/store/topic-detais/create-message.model';
-import { TopicDetailsStore } from '@app/store/topic-detais/topic-details.service';
+import { CreateMessage } from '@app/models/message.models';
+import { TopicMessagesStore } from '@app/store/topic-messages/topic-messages-store';
+import { TopicOverviewStore } from '@app/store/topic-overview/topic-overview-store';
 
 const defaultPayload: CreateMessage = {
   rawJson: '{}',
@@ -12,42 +13,21 @@ const defaultPayload: CreateMessage = {
 };
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'message-form',
+  selector: 'app-message-form',
   imports: [DDLSerde, FormsModule, JsonValidatorDirective],
   templateUrl: './message-form.html',
 })
 export class MessageForm {
-  readonly store = inject(TopicDetailsStore);
+  readonly topicOverviewStore = inject(TopicOverviewStore);
+  readonly messagesStore = inject(TopicMessagesStore);
 
-  payload: CreateMessage;
-
-  constructor() {
-    this.payload = { ...defaultPayload };
-
-    effect(() => {
-      const visible = this.store.showMessageForm();
-      if (!visible) {
-        this.payload = { ...defaultPayload };
-      }
-    });
-  }
+  payload = { ...defaultPayload };
 
   onProduceMessageClick(): void {
-    try {
-      const obj = JSON.parse(this.payload.rawJson ?? '{}');
-      const map = new Map<string, string>(Object.entries(obj).map(([k, v]) => [k, String(v)]));
-      this.payload.headers = Object.fromEntries(map);
-    } catch {
-      alert('Error! Invalid JSON in headers.');
-      return;
-    }
-
-    this.store.produceMessage(this.payload).subscribe(() => {
-      this.store.loadTopicDetails();
-      this.store.setShowMessageForm(false);
-      this.store.loadTopicDetails(true);
-      alert('Message created!');
+    this.messagesStore.produceMessage(this.payload).subscribe(() => {
+      this.messagesStore.setShowMessageForm(false);
+      this.topicOverviewStore.reloadTopicDetails();
+      this.payload = { ...defaultPayload };
     });
   }
 }

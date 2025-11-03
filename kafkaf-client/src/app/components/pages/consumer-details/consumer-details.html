@@ -1,0 +1,68 @@
+<div class="columns">
+  <div class="column">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li>
+          <a [routerLink]="['/clusters', cluster, 'consumers']">Consumers</a>
+        </li>
+        <li class="is-active">
+          <a href="#" aria-current="page" class="has-text-black">{{ consumerParam() }}</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div class="column">
+    <h1 class="title is-size-4 is-pulled-right">{{ consumerParam() }}</h1>
+  </div>
+</div>
+
+<app-page-wrapper [state]="store.pageState()">
+  <app-stats-card [cardItems]="cardItems()" [placeholderCount]="1" />
+
+  <app-search [search]="search" placeholder="Search by topic name" />
+
+  <div class="columns m-3">
+    <div class="column">Topic</div>
+    <div class="column">Consumer Lag</div>
+  </div>
+
+  @let rows = partitions();
+
+  @if (rows && rows.length > 0) {
+    @for (partition of rows; track $index) {
+      <details class="m-3 p-2 has-background-light">
+        <summary>
+          <div class="columns">
+            <div class="column">{{ partition.topic }}</div>
+            <div class="column">{{ partition.consumerLag }}</div>
+          </div>
+        </summary>
+
+        <table appKafkafTable>
+          <thead>
+            <tr>
+              <th>Partition</th>
+              <th>Consumer ID</th>
+              <th>Host</th>
+              <th>Consumer Lag</th>
+              <th>Current Offset</th>
+              <th>End offset</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of partitions(); track $index) {
+              <tr>
+                <td>{{ row.partition }}</td>
+                <td>{{ row.consumerId }}</td>
+                <td>{{ row.host }}</td>
+                <td>{{ row.consumerLag }}</td>
+                <td>{{ row.currentOffset }}</td>
+                <td>{{ row.endOffset }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </details>
+    }
+  }
+</app-page-wrapper>

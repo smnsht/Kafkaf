@@ -1,7 +1,7 @@
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { inject } from '@angular/core';
-import { TopicsStore } from '@app/store/topics/topics.service';
+import { TopicsStore } from '@app/store/topics/topics-store';
 
 export const TopicFormFieldNames = [
   'name',
@@ -23,14 +23,6 @@ export abstract class TopicFormBase {
   protected readonly topicsStore = inject(TopicsStore);
   protected readonly fb = inject(FormBuilder);
   protected readonly route = inject(ActivatedRoute);
-
-  constructor() {
-    this.route.paramMap.subscribe((params) => {
-      const cluster = Number.parseInt(params.get('cluster')!);
-      this.topicsStore.selectCluster(cluster);
-      this.topicsStore.loadTopicConfigRows();
-    });
-  }
 
   get customParameters() {
     const customParametersField: TopicFormFieldName = 'customParameters';
