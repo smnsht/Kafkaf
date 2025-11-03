@@ -24,20 +24,12 @@ export function uniqueKeysValidator(): ValidatorFn {
     const keys = formArray.controls.map((g) => (g as FormGroup).get('key')?.value);
 
     // Find duplicates
-    const seen = new Set<string>();
-    const duplicates = new Set<string>();
-
-    keys.forEach((k) => {
-      if (k && seen.has(k)) {
-        duplicates.add(k);
-      }
-      seen.add(k);
-    });
+    const duplicates = findDuplicates(keys);
 
     // For each control, merge/remove the 'duplicate' error
-    formArray.controls.forEach((g) => {
+    for (const g of formArray.controls) {
       const ctrl = (g as FormGroup).get('key');
-      if (!ctrl) return;
+      if (!ctrl) continue;
 
       const existing = ctrl.errors || {};
 
@@ -53,9 +45,24 @@ export function uniqueKeysValidator(): ValidatorFn {
         // If there are still other errors (like required), keep them
         ctrl.setErrors(Object.keys(existing).length ? existing : null);
       }
-    });
+    }
 
     // Return an array-level error if any duplicates exist
     return duplicates.size > 0 ? { duplicateKeys: true } : null;
   };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function findDuplicates(keys: any[]): Set<string> {
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+
+  for (const k of keys) {
+    if (k && seen.has(k)) {
+      duplicates.add(k);
+    }
+    seen.add(k);
+  }
+
+  return duplicates;
 }

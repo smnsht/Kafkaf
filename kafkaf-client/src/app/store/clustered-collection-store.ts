@@ -37,7 +37,7 @@ export abstract class ClusteredDataCollectionStore<T> extends BaseCollectionStor
     const clusterIdx = this.clusterIndex();
 
     if (Number.isNaN(clusterIdx)) {
-      throw new Error('clusterIdx is NaN');
+      throw new TypeError('clusterIdx is NaN');
     }
 
     return `${environment.apiUrl}/clusters/${clusterIdx}`;

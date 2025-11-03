@@ -25,19 +25,29 @@ public class ConsumersService : IConsumersService
     /// along with their committed offsets. Each group's offset
     /// query is executed in parallel for efficiency.
     /// </summary>
-    public async Task<List<ConsumerGroupInfo>> GetConsumersAsync(int clusterIdx, CancellationToken ct)
+    public async Task<List<ConsumerGroupInfo>> GetConsumersAsync(
+        int clusterIdx,
+        CancellationToken ct
+    )
     {
         var adminClient = _clientPool.GetClient(clusterIdx);
 
+        var requestTimeout = TimeSpan.FromMinutes(_options.RequestTimeout);
+
         // 1. List all groups
-        var groups = await adminClient.ListConsumerGroupsAsync();
+        var groups = await adminClient.ListConsumerGroupsAsync(
+            new ListConsumerGroupsOptions() { RequestTimeout = requestTimeout }
+        );
         var groupNames = groups.Valid.Select(group => group.GroupId).ToList();
 
         if (!groupNames.Any())
             return new List<ConsumerGroupInfo>();
 
         // 2. Describe all groups
-        var groupInfo = await adminClient.DescribeConsumerGroupsAsync(groupNames);
+        var groupInfo = await adminClient.DescribeConsumerGroupsAsync(
+            groupNames,
+            new DescribeConsumerGroupsOptions() { RequestTimeout = requestTimeout }
+        );
 
         // 3. For each group, start a task to fetch its committed offsets
         var offsetTasks = groupInfo.ConsumerGroupDescriptions.Select(async g =>
@@ -47,10 +57,11 @@ public class ConsumersService : IConsumersService
 
             // must call per group
             var result = await adminClient.ListConsumerGroupOffsetsAsync(
-                new[] { partitions } // wrap in a single-element array
+                new[] { partitions }, // wrap in a single-element array
+                new ListConsumerGroupOffsetsOptions() { RequestTimeout = requestTimeout }
             );
 
-			ct.ThrowIfCancellationRequested();
+            ct.ThrowIfCancellationRequested();
 
             // result is a List<ListConsumerGroupOffsetsResult>, but with one element
             var offsetsResult = result[0];

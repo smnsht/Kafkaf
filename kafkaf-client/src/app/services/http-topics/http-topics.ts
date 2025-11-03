@@ -11,7 +11,7 @@ import { forkJoin, map, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class HttpTopicsService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
   deleteTopics(clusterIdx: number, topicNames: string[]): Observable<void[]> {
     const requests$ = topicNames.map((topic) => {
@@ -41,7 +41,7 @@ export class HttpTopicsService {
           customParameters: [],
         };
 
-        settings.forEach((setting) => {
+        for(const setting of settings){
           switch (setting.name) {
             case 'cleanup.policy':
               queryParams.cleanupPolicy = setting.value;
@@ -59,7 +59,7 @@ export class HttpTopicsService {
               queryParams.maxMessageBytes = Number.parseInt(setting.value);
               break;
           }
-        });
+        }
 
         return queryParams;
       }),

@@ -2,6 +2,15 @@
 
 public static class KafkaTopicProperties
 {
+	private const string BOOLEAN = "boolean";
+	private const string STRING = "string";
+	private const string LONG = "long";
+	private const string INT = "int";
+	private const string DOUBLE = "double";
+
+	private const string FALSE = "false";
+	private const string MAX_LONG = "9223372036854775807";
+
 	public static readonly IReadOnlySet<string> COMPRESSION_TYPES = new HashSet<string>(
 		StringComparer.OrdinalIgnoreCase
 	)
@@ -34,28 +43,28 @@ public static class KafkaTopicProperties
 		//{ "cleanup.policy", ("string", "delete") },
 		//{ "retention.ms", ("long", "604800000") }, // 7 days
 		//{ "retention.bytes", ("long", "-1") }, // unlimited
-		{ "delete.retention.ms", ("long", "86400000") }, // 1 day
-		{ "min.cleanable.dirty.ratio", ("double", "0.5") },
-		{ "file.delete.delay.ms", ("long", "60000") },
-		{ "local.retention.ms", ("long", "-2") },
-		{ "local.retention.bytes", ("long", "-2") },
-		{ "preallocate", ("boolean", "false") },
-		{ "unclean.leader.election.enable", ("boolean", "false") },
+		{ "delete.retention.ms", (LONG, "86400000") }, // 1 day
+		{ "min.cleanable.dirty.ratio", (DOUBLE, "0.5") },
+		{ "file.delete.delay.ms", (LONG, "60000") },
+		{ "local.retention.ms", (LONG, "-2") },
+		{ "local.retention.bytes", (LONG, "-2") },
+		{ "preallocate", (BOOLEAN, FALSE) },
+		{ "unclean.leader.election.enable", (BOOLEAN, FALSE) },
 		// Compression
-		{ "compression.type", ("string", "producer") },
-		{ "compression.gzip.level", ("int", "-1") },
-		{ "compression.lz4.level", ("int", "0") },
+		{ "compression.type", (STRING, "producer") },
+		{ "compression.gzip.level", (INT, "-1") },
+		{ "compression.lz4.level", (INT, "0") },
 		//{ "compression.snappy.level", ("int", "0") },
-		{ "compression.zstd.level", ("int", "0") },
+		{ "compression.zstd.level", (INT, "0") },
 		// Segmenting and Indexing
-		{ "segment.bytes", ("long", "1073741824") }, // 1 GB
-		{ "segment.ms", ("long", "604800000") }, // 7 days
-		{ "segment.jitter.ms", ("long", "0") },
-		{ "segment.index.bytes", ("long", "10485760") }, // 10 MB
-		{ "index.interval.bytes", ("int", "4096") },
+		{ "segment.bytes", (LONG, "1073741824") }, // 1 GB
+		{ "segment.ms", (LONG, "604800000") }, // 7 days
+		{ "segment.jitter.ms", (LONG, "0") },
+		{ "segment.index.bytes", (LONG, "10485760") }, // 10 MB
+		{ "index.interval.bytes", (INT, "4096") },
 		// Flushing to Disk
-		{ "flush.messages", ("long", "9223372036854775807") }, // Long.MaxValue
-		{ "flush.ms", ("long", "9223372036854775807") }, // Long.MaxValue
+		{ "flush.messages", (LONG, MAX_LONG) }, // Long.MaxValue
+		{ "flush.ms", (LONG, MAX_LONG) }, // Long.MaxValue
 		// Replication
 		//{ "min.insync.replicas", ("int", "1") },
 		//{ "follower.replication.throttled.replicas", ("list", "[]") },
@@ -64,17 +73,17 @@ public static class KafkaTopicProperties
 		// Message Size and Timestamps
 		//{ "max.message.bytes", ("int", "1048588") }, // 1 MB
 		//{ "message.downconversion.enable", ("boolean", "true") },
-		{ "message.timestamp.type", ("string", "CreateTime") },
+		{ "message.timestamp.type", (STRING, "CreateTime") },
 		//{ "message.timestamp.difference.max.ms", ("long", "9223372036854775807") }, // Long.MaxValue
-		{ "message.timestamp.after.max.ms", ("long", "3600000") },
-		{ "message.timestamp.before.max.ms", ("long", "9223372036854775807") },
+		{ "message.timestamp.after.max.ms", (LONG, "3600000") },
+		{ "message.timestamp.before.max.ms", (LONG, MAX_LONG) },
 		// Compaction (for logs with cleanup.policy = compact)
-		{ "max.compaction.lag.ms", ("long", "9223372036854775807") }, // Long.MaxValue
-		{ "min.compaction.lag.ms", ("long", "0") },
+		{ "max.compaction.lag.ms", (LONG, MAX_LONG) }, // Long.MaxValue
+		{ "min.compaction.lag.ms", (LONG, "0") },
 		// Remote
-		{ "remote.log.delete.on.disable", ("boolean", "false") },
-		{ "remote.log.copy.disable", ("boolean", "false") },
-		{ "remote.storage.enable", ("boolean", "false") },
+		{ "remote.log.delete.on.disable", (BOOLEAN, FALSE) },
+		{ "remote.log.copy.disable", (BOOLEAN, FALSE) },
+		{ "remote.storage.enable", (BOOLEAN, FALSE) },
 	};
 
 	public static string[] GetKeys() => TOPIC_CONFIGS.Keys.ToArray();

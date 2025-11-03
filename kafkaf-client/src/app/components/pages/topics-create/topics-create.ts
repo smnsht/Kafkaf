@@ -69,19 +69,21 @@ export class TopicsCreate extends TopicFormBase {
       })),
     };
 
-    [
+    const props = [
       'minInSyncReplicas',
       'replicationFactor',
       'timeToRetain',
       'maxMessageBytes',
       'retentionBytes',
-    ].forEach((key) => {
+    ];
+
+    for (const key of props) {
       const numericValue = Number.parseInt(payload[key]);
       if (!Number.isNaN(numericValue)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (createRequest as any)[key] = numericValue;
       }
-    });
+    }
 
     this.topicsStore.createTopic(createRequest).subscribe(() => {
       this.topicForm.reset();

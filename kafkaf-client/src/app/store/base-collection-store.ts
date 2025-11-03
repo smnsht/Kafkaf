@@ -47,7 +47,7 @@ export abstract class BaseCollectionStore<T> {
     }));
   }
 
-  setError(error?: string, timeout = -1): void {
+  setError(error: string | null, timeout = -1): void {
     this.state.update((state) => ({
       ...state,
       error,
@@ -56,7 +56,7 @@ export abstract class BaseCollectionStore<T> {
 
     if (timeout > 100) {
       const handle = setTimeout(() => {
-        this.setError(undefined);
+        this.setError(null);
         clearTimeout(handle);
       }, timeout);
     }
@@ -132,7 +132,7 @@ export abstract class BaseCollectionStore<T> {
         }));
 
         const handle = setTimeout(() => {
-          this.setError(undefined);
+          this.setError(null);
           clearTimeout(handle);
         }, timeout);
       },

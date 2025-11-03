@@ -21,7 +21,7 @@ export const defaultSearchMessagesOptions: SearchMessagesOptions = {
 })
 export class TopicMessagesStore extends SectionedDataCollectionStore<MessageRow> {
   private searchContext: SearchMessagesOptions | undefined;
-  private showMessage = signal(false);
+  private readonly showMessage = signal(false);
 
   readonly messages = computed(() => this.collection());
   readonly showMessageForm = computed(() => this.showMessage());

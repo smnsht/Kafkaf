@@ -17,7 +17,7 @@ export class TopicsStore
   extends ClusteredDataCollectionStore<TopicsListViewModel>
   implements OnDestroy
 {
-  private topicsService = inject(HttpTopicsService);
+  private readonly topicsService = inject(HttpTopicsService);
 
   constructor() {
     super({});
