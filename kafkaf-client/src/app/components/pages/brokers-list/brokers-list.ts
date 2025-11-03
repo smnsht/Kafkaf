@@ -5,17 +5,8 @@ import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stat
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
 import { BrokerInfoRow } from '@app/store/brokers/broker-info-row.model';
 import { BrokersStore } from '@app/store/brokers/brokers.service';
-import { filter } from 'rxjs';
-
-const defaultCardItems: readonly StatsCardItem[] = [
-  { label: 'Broker Count', value: 0, icon: 'danger' },
-  { label: 'Active Controller', value: 0, icon: 'info' },
-  { label: 'Version', value: 'TODO' },
-  { label: 'Online', value: 'TODO' },
-  { label: 'URP', value: 'TODO' },
-  { label: 'In Sync Replicas', value: 'TODO' },
-  { label: 'Out Of Sync Replicas', value: 'TODO' },
-];
+import { ClusterInfo } from '@app/store/clusters/cluster-info.model';
+import { ClustersStore } from '@app/store/clusters/clusters.service';
 
 @Component({
   selector: 'page-brokers-list',
@@ -25,46 +16,74 @@ const defaultCardItems: readonly StatsCardItem[] = [
 })
 export class BrokersList implements OnInit {
   private readonly router = inject(Router);
+  readonly brokersStore = inject(BrokersStore);
+  readonly clustersStore = inject(ClustersStore);
 
-  readonly store = inject(BrokersStore);
+  readonly brokersWithClusterInfo = computed(() => {
+    const brokers = this.brokersStore.brokers();
+    const clustersInfo = this.clustersStore.collection();
 
-  cardItems = computed(() => {
-    const brokers = this.store.brokers();
-
-    if (brokers) {
-      return this.buildCarItems(brokers);
+    if (brokers && clustersInfo) {
+      return { brokers, clusterInfo: clustersInfo[this.brokersStore.clusterIndex()] };
     }
 
-    return [...defaultCardItems];
+    return undefined;
+  });
+
+  readonly cardItems = computed(() => {
+    const info = this.brokersWithClusterInfo();
+
+    if (info) {
+      return this.buildCarItems(info.brokers, info.clusterInfo);
+    }
+
+    return [];
   });
 
   ngOnInit(): void {
-    this.store.clusterIdx$.pipe(filter(Number.isInteger)).subscribe((_) => {
-      this.store.loadBrokers();
-    });
+    this.clustersStore.loadClusters();
+    this.brokersStore.loadBrokers();
   }
 
   navigateToBrokerDetails(brokerId: number): void {
     this.router.navigate([this.router.url, brokerId]);
   }
 
-  private buildCarItems(brokers: BrokerInfoRow[]): StatsCardItem[] {
-    const cardItems = [...defaultCardItems];
+  private buildCarItems(brokers: BrokerInfoRow[], clusterInfo: ClusterInfo): StatsCardItem[] {
+    const outOfSyncReplicasCount =
+      clusterInfo.totalPartitionCount - clusterInfo.inSyncReplicasCount;
 
-    // Broker Count
-    cardItems[0] = {
-      ...cardItems[0],
-      value: brokers.length,
-      icon: brokers.length == 0 ? 'danger' : undefined,
-    };
-
-    // Active Controller
-    cardItems[1] = {
-      ...cardItems[1],
-      value: brokers[0]?.controller,
-      icon: undefined,
-    };
-
-    return cardItems;
+    return [
+      {
+        label: 'Broker Count',
+        value: brokers.length,
+        icon: brokers.length == 0 ? 'danger' : undefined,
+      },
+      {
+        label: 'Active Controller',
+        value: brokers[0]?.controller,
+      },
+      {
+        label: 'Online Partitions',
+        value: clusterInfo.isOffline
+          ? 'Offline'
+          : `${clusterInfo.onlinePartitionCount} of ${clusterInfo.totalPartitionCount}`,
+        icon: clusterInfo.isOffline ? 'warning' : 'success',
+      },
+      {
+        label: 'URP',
+        value: clusterInfo.underReplicatedPartitionsCount,
+        icon: clusterInfo.underReplicatedPartitionsCount === 0 ? 'success' : 'warning',
+      },
+      {
+        label: 'In Sync Replicas',
+        value: `${clusterInfo.inSyncReplicasCount} of ${clusterInfo.totalPartitionCount}`,
+        icon: outOfSyncReplicasCount == 0 ? 'success' : 'warning',
+      },
+      {
+        label: 'Out Of Sync Replicas',
+        value: outOfSyncReplicasCount,
+      },
+    ];
   }
 }

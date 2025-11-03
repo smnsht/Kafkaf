@@ -7,7 +7,7 @@ import { BaseCollectionStore } from '../base-collection-store';
 @Injectable({
   providedIn: 'root',
 })
-export class ClustersStore2 extends BaseCollectionStore<ClusterInfo> {
+export class ClustersStore extends BaseCollectionStore<ClusterInfo> {
   constructor() {
     super({});
   }

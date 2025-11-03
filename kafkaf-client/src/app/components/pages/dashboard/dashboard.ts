@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
-import { ClustersStore2 } from '@app/store/clusters/clusters.service';
+import { ClustersStore } from '@app/store/clusters/clusters.service';
 
 interface Stats {
   online: number;
@@ -17,7 +17,7 @@ interface Stats {
   templateUrl: './dashboard.html',
 })
 export class Dashboard implements OnInit {
-  readonly store = inject(ClustersStore2);
+  readonly store = inject(ClustersStore);
   readonly onlyOfflineClusters = model(false);
 
   public cardItems = computed(() => {

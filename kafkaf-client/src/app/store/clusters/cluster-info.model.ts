@@ -3,9 +3,12 @@ export type MaybeString = string | null | undefined;
 
 export interface ClusterInfo {
   alias: string;
-  version: string;
   brokerCount: number;
+  totalPartitionCount: number,
   onlinePartitionCount: number;
+  underReplicatedPartitionsCount: number;
+  totalReplicasCount: number;
+  inSyncReplicasCount: number;
   topicCount: number;
   originatingBrokerName?: string;
   originatingBrokerId: number;
