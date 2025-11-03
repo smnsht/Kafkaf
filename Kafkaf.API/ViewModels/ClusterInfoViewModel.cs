@@ -17,14 +17,6 @@ public class ClusterInfoViewModel
     public bool IsOffline { get; set; }
     public string? Error { get; set; }
 
-    //public int? DefaultCluster { get; set; }
-    //public string Status { get; set; } = "online";
-    //public string? LastError { get; set; }
-    //public int? BytesInPerSec { get; set; }
-    //public int BytesOutPerSec { get; set; }
-    //public bool ReadOnly { get; set; }=
-    //public ClusterFeature[] Features { get; set; } = [];
-
     public static ClusterInfoViewModel FromMetadata(string alias, Metadata meta)
     {
         ArgumentNullException.ThrowIfNull(meta);
@@ -37,8 +29,8 @@ public class ClusterInfoViewModel
             OnlinePartitionCount = meta
                 .Topics.Where(t => !t.Error.IsError)
                 .Sum(t => t.Partitions.Count),
-			// A partition is considered under‑replicated if not all of its replicas are currently in the In‑Sync Replica (ISR) set.
-			UnderReplicatedPartitionsCount = meta.Topics.Sum(t =>
+            // A partition is considered under‑replicated if not all of its replicas are currently in the In‑Sync Replica (ISR) set.
+            UnderReplicatedPartitionsCount = meta.Topics.Sum(t =>
                 t.Partitions.Count(p => p.Replicas.Length > p.InSyncReplicas.Length)
             ),
             TotalReplicasCount = meta.Topics.Sum(t =>

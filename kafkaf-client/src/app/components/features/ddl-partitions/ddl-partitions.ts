@@ -32,7 +32,7 @@ export class DDLPartitions implements OnInit {
   });
 
   partitionsFiltered = computed(() => {
-    const all = this.store.partitions(); //this.src();
+    const all = this.store.partitions();
     const searchTopic = Number.parseInt(this.search());
 
     if (Number.isNaN(searchTopic)) {

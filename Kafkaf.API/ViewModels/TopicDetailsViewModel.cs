@@ -52,7 +52,7 @@ public class TopicDetailsViewModel
     public int SegmentCount { get; set; }
     public int UnderReplicatedPartitions { get; set; }
     public long? MessageCount { get; set; }
-    public PartitionInfo[] Partitions { get; set; } = [];
+    public PartitionInfo[] Partitions { get; set; }
 
     public static TopicDetailsViewModel build(
         TopicDescription topicDescription,
