@@ -1,8 +1,11 @@
-import { Component, effect, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
+import { BrokerConfigRow } from '@app/store/broker-details/broker-config-row.model';
 import { BrokerDetailsStore } from '@app/store/broker-details/broker-details.service';
+import { BrokerInfoRow } from '@app/store/brokers/broker-info-row.model';
+import { BrokersStore } from '@app/store/brokers/brokers.service';
 
 type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
 
@@ -12,30 +15,26 @@ type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
   templateUrl: './broker-details.html',
 })
 export class BrokerDetails implements OnInit {
-  readonly store = inject(BrokerDetailsStore);
+  readonly detailsStore = inject(BrokerDetailsStore);
+  readonly brokersStore = inject(BrokersStore);
 
-  cardItems: StatsCardItem[] = [];
-  cluster = Number.NaN;
-  broker = Number.NaN;
+  readonly cluster = computed(() => this.detailsStore.clusterIndex());
+  readonly broker = computed(() => this.detailsStore.brokerId());
+
+  readonly cardItems = computed(() => {
+    const clusterIdx = this.detailsStore.clusterIndex();
+    const infoRows = this.brokersStore.brokers();
+    const configs = this.detailsStore.collection();
+    const currentBroker = infoRows?.at(clusterIdx);
+
+    return currentBroker ? this.buildStatsCardItems(currentBroker, configs) : [];
+  });
+
   currentTab?: BrokerTabs;
 
-  constructor() {
-    effect(() => {
-      if (this.store.currentCacheKey()) {
-        this.store.loadConfigs();
-        this.cluster = this.store.clusterIndex();
-        this.broker = this.store.brokerId();
-      }
-    });
-  }
-
   ngOnInit(): void {
-    this.cardItems = [
-      { label: 'Segment Size', value: 'TODO KB' },
-      { label: 'Segment Count', value: 'TODO' },
-      { label: 'Port', value: 'TODO' },
-      { label: 'Host', value: 'TODO' },
-    ];
+    this.detailsStore.loadConfigs();
+    this.brokersStore.loadBrokers();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,5 +43,23 @@ export class BrokerDetails implements OnInit {
       this.currentTab = componentRef.constructor.name as BrokerTabs;
       clearTimeout(timeoutID);
     }, 100);
+  }
+
+  private buildStatsCardItems(
+    infoRow: BrokerInfoRow,
+    configs: BrokerConfigRow[] | undefined,
+  ): StatsCardItem[] {
+    const version = configs?.find((cfg) => cfg.name === 'inter.broker.protocol.version')?.value;
+
+    return [
+      { label: 'Segment Size', value: 'TODO KB' },
+      { label: 'Segment Count', value: 'TODO' },
+      { label: 'Port', value: infoRow.port },
+      { label: 'Host', value: infoRow.host },
+      {
+        label: 'Version',
+        value: version ?? '?',
+      },
+    ];
   }
 }
