@@ -7,14 +7,14 @@
       <div class="box">
         <a routerLink="/">Dashboard</a>
       </div>
-      @if (rootStore.clusterIndex()  >= 0) {
+      @if (rootStore.clusterIndex() >= 0) {
         <div class="box">
           <em>Cluster #{{ rootStore.clusterIndex() }}</em>
           <app-cluster-side-menu [cluster]="rootStore.clusterIndex()" />
         </div>
       }
       <div class="box cluster-details">
-        @for (cfg of clustersStore.clusters() ; track $index) {
+        @for (cfg of clustersStore.clusters(); track $index) {
           <details class="mb-3">
             @if (cfg.isOffline) {
               <summary title="Cluster offline">

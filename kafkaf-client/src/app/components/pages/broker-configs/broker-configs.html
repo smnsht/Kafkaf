@@ -1,7 +1,8 @@
-@if (!store.loading()) {
+<app-page-wrapper [state]="store.pageState()">
   <app-search placeholder="Search by config key" [search]="search" />
 
-  <div style="overflow-y: scroll; max-height: 60vh;">
+  <!-- TODO: wrap with Bulma panel -->
+  <div style="overflow-y: scroll; max-height: 60vh">
     <table appKafkafTable>
       <thead>
         <tr>
@@ -25,4 +26,4 @@
       </tbody>
     </table>
   </div>
-}
+</app-page-wrapper>

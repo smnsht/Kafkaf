@@ -123,5 +123,5 @@ export const routes: Routes = [
     path: 'clusters/:cluster/consumers/:consumer',
     component: ConsumerDetails,
     title: 'Cluster %cluster% > Consumers > %consumer%',
-  }
+  },
 ];

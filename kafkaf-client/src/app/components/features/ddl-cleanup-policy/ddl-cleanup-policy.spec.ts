@@ -8,9 +8,8 @@ describe('DdlCleanupPolicy', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DdlCleanupPolicy]
-    })
-    .compileComponents();
+      imports: [DdlCleanupPolicy],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DdlCleanupPolicy);
     component = fixture.componentInstance;

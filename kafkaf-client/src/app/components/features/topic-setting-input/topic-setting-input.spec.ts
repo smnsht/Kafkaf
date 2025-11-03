@@ -8,9 +8,8 @@ describe('TopicSettingInput', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TopicSettingInput]
-    })
-    .compileComponents();
+      imports: [TopicSettingInput],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TopicSettingInput);
     component = fixture.componentInstance;

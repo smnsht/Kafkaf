@@ -4,7 +4,7 @@ import { ConfirmationService } from '@app/services/confirmation/confirmation';
 import { LoggerService } from '@app/services/logger/logger';
 
 import { of } from 'rxjs';
-import { ClickOutsideDirective } from "@app/directives/click-outside/click-outside";
+import { ClickOutsideDirective } from '@app/directives/click-outside/click-outside';
 
 export type DropdownMenuCommand =
   | 'ClearMessages'

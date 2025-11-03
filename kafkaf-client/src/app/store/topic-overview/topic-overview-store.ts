@@ -1,8 +1,8 @@
 import { computed, Injectable } from '@angular/core';
 import { SectionedDataCollectionStore } from '../sectioned-collection-store';
 import { map, Observable, tap } from 'rxjs';
-import { TopicDetailsViewModel } from '../topic-detais/topic-details-view.model';
 import { PartitionInfo } from '@app/models/partition-info';
+import { TopicDetailsViewModel } from '@app/models/topic.models';
 
 @Injectable({
   providedIn: 'root',

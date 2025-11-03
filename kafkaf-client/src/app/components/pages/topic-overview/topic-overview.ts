@@ -2,7 +2,7 @@ import { Component, computed, inject, OnInit } from '@angular/core';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
-import { TopicDetailsViewModel } from '@app/store/topic-detais/topic-details-view.model';
+import { TopicDetailsViewModel } from '@app/models/topic.models';
 import { TopicOverviewStore } from '@app/store/topic-overview/topic-overview-store';
 
 @Component({

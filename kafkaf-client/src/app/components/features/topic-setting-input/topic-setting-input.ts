@@ -12,10 +12,10 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
-import { MaybeString } from '@app/store/clusters/cluster-info.model';
 import { TopicConfigsStore } from '@app/store/topic-configs/topic-configs-store';
 import { DdlCleanupPolicy } from '../ddl-cleanup-policy/ddl-cleanup-policy';
 import { Subscription } from 'rxjs';
+import { MaybeString } from '@app/store/clusters/clusters-store';
 
 export type TopicConfigType = 'number' | 'boolean' | 'text' | 'list';
 

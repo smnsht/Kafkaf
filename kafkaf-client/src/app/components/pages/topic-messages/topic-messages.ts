@@ -10,7 +10,10 @@ import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
 import { TimestampPipe } from '@app/pipes/timestamp/timestamp';
 import { TruncatePipe } from '@app/pipes/truncate/truncate';
-import { defaultSearchMessagesOptions, TopicMessagesStore } from '@app/store/topic-messages/topic-messages-store';
+import {
+  defaultSearchMessagesOptions,
+  TopicMessagesStore,
+} from '@app/store/topic-messages/topic-messages-store';
 
 @Component({
   selector: 'app-topic-messages',

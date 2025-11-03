@@ -1,8 +1,8 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { MaybeString, tKafkaSection } from '../clusters/cluster-info.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
+import { MaybeString, tKafkaSection } from '../clusters/clusters-store';
 
 @Injectable({ providedIn: 'root' })
 export class RootStore {

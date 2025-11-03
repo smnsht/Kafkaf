@@ -1,11 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Search } from '@app/components/shared/search/search/search';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
-import { BrokerDetailsStore } from '@app/store/broker-details/broker-details.service';
+import { BrokerDetailsStore } from '@app/store/broker-details/broker-details-store';
+import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 
 @Component({
   selector: 'app-broker-configs',
-  imports: [KafkafTableDirective, Search],
+  imports: [KafkafTableDirective, Search, PageWrapper],
   templateUrl: './broker-configs.html',
 })
 export class BrokerConfigs {

@@ -1,7 +1,7 @@
 import { computed, Injectable, OnDestroy } from '@angular/core';
-import { ConsumerGroupRow } from './consumer-group-row.model';
 import { Observable } from 'rxjs';
 import { ClusteredDataCollectionStore } from '../clustered-collection-store';
+import { ConsumerGroupRow } from '@app/models/consumer.models';
 
 @Injectable({ providedIn: 'root' })
 export class ConsumersStore

@@ -1,9 +1,9 @@
 import { BehaviorSubject, Observable, startWith, pairwise } from 'rxjs';
 import { BaseCollectionState, BaseCollectionStore } from './base-collection-store';
 import { computed, effect, inject } from '@angular/core';
-import { RootStore } from './root/root.service';
-import { MaybeString } from './clusters/cluster-info.model';
+import { RootStore } from './root/root-store';
 import { environment } from 'environments/environment';
+import { MaybeString } from './clusters/clusters-store';
 
 export abstract class SectionedDataCollectionStore<T> extends BaseCollectionStore<T> {
   protected readonly rootStore = inject(RootStore);

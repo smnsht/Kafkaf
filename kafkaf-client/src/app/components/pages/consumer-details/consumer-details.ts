@@ -1,11 +1,11 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ConsumersStore } from '@app/store/consumers/consumers.service';
+import { ConsumersStore } from '@app/store/consumers/consumers-store';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
-import { ConsumerGroupRow } from '@app/store/consumers/consumer-group-row.model';
 import { Search } from '@app/components/shared/search/search/search';
+import { ConsumerGroupRow } from '@app/models/consumer.models';
 
 const defaultCardItems: readonly StatsCardItem[] = [
   { label: 'State', value: '?' },

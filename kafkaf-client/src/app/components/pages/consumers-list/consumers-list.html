@@ -17,7 +17,9 @@
     <tbody>
       @for (row of consumers(); track $index) {
         <tr>
-          <td><a [routerLink]="row.groupId">{{ row.groupId }}</a></td>
+          <td>
+            <a [routerLink]="row.groupId">{{ row.groupId }}</a>
+          </td>
           <td>{{ row.numberOfMembers }}</td>
           <td>{{ row.numberOfTopics }}</td>
           <td>{{ row.consumerLag }}</td>

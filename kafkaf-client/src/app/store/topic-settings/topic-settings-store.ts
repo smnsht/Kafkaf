@@ -2,7 +2,6 @@ import { computed, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SectionedDataCollectionStore } from '../sectioned-collection-store';
 
-
 export interface TopicSettingRow {
   name: string;
   value: string;
@@ -43,7 +42,7 @@ export class TopicSettingsStore extends SectionedDataCollectionStore<TopicSettin
     const noticeHandler = this.withNoticeHandling(() => `Setting ${model.name} updated.`);
     const payload = {
       ...model,
-      value: String(model.value)
+      value: String(model.value),
     };
 
     return this.http.patch<void>(url, payload).pipe(noticeHandler);

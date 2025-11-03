@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
-import { ClustersStore } from '@app/store/clusters/clusters.service';
+import { ClustersStore } from '@app/store/clusters/clusters-store';
 
 interface Stats {
   online: number;

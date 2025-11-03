@@ -1,11 +1,11 @@
 export interface ConsumerGroupPartitionRow {
-    topic: string;
-    partition: number;
-    currentOffset?: number;
-    endOffset?: number;
-    consumerLag: number;
-    consumerId?: string;
-    host?: string;
+  topic: string;
+  partition: number;
+  currentOffset?: number;
+  endOffset?: number;
+  consumerLag: number;
+  consumerId?: string;
+  host?: string;
 }
 
 export interface ConsumerGroupRow {
@@ -15,5 +15,5 @@ export interface ConsumerGroupRow {
   consumerLag: number;
   coordinator: number;
   state: string;
-  partitions: ConsumerGroupPartitionRow[]
+  partitions: ConsumerGroupPartitionRow[];
 }

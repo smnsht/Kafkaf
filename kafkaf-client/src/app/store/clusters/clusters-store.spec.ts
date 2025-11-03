@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { ClustersStore } from './clusters.service';
+import { ClustersStore } from './clusters-store';
 
 describe('ClustersStore', () => {
   let service: ClustersStore;

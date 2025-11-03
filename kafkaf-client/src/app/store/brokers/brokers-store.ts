@@ -1,7 +1,7 @@
 import { computed, Injectable, OnDestroy } from '@angular/core';
-import { BrokerInfoRow } from './broker-info-row.model';
 import { ClusteredDataCollectionStore } from '../clustered-collection-store';
 import { Observable } from 'rxjs';
+import { BrokerInfoRow } from '@app/models/broker.models';
 
 @Injectable({
   providedIn: 'root',

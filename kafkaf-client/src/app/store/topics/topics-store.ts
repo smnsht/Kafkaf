@@ -1,12 +1,14 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { environment } from 'environments/environment';
-import { TopicsListViewModel } from './topics-list-view.model';
-import { CreateTopicModel } from './create-topic.model';
-import { RecreateTopicModel } from './recreate-topic.model';
 import { ClusteredDataCollectionStore } from '../clustered-collection-store';
 import { HttpTopicsService } from '@app/services/http-topics/http-topics';
-import { UpdateTopicModel } from '../topic-detais/update-topic.model';
+import {
+  CreateTopicModel,
+  RecreateTopicModel,
+  TopicsListViewModel,
+  UpdateTopicModel,
+} from '../../models/topic.models';
 
 @Injectable({
   providedIn: 'root',

@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { BulmaField } from '@app/components/shared/bulma-field/bulma-field';
-import { DdlCleanupPolicy } from "../ddl-cleanup-policy/ddl-cleanup-policy";
+import { DdlCleanupPolicy } from '../ddl-cleanup-policy/ddl-cleanup-policy';
 
 @Component({
   selector: 'app-topic-form',

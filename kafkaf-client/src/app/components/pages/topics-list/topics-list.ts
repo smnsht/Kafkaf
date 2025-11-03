@@ -5,9 +5,9 @@ import { TopicsDropdownMenu } from '@app/components/features/topics-dropdown-men
 import { DropdownMenuEvent } from '@app/components/shared/dropdown-menu/dropdown-menu';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
+import { TopicsListViewModel } from '@app/models/topic.models';
 import { ConfirmationService } from '@app/services/confirmation/confirmation';
 import { HttpTopicsService } from '@app/services/http-topics/http-topics';
-import { TopicsListViewModel } from '@app/store/topics/topics-list-view.model';
 import { TopicsStore } from '@app/store/topics/topics-store';
 import { filter, concatMap } from 'rxjs';
 
@@ -53,9 +53,7 @@ export class TopicsList implements OnInit {
   });
 
   ngOnInit(): void {
-    this.store.clusterIdx$
-      .pipe(filter(Number.isInteger))
-      .subscribe((_) => this.store.loadTopics());
+    this.store.clusterIdx$.pipe(filter(Number.isInteger)).subscribe((_) => this.store.loadTopics());
   }
 
   onCheckboxChange(value: string, isChecked: boolean) {

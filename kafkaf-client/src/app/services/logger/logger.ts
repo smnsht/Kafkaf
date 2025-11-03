@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from "@angular/common/http";
+import { HttpErrorResponse } from '@angular/common/http';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export enum LogLevel {

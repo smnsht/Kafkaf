@@ -69,11 +69,9 @@ export class TopicDetails implements OnInit {
           break;
 
         case 'ClearMessages':
-          this.topicsStore
-            .purgeMessages([topic.name])
-            .subscribe(() => {
-              this.overviewStore.reloadTopicDetails();
-            });
+          this.topicsStore.purgeMessages([topic.name]).subscribe(() => {
+            this.overviewStore.reloadTopicDetails();
+          });
           break;
 
         case 'RecreateTopic':

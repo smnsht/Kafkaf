@@ -3,10 +3,9 @@ import { Router } from '@angular/router';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
-import { BrokerInfoRow } from '@app/store/brokers/broker-info-row.model';
-import { BrokersStore } from '@app/store/brokers/brokers.service';
-import { ClusterInfo } from '@app/store/clusters/cluster-info.model';
-import { ClustersStore } from '@app/store/clusters/clusters.service';
+import { BrokerInfoRow } from '@app/models/broker.models';
+import { BrokersStore } from '@app/store/brokers/brokers-store';
+import { ClusterInfo, ClustersStore } from '@app/store/clusters/clusters-store';
 
 @Component({
   selector: 'page-brokers-list',

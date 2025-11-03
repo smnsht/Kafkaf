@@ -1,12 +1,7 @@
 import { computed, Injectable } from '@angular/core';
 import { ClusteredDataCollectionStore } from '../clustered-collection-store';
 import { Observable } from 'rxjs';
-
-export interface TopicConfigRow {
-  key: string;
-  type: string;
-  defaultValue: string;
-}
+import { TopicConfigRow } from '@app/models/topic.models';
 
 @Injectable({
   providedIn: 'root',

@@ -16,7 +16,7 @@ export const DefaultTopicCleanupPolicy: TopicCleanupPolicy = 'delete';
     },
   ],
   templateUrl: './ddl-cleanup-policy.html',
-  styleUrl: './ddl-cleanup-policy.scss'
+  styleUrl: './ddl-cleanup-policy.scss',
 })
 export class DdlCleanupPolicy implements ControlValueAccessor {
   readonly id = input('cleanupPolicy');

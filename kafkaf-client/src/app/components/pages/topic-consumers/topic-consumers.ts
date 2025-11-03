@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { Search } from '@app/components/shared/search/search/search';
 import { KafkafTableDirective } from '@app/directives/kafkaf-table/kafkaf-table';
-import { ConsumersStore } from '@app/store/consumers/consumers.service';
+import { ConsumersStore } from '@app/store/consumers/consumers-store';
 
 @Component({
   selector: 'app-topic-consumers',

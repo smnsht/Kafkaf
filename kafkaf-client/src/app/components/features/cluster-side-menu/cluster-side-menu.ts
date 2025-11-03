@@ -1,7 +1,7 @@
 import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { tKafkaSection } from '@app/store/clusters/cluster-info.model';
-import { RootStore } from '@app/store/root/root.service';
+import { tKafkaSection } from '@app/store/clusters/clusters-store';
+import { RootStore } from '@app/store/root/root-store';
 
 @Component({
   selector: 'app-cluster-side-menu',

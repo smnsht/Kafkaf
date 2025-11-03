@@ -2,10 +2,9 @@ import { Component, computed, inject, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { PageWrapper } from '@app/components/shared/page-wrapper/page-wrapper';
 import { StatsCard, StatsCardItem } from '@app/components/shared/stats-card/stats-card';
-import { BrokerConfigRow } from '@app/store/broker-details/broker-config-row.model';
-import { BrokerDetailsStore } from '@app/store/broker-details/broker-details.service';
-import { BrokerInfoRow } from '@app/store/brokers/broker-info-row.model';
-import { BrokersStore } from '@app/store/brokers/brokers.service';
+import { BrokerInfoRow, BrokerConfigRow } from '@app/models/broker.models';
+import { BrokerDetailsStore } from '@app/store/broker-details/broker-details-store';
+import { BrokersStore } from '@app/store/brokers/brokers-store';
 
 type BrokerTabs = 'BrokerLogDirectories' | 'BrokerConfigs' | 'BrokerMetrics';
 

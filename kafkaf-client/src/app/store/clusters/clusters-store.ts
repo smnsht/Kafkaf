@@ -1,8 +1,25 @@
 import { computed, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
-import { ClusterInfo } from './cluster-info.model';
 import { BaseCollectionStore } from '../base-collection-store';
+
+export type tKafkaSection = 'brokers' | 'topics' | 'consumers' | null;
+export type MaybeString = string | null | undefined;
+
+export interface ClusterInfo {
+  alias: string;
+  brokerCount: number;
+  totalPartitionCount: number;
+  onlinePartitionCount: number;
+  underReplicatedPartitionsCount: number;
+  totalReplicasCount: number;
+  inSyncReplicasCount: number;
+  topicCount: number;
+  originatingBrokerName?: string;
+  originatingBrokerId: number;
+  isOffline: boolean;
+  error?: string;
+}
 
 @Injectable({
   providedIn: 'root',

@@ -26,39 +26,43 @@
     <div class="column">Consumer Lag</div>
   </div>
 
-  @for (partition of partitions(); track $index) {
-    <details class="m-3 p-2 has-background-light">
-      <summary>
-        <div class="columns">
-          <div class="column">{{ partition.topic }}</div>
-          <div class="column">{{ partition.consumerLag }}</div>
-        </div>
-      </summary>
+  @let rows = partitions();
 
-      <table appKafkafTable>
-        <thead>
-          <tr>
-            <th>Partition</th>
-            <th>Consumer ID</th>
-            <th>Host</th>
-            <th>Consumer Lag</th>
-            <th>Current Offset</th>
-            <th>End offset</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (row of partitions(); track $index) {
+  @if (rows && rows.length > 0) {
+    @for (partition of rows; track $index) {
+      <details class="m-3 p-2 has-background-light">
+        <summary>
+          <div class="columns">
+            <div class="column">{{ partition.topic }}</div>
+            <div class="column">{{ partition.consumerLag }}</div>
+          </div>
+        </summary>
+
+        <table appKafkafTable>
+          <thead>
             <tr>
-              <td>{{ row.partition }}</td>
-              <td>{{ row.consumerId }}</td>
-              <td>{{ row.host }}</td>
-              <td>{{ row.consumerLag }}</td>
-              <td>{{ row.currentOffset }}</td>
-              <td>{{ row.endOffset }}</td>
+              <th>Partition</th>
+              <th>Consumer ID</th>
+              <th>Host</th>
+              <th>Consumer Lag</th>
+              <th>Current Offset</th>
+              <th>End offset</th>
             </tr>
-          }
-        </tbody>
-      </table>
-    </details>
+          </thead>
+          <tbody>
+            @for (row of partitions(); track $index) {
+              <tr>
+                <td>{{ row.partition }}</td>
+                <td>{{ row.consumerId }}</td>
+                <td>{{ row.host }}</td>
+                <td>{{ row.consumerLag }}</td>
+                <td>{{ row.currentOffset }}</td>
+                <td>{{ row.endOffset }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </details>
+    }
   }
 </app-page-wrapper>

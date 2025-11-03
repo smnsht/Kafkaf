@@ -1,4 +1,3 @@
-
 summary {
   display: flex;
   align-items: center;
@@ -12,7 +11,7 @@ summary::-webkit-details-marker {
 
 /* custom marker */
 summary::before {
-  content: "▶"; /* closed state arrow */
+  content: '▶'; /* closed state arrow */
   margin-right: 0.5em;
   transition: transform 0.2s ease;
 }
@@ -23,6 +22,6 @@ details[open] summary::before {
 }
 
 summary .columns {
-  flex: 1;       /* allow it to grow and fill remaining space */
-  min-width: 0;  /* prevent overflow issues in flexbox */
+  flex: 1; /* allow it to grow and fill remaining space */
+  min-width: 0; /* prevent overflow issues in flexbox */
 }

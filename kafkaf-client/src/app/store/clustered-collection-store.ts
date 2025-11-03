@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable, startWith, pairwise } from 'rxjs';
 import { BaseCollectionState, BaseCollectionStore } from './base-collection-store';
 import { computed, effect, inject } from '@angular/core';
-import { RootStore } from './root/root.service';
+import { RootStore } from './root/root-store';
 import { environment } from 'environments/environment';
 
 export abstract class ClusteredDataCollectionStore<T> extends BaseCollectionStore<T> {

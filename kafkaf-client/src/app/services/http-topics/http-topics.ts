@@ -1,9 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import {
+  RecreateTopicModel,
+  TopicsListViewModel,
+  CreateTopicModel,
+} from '@app/models/topic.models';
 import { TopicSettingRow } from '@app/store/topic-settings/topic-settings-store';
-import { CreateTopicModel } from '@app/store/topics/create-topic.model';
-import { RecreateTopicModel } from '@app/store/topics/recreate-topic.model';
-import { TopicsListViewModel } from '@app/store/topics/topics-list-view.model';
 import { environment } from 'environments/environment';
 import { forkJoin, map, Observable } from 'rxjs';
 
@@ -79,5 +81,4 @@ export class HttpTopicsService {
 
     return forkJoin(requests$);
   }
-
 }

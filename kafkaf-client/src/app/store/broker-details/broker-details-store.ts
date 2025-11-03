@@ -1,7 +1,7 @@
 import { computed, Injectable } from '@angular/core';
-import { BrokerConfigRow } from './broker-config-row.model';
 import { Observable } from 'rxjs';
 import { SectionedDataCollectionStore } from '../sectioned-collection-store';
+import { BrokerConfigRow } from '@app/models/broker.models';
 
 @Injectable({ providedIn: 'root' })
 export class BrokerDetailsStore extends SectionedDataCollectionStore<BrokerConfigRow> {
