@@ -68,9 +68,24 @@ public class ClustersController : ControllerBase
     [HttpGet("{clusterIdx:clusterIndex}/consumers")]
     public async Task<IEnumerable<ConsumerGroupRow>> GetConsumersAsync(
         [FromRoute] int clusterIdx,
-        [FromServices] ConsumerGroupRowBuilder builder,
-        CancellationToken cancellationToken
-    ) => await builder.BuildAsync(clusterIdx, cancellationToken, row => row);
+        [FromServices] IConsumersService consumersService,
+        [FromServices] IWatermarkOffsetsService watermarksService,
+        CancellationToken ct
+    )
+    {
+        var groups = await consumersService.GetConsumersAsync(clusterIdx, ct);
+
+        var allPartitions = groups.SelectMany(g => g.Offsets.Keys).Distinct().ToList();
+
+        var watermarkResults = watermarksService.GetWatermarkOffsets(
+            clusterIdx,
+            allPartitions
+        );
+
+        return groups
+            .Select(g => ConsumerGroupRow.FromConsumerGroupInfo(g, watermarkResults))
+            .Where(r => r != null)!;
+    }
 
     /// <summary>
     /// GET api/clusters/{cluserIdx}/brokers

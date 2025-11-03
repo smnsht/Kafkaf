@@ -140,32 +140,5 @@ public class TopicController : ControllerBase
 
         await svc.UpdatePartialAsync(ClusterIdx, TopicName, model);
         return NoContent();
-    }
-
-    /// <summary>
-    /// GET api/clusters/{clusterIdx}/topics/{topicName}/consumers
-    /// </summary>
-    /// <param name="builder"></param>
-    /// <returns></returns>
-    [HttpGet("consumers")]
-    public async Task<IEnumerable<ConsumerGroupRow>> GetTopicConsumersAsync(
-        [FromServices] ConsumerGroupRowBuilder builder,
-		CancellationToken cancellationToken
-    ) =>
-        await builder.BuildAsync(
-            ClusterIdx,
-			cancellationToken,
-            row =>
-            {
-                var filtered = row with
-                {
-                    Partitions = row
-                        .Partitions.Where(p =>
-                            p.Topic.Equals(TopicName, StringComparison.OrdinalIgnoreCase)
-                        )
-                        .ToList(),
-                };
-                return filtered.Partitions.Any() ? filtered : null;
-            }
-        );
+    }    
 }
