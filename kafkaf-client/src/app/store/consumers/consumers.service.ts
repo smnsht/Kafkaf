@@ -3,10 +3,11 @@ import { ConsumerGroupRow } from './consumer-group-row.model';
 import { Observable } from 'rxjs';
 import { ClusteredDataCollectionStore } from '../clustered-collection-store';
 
-
 @Injectable({ providedIn: 'root' })
-export class ConsumersStore extends ClusteredDataCollectionStore<ConsumerGroupRow> implements OnDestroy {
-
+export class ConsumersStore
+  extends ClusteredDataCollectionStore<ConsumerGroupRow>
+  implements OnDestroy
+{
   constructor() {
     super({});
   }

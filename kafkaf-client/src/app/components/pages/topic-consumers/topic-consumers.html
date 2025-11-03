@@ -14,9 +14,13 @@
     <tbody>
       @for (consumer of consumers(); track $index) {
         <tr>
-          <td>{{ consumer.groupId }}</td>
-          <td>{{ consumer.activeConsumers }}</td>
-          <td>TODO</td>
+          <td>
+            <a [routerLink]="['/clusters', cluster(), 'consumers', consumer.groupId]">{{
+              consumer.groupId
+            }}</a>
+          </td>
+          <td>{{ consumer.numberOfMembers }}</td>
+          <td>{{ consumer.consumerLag }}</td>
           <td>{{ consumer.coordinator }}</td>
           <td>{{ consumer.state }}</td>
         </tr>
