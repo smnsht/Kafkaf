@@ -93,13 +93,22 @@ namespace Kafkaf.API
 						return sb.ToString();
 					}
 				);
-			}			
+			}
 
 			app.UseCors("dev");
 
-			app.UseAuthorization();
+			// TODO:  app.UseDefaultFiles() && app.UseStaticFiles() required only in dev docker, to serve Angular assets
+			// should add this feature conditionally
 
-			app.MapControllers();
+			// Enable default file mapping (index.html, default.html, etc.)
+			app.UseDefaultFiles();
+
+			// Enable serving static files (from wwwroot by default)
+			app.UseStaticFiles();
+
+			//app.UseAuthorization();
+
+			app.MapControllers();			
 
 			app.Run();
 		}
