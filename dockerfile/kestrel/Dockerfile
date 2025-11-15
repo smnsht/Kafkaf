@@ -36,5 +36,7 @@ RUN chown -R kafkaf:kafkaf /app/api
 # Switch to non-root user
 USER kafkaf
 
+ENV USE_STATIC_FILES=true
+
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "Kafkaf.API.dll"]
