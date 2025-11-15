@@ -14,6 +14,8 @@ export class TopicsDropdownMenu extends DropdownMenu {
   topicName = input<string>();
   disabled = input<boolean>(false);
   showEditSettings = input(false);
+  showRecreateTopic = input(true);
+  showRemoveTopic = input(true);
 
   constructor() {
     super();

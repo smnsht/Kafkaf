@@ -1,4 +1,4 @@
-<app-page-wrapper [state]="store.pageState()">
+<app-page-wrapper [state]="topicOverviewStore.pageState()">
   <app-stats-card [cardItems]="cardItems()" />
 
   <table appKafkafTable>
@@ -13,14 +13,22 @@
       </tr>
     </thead>
     <tbody>
-      @for (row of store.partitions(); track $index) {
+      @for (row of topicOverviewStore.partitions(); track $index) {
         <tr>
           <td>{{ row.partition }}</td>
           <td>{{ row.replicas.length }}</td>
           <td>{{ row.offsetMin }}</td>
           <td>{{ row.offsetMax }}</td>
           <td>{{ row.messagesCount }}</td>
-          <td>&nbsp;</td>
+          <td>
+            <topics-dropdown-menu
+              [topicName]="topicName()"
+              [disabled]="row.messagesCount === 0"
+              [showRecreateTopic]="false"
+              [showRemoveTopic]="false"
+              (commandSelected)="onCommandSelected($event, row)"
+            />
+          </td>
         </tr>
       }
     </tbody>

@@ -41,7 +41,7 @@ export class HttpTopicsService {
           customParameters: [],
         };
 
-        for(const setting of settings){
+        for (const setting of settings) {
           switch (setting.name) {
             case 'cleanup.policy':
               queryParams.cleanupPolicy = setting.value;
