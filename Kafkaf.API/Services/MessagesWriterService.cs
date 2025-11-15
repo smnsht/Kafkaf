@@ -15,7 +15,8 @@ public interface IMessagesWriterService
     );
     Task<List<DeleteRecordsResult>> TruncateMessagesAsync(
         int clusterIdx,
-        TopicDescription topicDescription
+        TopicDescription topicDescription,
+		int? partition
     );
 }
 
@@ -64,11 +65,14 @@ public class MessagesWriterService : IMessagesWriterService
     /// </summary>
     public async Task<List<DeleteRecordsResult>> TruncateMessagesAsync(
         int clusterIdx,
-        TopicDescription topicDescription
+        TopicDescription topicDescription,
+		int? partition
     )
-    {
-        // Extract the partition IDs from the topic metadata
-        var partitions = topicDescription.Partitions.Select(td => td.Partition).ToArray();
+    {        
+        var partitions = partition.HasValue
+			? [partition.Value]
+			// Extract the partition IDs from the topic metadata
+			: topicDescription.Partitions.Select(td => td.Partition).ToArray();
 
         // Query the current watermark offsets (low/high) for each partition
         var watermarks = _watermarkOffsetsService.GetWatermarkOffsets(

@@ -71,7 +71,7 @@ public class TopicDetailsViewModel
     {
         Name = desc.Name;
         Internal = desc.IsInternal;
-        PartitionCount = desc.Partitions.Count;
+        PartitionCount = desc.Partitions.Count;		
 
         // Replication factor: same for all partitions, so take from the first
         ReplicationFactor = desc.Partitions.FirstOrDefault()?.Replicas.Count ?? 0;
@@ -104,5 +104,7 @@ public class TopicDetailsViewModel
                 return new PartitionInfo(p, offsetMin: offsetMin, offsetMax: offsetMax);
             })
             .ToArray();
-    }
+
+		MessageCount = Partitions.Sum(p => p.MessagesCount);
+	}
 }

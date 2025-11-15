@@ -21,14 +21,21 @@
     <i class="dropdown-item is-size-7"
       >Clearing messages is only allowed for topics with DELETE policy</i
     >
-    <a
-      href=""
-      (click)="onCommandClick($event, 'RecreateTopic')"
-      class="dropdown-item has-text-danger"
-      >Recreate Topic</a
-    >
-    <a href="" (click)="onCommandClick($event, 'RemoveTopic')" class="dropdown-item has-text-danger"
-      >Remove Topic</a
-    >
+    @if (showRecreateTopic()) {
+      <a
+        href=""
+        (click)="onCommandClick($event, 'RecreateTopic')"
+        class="dropdown-item has-text-danger"
+        >Recreate Topic</a
+      >
+    }
+    @if (showRemoveTopic()) {
+      <a
+        href=""
+        (click)="onCommandClick($event, 'RemoveTopic')"
+        class="dropdown-item has-text-danger"
+        >Remove Topic</a
+      >
+    }
   </app-dropdown-menu>
 }

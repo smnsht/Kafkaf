@@ -1,0 +1,26 @@
+# Node / Angular
+kafkaf-client/node_modules
+kafkaf-client/dist
+
+# .NET build artifacts
+Kafkaf.API/bin
+Kafkaf.API/obj
+
+# OS / IDE files
+*.swp
+*.log
+*.tmp
+.vscode
+.idea
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+dockerfile/
+.dockerignore
+
+# Environment / secrets
+.env

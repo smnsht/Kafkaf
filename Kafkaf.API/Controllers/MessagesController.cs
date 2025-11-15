@@ -87,27 +87,31 @@ public class MessagesController : ControllerBase
         return Ok(dr);
     }
 
-	/// <summary>
-	/// DELETE api/clusters/{clusterIdx}/topics/{topicName}/messages
-	/// </summary>
-	/// <param name="clusterIdx"></param>
-	/// <param name="topicName"></param>
-	/// <param name="topicsService"></param>
-	/// <param name="messagesWriterService"></param>
-	/// <param name="ct"></param>
-	/// <returns></returns>
-	[HttpDelete]
+    /// <summary>
+    /// DELETE api/clusters/{clusterIdx}/topics/{topicName}/messages
+    /// </summary>
+    /// <param name="clusterIdx"></param>
+    /// <param name="topicName"></param>
+    /// <param name="topicsService"></param>
+    /// <param name="messagesWriterService"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
+    [HttpDelete]
     public async Task<ActionResult<int>> PurgeMessagesAsync(
         [FromRoute] int clusterIdx,
         [FromRoute] string topicName,
-		[FromServices] ITopicsService topicsService,
-		[FromServices] IMessagesWriterService messagesWriterService        
+        [FromQuery] int? partition,
+        [FromServices] ITopicsService topicsService,
+        [FromServices] IMessagesWriterService messagesWriterService
     )
     {
-		var td = await topicsService.DescribeTopicsAsync(clusterIdx, topicName);
-		var results = await messagesWriterService.TruncateMessagesAsync(clusterIdx, td);
-        
-		
+        var td = await topicsService.DescribeTopicsAsync(clusterIdx, topicName);
+        var results = await messagesWriterService.TruncateMessagesAsync(
+            clusterIdx,
+            td,
+            partition
+        );
+
         return Ok(results.Count);
     }
 }
