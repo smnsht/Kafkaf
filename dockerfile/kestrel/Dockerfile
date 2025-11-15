@@ -2,7 +2,7 @@
 FROM node:lts-alpine AS angular-build
 WORKDIR /app/kafkaf-client
 COPY kafkaf-client/package.json kafkaf-client/package-lock.json ./
-RUN npm install
+RUN npm install --ignore-scripts
 COPY kafkaf-client/ .
 RUN npm run build
 
